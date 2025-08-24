@@ -157,7 +157,7 @@ export default function ActivityDetailPage() {
                 </div>
                 <CardTitle className="text-3xl font-headline text-primary">{activity.activityName}</CardTitle>
              </div>
-            <CardDescription className="text-base text-foreground/80">{activity.learningObjective}</CardDescription>
+            <CardDescription className="text-base text-foreground/80 whitespace-pre-line">{activity.learningObjective}</CardDescription>
           </CardHeader>
           <CardContent className="p-6 space-y-8">
             <div>

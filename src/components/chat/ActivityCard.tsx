@@ -20,13 +20,13 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity }) => {
           <ActivityIcon className="h-6 w-6 text-primary" />
           <CardTitle className="text-lg font-headline text-primary truncate">{activity.activityName}</CardTitle>
         </div>
-        <CardDescription className="text-sm text-muted-foreground line-clamp-3 h-[3.75rem]">
+        <CardDescription className="text-sm text-muted-foreground line-clamp-3 h-[3.75rem] whitespace-pre-line">
           <strong>Objetivo:</strong> {activity.learningObjective}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="text-xs text-muted-foreground space-y-1">
-            <p className="line-clamp-2"><strong>Materiales:</strong> {activity.materials}</p>
+            <p className="line-clamp-2 whitespace-pre-line"><strong>Materiales:</strong> {activity.materials}</p>
         </div>
       </CardContent>
       <CardFooter>
