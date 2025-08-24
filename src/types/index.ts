@@ -36,8 +36,13 @@ export interface LessonParams {
 }
 
 export const subjectAreas = [
-  "Matemáticas", "Ciencias", "Lengua y Literatura", "Ciencias Sociales", 
-  "Artes", "Educación Física", "Tecnología", "Ingeniería", "Otro"
+  "Matemáticas",
+  "Tecnología e Informática",
+  "Ciencias Naturales",
+  "Lengua Castellana",
+  "Ciencias Sociales",
+  "Educación Artística",
+  "Educación Física"
 ];
 
 export const gradeLevels = [
@@ -47,11 +52,10 @@ export const gradeLevels = [
 ];
 
 export const computationalConcepts = [
-  "Algoritmos",
   "Descomposición",
-  "Reconocimiento de Patrones",
+  "Reconocimiento de patrones",
   "Abstracción",
-  "Pensamiento Lógico",
-  "Depuración",
+  "Algoritmos",
   "Todos los conceptos"
 ];
+
