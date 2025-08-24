@@ -24,8 +24,8 @@ const EducationalActivitySchema = z.object({
   activityName: z.string().describe('Un nombre detallado para la actividad desconectada.'),
   learningObjective: z.string().describe('Un objetivo de aprendizaje claro y medible.'),
   materials: z.string().describe('Una lista de materiales simples y accesibles (no electrónicos).'),
-  instructions: z.string().describe('Instrucciones detalladas paso a paso para el docente y los estudiantes.'),
-  reflectionQuestion: z.string().describe('Una pregunta o tema para la reflexión y el cierre pedagógico de la actividad.'),
+  instructions: z.string().describe('Instrucciones detalladas y numeradas (paso a paso) para el docente y los estudiantes.'),
+  reflectionQuestion: z.string().describe('Una explicación de cómo la actividad evidencia el concepto de pensamiento computacional y una pregunta o tema para la reflexión y el cierre pedagógico de la actividad.'),
 });
 
 const GenerateEducationalActivitiesOutputSchema = z.array(EducationalActivitySchema).length(3).describe('Tres actividades desconectadas y detalladas.');
@@ -61,8 +61,10 @@ Asegúrate de que cada actividad generada cumpla estrictamente con la siguiente 
 - **Nombre de la actividad:** Un título claro y descriptivo.
 - **Objetivo de aprendizaje:** Un objetivo pedagógico preciso.
 - **Materiales necesarios:** Lista de elementos sencillos y no electrónicos.
-- **Instrucciones paso a paso:** Una guía detallada para que el docente pueda implementar la actividad.
-- **Reflexión o cierre:** Una pregunta o dinámica para consolidar el aprendizaje.
+- **Instrucciones paso a paso:** Una guía detallada y **numerada** para que el docente pueda implementar la actividad de forma organizada.
+- **Reflexión y Conexión:** Este apartado debe tener dos partes claras:
+    1.  **Conexión con el Pensamiento Computacional:** Explica detalladamente cómo la dinámica de la actividad evidencia y permite comprender el concepto clave solicitado (ej. "En esta actividad, la descomposición se manifiesta cuando los estudiantes dividen el problema grande de... en las siguientes subtareas...").
+    2.  **Cierre Pedagógico:** Propón una pregunta o dinámica final para consolidar el aprendizaje y la reflexión de los estudiantes.
 
 La salida debe ser un JSON array con tres objetos, donde cada objeto representa una actividad y contiene los campos: activityName, learningObjective, materials, instructions, y reflectionQuestion.
   `,
