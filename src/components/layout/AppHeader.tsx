@@ -60,7 +60,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ page, lessonParams, onRese
           className="transition-transform duration-300 hover:scale-110"
         />
         <div>
-          <h1 className="text-sm font-bold text-foreground/80">
+           <h1 className="text-xl font-bold uppercase animate-background-shine bg-[linear-gradient(110deg,#939393,45%,#1e293b,55%,#939393)] bg-[length:250%_100%] bg-clip-text text-transparent">
             IE Alfonso Spath Spath
           </h1>
           <h2 className="text-xl font-headline text-primary">
