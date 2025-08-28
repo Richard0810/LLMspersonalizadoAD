@@ -4,25 +4,19 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Lightbulb, Users, Bot, ArrowRight, BookOpenCheck, Brain, GraduationCap } from 'lucide-react';
-import { Bar, BarChart, Pie, PieChart, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
+import { Lightbulb, Users, Bot, ArrowRight, BookOpenCheck, Brain, GraduationCap, Target, Rocket, Handshake, Globe } from 'lucide-react';
+import { Pie, PieChart } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 
 const InfoCard = ({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) => (
     <div className="flex items-start gap-4">
-        <div className="flex-shrink-0">{icon}</div>
+        <div className="flex-shrink-0 text-primary">{icon}</div>
         <div>
             <h4 className="font-semibold text-foreground">{title}</h4>
-            <p className="text-muted-foreground">{description}</p>
+            <p className="text-sm text-muted-foreground">{description}</p>
         </div>
     </div>
 );
-
-const objectiveData = [
-  { metric: 'Innovación', value: 85, fill: 'hsl(var(--chart-1))' },
-  { metric: 'Apoyo', value: 92, fill: 'hsl(var(--chart-2))' },
-  { metric: 'Acceso', value: 78, fill: 'hsl(var(--chart-3))' },
-];
 
 const audienceData = [
   { name: 'Doc. Tecnología', value: 70, fill: 'hsl(var(--chart-1))' },
@@ -31,21 +25,6 @@ const audienceData = [
 ];
 
 const chartConfig = {
-  value: {
-    label: "Valor",
-  },
-  Innovación: {
-    label: "Innovación Didáctica",
-    color: "hsl(var(--chart-1))",
-  },
-  Apoyo: {
-    label: "Apoyo Docente",
-    color: "hsl(var(--chart-2))",
-  },
-  Acceso: {
-    label: "Acceso Equitativo",
-    color: "hsl(var(--chart-3))",
-  },
    'Doc. Tecnología': {
     label: 'Docentes de Tecnología',
     color: 'hsl(var(--chart-1))',
@@ -77,7 +56,7 @@ const ProjectInfo = () => {
         <Tabs defaultValue="objective" className="w-full flex-grow flex flex-col">
           <TabsList className="grid w-full grid-cols-3 mb-4">
             <TabsTrigger value="objective">
-                <Lightbulb className="h-4 w-4 mr-1"/> Objetivo
+                <Target className="h-4 w-4 mr-1"/> Objetivo
             </TabsTrigger>
             <TabsTrigger value="audience">
                 <Users className="h-4 w-4 mr-1"/> ¿Para Quién?
@@ -88,25 +67,29 @@ const ProjectInfo = () => {
           </TabsList>
 
           <TabsContent value="objective" className="flex-grow">
-            <div className="space-y-4 h-full flex flex-col justify-around">
-                <ChartContainer config={chartConfig} className="w-full h-[150px]">
-                  <BarChart data={objectiveData} accessibilityLayer>
-                    <CartesianGrid vertical={false} />
-                    <XAxis dataKey="metric" tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => chartConfig[value as keyof typeof chartConfig]?.label.toString().substring(0,3) ?? value} />
-                    <ChartTooltip content={<ChartTooltipContent hideLabel />} />
-                    <Bar dataKey="value" radius={8} />
-                  </BarChart>
-                </ChartContainer>
-                <p className="text-muted-foreground text-center italic">
-                    Nuestra misión es asistir a docentes de tecnología en el diseño de actividades desconectadas que desarrollen el pensamiento computacional, especialmente en contextos con baja o nula conectividad.
-                </p>
+            <div className="space-y-6 h-full flex flex-col justify-around">
+                <InfoCard
+                    icon={<Rocket size={24} />}
+                    title="Innovación Pedagógica"
+                    description="Personalizar un LLM para asesorar a docentes en el diseño de actividades desconectadas que desarrollen el pensamiento computacional."
+                />
+                <InfoCard
+                    icon={<Handshake size={24} />}
+                    title="Apoyo Docente"
+                    description="Analizar y responder a las necesidades de los educadores para crear recursos didácticos efectivos en entornos rurales o sin conectividad."
+                />
+                 <InfoCard
+                    icon={<Globe size={24} />}
+                    title="Acceso Equitativo"
+                    description="Implementar y validar la herramienta en contextos reales para asegurar su efectividad y mejorarla con retroalimentación."
+                />
             </div>
           </TabsContent>
           <TabsContent value="audience" className="flex-grow">
              <div className="space-y-4 h-full flex flex-col justify-around">
                 <ChartContainer config={chartConfig} className="w-full h-[150px]">
                     <PieChart>
-                         <Tooltip content={<ChartTooltipContent hideLabel />} />
+                         <ChartTooltip content={<ChartTooltipContent hideLabel />} />
                         <Pie data={audienceData} dataKey="value" nameKey="name" innerRadius={30} outerRadius={50} />
                     </PieChart>
                 </ChartContainer>
