@@ -12,7 +12,7 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const GenerateEducationalActivitiesInputSchema = z.object({
-  lessonName: z.string().describe('The name of the lesson.'),
+  topicName: z.string().describe('El tema a tratar en la actividad.'),
   computationalConcept: z.string().describe('The key computational thinking concept.'),
   subjectArea: z.string().describe('The subject area or discipline.'),
   gradeLevel: z.string().describe('The grade level for the activities.'),
@@ -51,7 +51,7 @@ Tono: Académico, didáctico y formal.
 **Instrucción Principal:**
 Genera tres actividades desconectadas distintas basadas en la siguiente información. **Todo el contenido debe estar en español.**
 
-- Nombre de la Lección de Referencia: {{{lessonName}}}
+- Tema a Tratar: {{{topicName}}}
 - Concepto de Pensamiento Computacional a Tratar: {{{computationalConcept}}}
 - Área Temática: {{{subjectArea}}}
 - Nivel de Grado: {{{gradeLevel}}}

@@ -53,7 +53,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ page, lessonParams, onRese
       <div className="flex items-center gap-2">
         <Bot className="h-8 w-8 text-primary" />
         <h1 className="text-xl font-headline text-primary">
-          {page === 'chat' ? 'Chat EduSpark AI' : 'Configuración de la Lección'}
+          {page === 'chat' ? 'Chat EduSpark AI' : 'Configuración de Actividad'}
         </h1>
       </div>
       <div className="flex items-center gap-2">
@@ -66,11 +66,11 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ page, lessonParams, onRese
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>Editar Parámetros de Lección</DropdownMenuLabel>
+                <DropdownMenuLabel>Editar Parámetros de Actividad</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => onParameterEdit?.('lessonName')}>
+                <DropdownMenuItem onClick={() => onParameterEdit?.('topicName')}>
                   <BookOpen className="mr-2 h-4 w-4" />
-                  <span>Nombre de Lección</span>
+                  <span>Tema a Tratar</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onParameterEdit?.('computationalConcept')}>
                   <Brain className="mr-2 h-4 w-4" />

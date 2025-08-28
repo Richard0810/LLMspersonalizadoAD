@@ -61,7 +61,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialParams, onResetSet
 
     try {
       const generateInput: GenerateEducationalActivitiesInput = {
-        lessonName: params.lessonName,
+        topicName: params.topicName,
         computationalConcept: params.computationalConcept,
         subjectArea: params.subjectArea,
         gradeLevel: params.gradeLevel,
@@ -103,8 +103,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialParams, onResetSet
     const systemMessage: ChatMessage = {
       id: Date.now().toString(),
       sender: 'system',
-      text: `¡Hola ${user?.username}! Parámetros de la lección establecidos:
-- Lección: ${initialParams.lessonName}
+      text: `¡Hola ${user?.username}! Parámetros de la actividad establecidos:
+- Tema: ${initialParams.topicName}
 - Concepto: ${initialParams.computationalConcept}
 - Área: ${initialParams.subjectArea}
 - Grado: ${initialParams.gradeLevel}
@@ -126,7 +126,7 @@ Generando actividades iniciales...`,
     addMessage({ id: 'loading-consult', sender: 'ai', type: 'loading', timestamp: Date.now(), isLoading: true });
 
     const consultInput: ConsultAIOnLessonInput = {
-      lessonName: currentLessonParams.lessonName,
+      topicName: currentLessonParams.topicName,
       concept: currentLessonParams.computationalConcept,
       area: currentLessonParams.subjectArea,
       grade: currentLessonParams.gradeLevel,
@@ -174,8 +174,8 @@ Generando actividades iniciales...`,
     if (editingField) {
       handleParameterInputChange(editingField, inputValue);
       setEditingField(null);
-    } else if (lowerInputValue.includes('cambiar nombre de lección') || lowerInputValue.includes('cambiar lección')) {
-      editFieldHandler('lessonName');
+    } else if (lowerInputValue.includes('cambiar tema')) {
+      editFieldHandler('topicName');
     } else if (lowerInputValue.includes('cambiar concepto')) {
        editFieldHandler('computationalConcept');
     } else if (lowerInputValue.includes('cambiar área temática') || lowerInputValue.includes('cambiar área')) {
@@ -198,7 +198,7 @@ Generando actividades iniciales...`,
     
     let fieldLabel = '';
     switch(field) {
-      case 'lessonName': fieldLabel = 'Nombre de la lección'; break;
+      case 'topicName': fieldLabel = 'Tema'; break;
       case 'computationalConcept': fieldLabel = 'Concepto computacional'; break;
       case 'subjectArea': fieldLabel = 'Área temática'; break;
       case 'gradeLevel': fieldLabel = 'Nivel de grado'; break;
@@ -227,7 +227,7 @@ Generando actividades iniciales...`,
       addMessage({id: Date.now().toString(), sender: 'system', text: "Por favor, selecciona el nuevo nivel de grado:", lessonParams: currentLessonParams, timestamp: Date.now(), type: 'parameter_select_grade'});
     } else {
       let questionText = `¿Cuál debería ser el nuevo ${field.toLowerCase()}?`;
-      if (field === 'lessonName') questionText = `¿Cuál debería ser el nuevo nombre de la lección?`;
+      if (field === 'topicName') questionText = `¿Cuál debería ser el nuevo tema?`;
       else if (field === 'computationalConcept') questionText = `¿Cuál debería ser el nuevo concepto computacional?`;
       
       addMessage({ id: Date.now().toString(), sender: 'system', text: questionText, timestamp: Date.now(), type: 'text' });
@@ -281,7 +281,7 @@ Generando actividades iniciales...`,
             ref={inputRef}
             type="text"
             placeholder={editingField ? 
-              (editingField === 'lessonName' ? 'Ingresa el nuevo nombre de lección...' : 
+              (editingField === 'topicName' ? 'Ingresa el nuevo tema...' : 
                editingField === 'computationalConcept' ? 'Ingresa el nuevo concepto computacional...' : 
                `Ingresa nuevo ${editingField.toLowerCase()}...`) 
               : "Escribe tu mensaje o un comando..."}
@@ -297,7 +297,7 @@ Generando actividades iniciales...`,
           </Button>
         </div>
          <p className="text-xs text-muted-foreground mt-1">
-          Puedes decir: "cambiar nombre de lección", "generar nuevas actividades", o hacer cualquier pregunta.
+          Puedes decir: "cambiar tema", "generar nuevas actividades", o hacer cualquier pregunta.
         </p>
       </footer>
 

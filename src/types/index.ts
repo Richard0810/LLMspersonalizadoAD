@@ -29,7 +29,7 @@ export interface ChatMessage {
 }
 
 export interface LessonParams {
-  lessonName: string;
+  topicName: string;
   computationalConcept: string;
   subjectArea: string;
   gradeLevel: string;
@@ -61,5 +61,6 @@ export const computationalConcepts = [
   "Algoritmos",
   "Todos los conceptos"
 ];
+
 
 

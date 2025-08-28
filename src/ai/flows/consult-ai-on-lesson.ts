@@ -13,7 +13,7 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const ConsultAIOnLessonInputSchema = z.object({
-  lessonName: z.string().describe('The name of the current lesson.'),
+  topicName: z.string().describe('The name of the current lesson topic.'),
   concept: z.string().describe('The key computational thinking concept for the lesson.'),
   area: z.string().describe('The subject area of the lesson.'),
   grade: z.string().describe('The grade level of the lesson.'),
@@ -38,8 +38,8 @@ const prompt = ai.definePrompt({
 
 You will answer questions related to the current lesson, or general questions about computational thinking and offline activities.
 
-Here is information about the current lesson:
-Lesson Name: {{{lessonName}}}
+Here is information about the current lesson context:
+Topic: {{{topicName}}}
 Concept: {{{concept}}}
 Area: {{{area}}}
 Grade: {{{grade}}}

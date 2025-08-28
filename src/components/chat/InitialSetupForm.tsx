@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -17,7 +18,7 @@ interface InitialSetupFormProps {
 }
 
 const InitialSetupForm: React.FC<InitialSetupFormProps> = ({ onSetupComplete }) => {
-  const [lessonName, setLessonName] = useState('');
+  const [topicName, setTopicName] = useState('');
   const [computationalConcept, setComputationalConcept] = useState('');
   const [subjectArea, setSubjectArea] = useState('');
   const [gradeLevel, setGradeLevel] = useState('');
@@ -26,7 +27,7 @@ const InitialSetupForm: React.FC<InitialSetupFormProps> = ({ onSetupComplete }) 
   useEffect(() => {
     const savedParams = getLessonParamsFromLocalStorage();
     if (savedParams) {
-      setLessonName(savedParams.lessonName);
+      setTopicName(savedParams.topicName);
       setComputationalConcept(savedParams.computationalConcept);
       setSubjectArea(savedParams.subjectArea);
       setGradeLevel(savedParams.gradeLevel);
@@ -36,7 +37,7 @@ const InitialSetupForm: React.FC<InitialSetupFormProps> = ({ onSetupComplete }) 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    const params: LessonParams = { lessonName, computationalConcept, subjectArea, gradeLevel };
+    const params: LessonParams = { topicName, computationalConcept, subjectArea, gradeLevel };
     saveLessonParamsToLocalStorage(params);
     onSetupComplete(params);
   };
@@ -47,7 +48,7 @@ const InitialSetupForm: React.FC<InitialSetupFormProps> = ({ onSetupComplete }) 
           <div className="inline-block mx-auto p-3 bg-primary/10 rounded-full mb-4">
              <Lightbulb className="w-10 h-10 text-primary" />
           </div>
-          <CardTitle className="text-3xl font-headline text-primary">Configuración de la Lección</CardTitle>
+          <CardTitle className="text-3xl font-headline text-primary">Configuración de la Actividad</CardTitle>
           <CardDescription className="text-muted-foreground">
             Definamos los conceptos básicos para tus actividades educativas.
           </CardDescription>
@@ -55,17 +56,17 @@ const InitialSetupForm: React.FC<InitialSetupFormProps> = ({ onSetupComplete }) 
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="lessonName" className="flex items-center gap-2"><BookOpenCheck size={18}/>Nombre de la Lección</Label>
+              <Label htmlFor="topicName" className="flex items-center gap-2"><BookOpenCheck size={18}/>Tema a Tratar</Label>
               <Input
-                id="lessonName"
-                value={lessonName}
-                onChange={(e) => setLessonName(e.target.value)}
-                placeholder="Ej: Introducción a los Algoritmos"
+                id="topicName"
+                value={topicName}
+                onChange={(e) => setTopicName(e.target.value)}
+                placeholder="Ej: El ciclo del agua, Suma de fracciones"
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="computationalConcept" className="flex items-center gap-2"><Brain size={18}/>Concepto Computacional Clave</Label>
+              <Label htmlFor="computationalConcept" className="flex items-center gap-2"><Brain size={18}/>Pensamiento Computacional</Label>
               <Select value={computationalConcept} onValueChange={setComputationalConcept} required>
                 <SelectTrigger id="computationalConcept">
                   <SelectValue placeholder="Selecciona un concepto" />
@@ -78,7 +79,7 @@ const InitialSetupForm: React.FC<InitialSetupFormProps> = ({ onSetupComplete }) 
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="subjectArea" className="flex items-center gap-2"><Target size={18}/>Área Temática</Label>
+              <Label htmlFor="subjectArea" className="flex items-center gap-2"><Target size={18}/>Área</Label>
               <Select value={subjectArea} onValueChange={setSubjectArea} required>
                 <SelectTrigger id="subjectArea">
                   <SelectValue placeholder="Selecciona un área temática" />
@@ -103,7 +104,7 @@ const InitialSetupForm: React.FC<InitialSetupFormProps> = ({ onSetupComplete }) 
                 </SelectContent>
               </Select>
             </div>
-            <Button type="submit" className="w-full text-lg py-6" disabled={isLoading || !computationalConcept || !subjectArea || !gradeLevel}>
+            <Button type="submit" className="w-full text-lg py-6" disabled={isLoading || !topicName || !computationalConcept || !subjectArea || !gradeLevel}>
               {isLoading ? 'Guardando...' : 'Comenzar a Generar Actividades'}
             </Button>
           </form>
