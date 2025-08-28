@@ -54,9 +54,9 @@ export default function LoginPage() {
         </div>
       </header>
 
-      <main className="flex flex-col lg:flex-row items-center justify-center w-full gap-8 z-10">
+      <main className="flex flex-col lg:flex-row items-stretch justify-center w-full gap-8 z-10">
         <div className="w-full max-w-md">
-            <Card className="shadow-2xl">
+            <Card className="shadow-2xl h-full">
               <CardHeader className="text-center">
                 <div className="inline-block mx-auto p-3 bg-primary/10 rounded-full mb-4">
                   <LogInIcon className="w-10 h-10 text-primary" />

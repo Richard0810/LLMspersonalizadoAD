@@ -63,7 +63,7 @@ const chartConfig = {
 
 const ProjectInfo = () => {
   return (
-    <Card className="shadow-2xl animate-fade-in w-full">
+    <Card className="shadow-2xl animate-fade-in w-full h-full flex flex-col">
       <CardHeader>
         <CardTitle className="text-2xl font-headline text-primary flex items-center gap-2">
             <Lightbulb className="h-7 w-7" />
@@ -73,8 +73,8 @@ const ProjectInfo = () => {
             Una plataforma para potenciar la enseñanza con Inteligencia Artificial.
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <Tabs defaultValue="objective" className="w-full">
+      <CardContent className="flex-grow flex flex-col">
+        <Tabs defaultValue="objective" className="w-full flex-grow flex flex-col">
           <TabsList className="grid w-full grid-cols-3 mb-4">
             <TabsTrigger value="objective">
                 <Lightbulb className="h-4 w-4 mr-1"/> Objetivo
@@ -87,8 +87,8 @@ const ProjectInfo = () => {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="objective">
-            <div className="space-y-4">
+          <TabsContent value="objective" className="flex-grow">
+            <div className="space-y-4 h-full flex flex-col justify-around">
                 <ChartContainer config={chartConfig} className="w-full h-[150px]">
                   <BarChart data={objectiveData} layout="vertical" margin={{ left: 10 }}>
                     <XAxis type="number" hide />
@@ -102,8 +102,8 @@ const ProjectInfo = () => {
                 </p>
             </div>
           </TabsContent>
-          <TabsContent value="audience">
-             <div className="space-y-4">
+          <TabsContent value="audience" className="flex-grow">
+             <div className="space-y-4 h-full flex flex-col justify-around">
                 <ChartContainer config={chartConfig} className="w-full h-[150px]">
                     <PieChart>
                          <Tooltip content={<ChartTooltipContent hideLabel />} />
@@ -117,8 +117,8 @@ const ProjectInfo = () => {
                 />
             </div>
           </TabsContent>
-          <TabsContent value="what-it-does">
-            <div className="space-y-6 text-center">
+          <TabsContent value="what-it-does" className="flex-grow">
+            <div className="space-y-6 text-center h-full flex flex-col justify-around">
                  <div className="flex items-center justify-center space-x-2 text-muted-foreground font-semibold">
                     <div className="flex flex-col items-center gap-1 p-2 bg-primary/10 rounded-lg">
                         <BookOpenCheck size={24} className="text-primary"/> 
