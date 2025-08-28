@@ -51,7 +51,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ page, lessonParams, onRese
 
   return (
     <header className="flex items-center justify-between p-3 border-b bg-card shadow-sm z-20">
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 bg-gradient-to-r from-green-500 via-white to-red-500 p-2 rounded-md">
         <Image 
           src="/escudo.jpg"
           alt="Escudo Institucional IE Alfonso Spath Spath"
@@ -60,10 +60,10 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ page, lessonParams, onRese
           className="transition-transform duration-300 hover:scale-110"
         />
         <div>
-           <h1 className="text-xl font-bold uppercase animate-background-shine bg-[linear-gradient(110deg,#939393,45%,#1e293b,55%,#939393)] bg-[length:250%_100%] bg-clip-text text-transparent">
+           <h1 className="text-xl font-bold uppercase text-black">
             Institucion Educativa Alfonso Spath Spath
           </h1>
-          <h2 className="text-xl font-headline text-primary">
+          <h2 className="text-xl font-headline text-black">
             {page === 'chat' ? 'Asistente EduSpark AI' : 'Configuración de Actividad'}
           </h2>
         </div>
