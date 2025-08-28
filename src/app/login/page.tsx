@@ -32,86 +32,92 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-transparent p-4 animate-fade-in">
+    <div className="flex flex-col items-center justify-start min-h-screen bg-transparent animate-fade-in">
       <InteractiveBackground />
-      <div className="flex items-center justify-center gap-4 mb-8 z-10 p-4 rounded-lg animate-slide-up bg-gradient-to-r from-green-500 via-white to-red-500">
-          <Image
-            src="/escudo.jpg"
-            alt="Escudo Institucional"
-            width={80}
-            height={80}
-            className="transition-all duration-300 hover:scale-110"
-          />
-          <div className="text-left">
-            <h1 className="text-2xl font-headline font-bold uppercase text-black tracking-wider">
-              Institucion Educativa Alfonso Spath Spath
-            </h1>
-            <p className="text-base text-black/80 font-medium">Martinez- Cereté</p>
-          </div>
-      </div>
-      <Card className="w-full max-w-md shadow-2xl z-10">
-        <CardHeader className="text-center">
-          <div className="inline-block mx-auto p-3 bg-primary/10 rounded-full mb-4">
-            <LogInIcon className="w-10 h-10 text-primary" />
-          </div>
-          <CardTitle className="text-3xl font-headline text-primary">Bienvenido de Nuevo a EduSpark AI</CardTitle>
-          <CardDescription className="text-muted-foreground">
-            Ingresa tus credenciales para acceder a tu cuenta.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="username">Nombre de Usuario</Label>
-              <Input
-                id="username"
-                type="text"
-                placeholder="Ingresa tu nombre de usuario"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-                className="text-base"
-              />
+      
+      <header className="w-full bg-gradient-to-r from-green-500 via-white to-red-500 shadow-md z-10 animate-slide-down-fade">
+        <div className="container mx-auto flex items-center justify-center p-3 gap-3 md:gap-4">
+            <Image
+              src="/escudo.jpg"
+              alt="Escudo Institucional"
+              width={64}
+              height={64}
+              className="transition-all duration-300 hover:scale-110 w-12 h-12 md:w-16 md:h-16"
+            />
+            <div className="text-left">
+              <h1 className="text-base md:text-xl font-headline font-bold uppercase text-black tracking-wider">
+                Institucion Educativa Alfonso Spath Spath
+              </h1>
+              <p className="text-sm md:text-base text-black/80 font-medium">Martinez- Cereté</p>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Contraseña</Label>
-              <div className="relative">
+        </div>
+      </header>
+
+      <main className="flex flex-col items-center justify-center flex-grow w-full p-4">
+        <Card className="w-full max-w-md shadow-2xl z-10">
+          <CardHeader className="text-center">
+            <div className="inline-block mx-auto p-3 bg-primary/10 rounded-full mb-4">
+              <LogInIcon className="w-10 h-10 text-primary" />
+            </div>
+            <CardTitle className="text-3xl font-headline text-primary">Bienvenido de Nuevo a EduSpark AI</CardTitle>
+            <CardDescription className="text-muted-foreground">
+              Ingresa tus credenciales para acceder a tu cuenta.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="username">Nombre de Usuario</Label>
                 <Input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="Ingresa tu contraseña"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  id="username"
+                  type="text"
+                  placeholder="Ingresa tu nombre de usuario"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   required
-                  className="text-base pr-10"
+                  className="text-base"
                 />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-muted-foreground hover:text-foreground"
-                  onClick={() => setShowPassword(!showPassword)}
-                  tabIndex={-1}
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  <span className="sr-only">{showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}</span>
-                </Button>
               </div>
-            </div>
-            <Button type="submit" className="w-full text-lg py-6" disabled={isLoading}>
-              {isLoading ? 'Iniciando Sesión...' : 'Iniciar Sesión'}
-            </Button>
-          </form>
-        </CardContent>
-        <CardFooter className="flex flex-col items-center space-y-2">
-          <p className="text-sm text-muted-foreground">
-            ¿No tienes una cuenta?{' '}
-            <Link href="/register" className="font-medium text-primary hover:underline">
-              Regístrate aquí
-            </Link>
-          </p>
-        </CardFooter>
-      </Card>
+              <div className="space-y-2">
+                <Label htmlFor="password">Contraseña</Label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Ingresa tu contraseña"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="text-base pr-10"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-muted-foreground hover:text-foreground"
+                    onClick={() => setShowPassword(!showPassword)}
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    <span className="sr-only">{showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}</span>
+                  </Button>
+                </div>
+              </div>
+              <Button type="submit" className="w-full text-lg py-6" disabled={isLoading}>
+                {isLoading ? 'Iniciando Sesión...' : 'Iniciar Sesión'}
+              </Button>
+            </form>
+          </CardContent>
+          <CardFooter className="flex flex-col items-center space-y-2">
+            <p className="text-sm text-muted-foreground">
+              ¿No tienes una cuenta?{' '}
+              <Link href="/register" className="font-medium text-primary hover:underline">
+                Regístrate aquí
+              </Link>
+            </p>
+          </CardFooter>
+        </Card>
+      </main>
     </div>
   );
 }

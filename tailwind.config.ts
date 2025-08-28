@@ -9,6 +9,13 @@ export default {
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
+    container: {
+      center: true,
+      padding: "2rem",
+      screens: {
+        "2xl": "1400px",
+      },
+    },
     extend: {
       fontFamily: {
         body: ['Inter', 'sans-serif'],
@@ -97,6 +104,10 @@ export default {
           from: { transform: 'translateY(20px)', opacity: '0'},
           to: { transform: 'translateY(0)', opacity: '1'}
         },
+        'slide-down-fade': {
+          from: { transform: 'translateY(-20px)', opacity: '0'},
+          to: { transform: 'translateY(0)', opacity: '1'}
+        },
         'pulse-slow': {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0.8' },
@@ -111,6 +122,7 @@ export default {
         'accordion-up': 'accordion-up 0.2s ease-out',
         'fade-in': 'fade-in 0.5s ease-out',
         'slide-up': 'slide-up 0.5s ease-out forwards',
+        'slide-down-fade': 'slide-down-fade 0.6s ease-out forwards',
         'pulse-slow': 'pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'background-shine': 'background-shine 2s linear infinite',
       },
