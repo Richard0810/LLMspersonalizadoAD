@@ -34,19 +34,19 @@ export default function LoginPage() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-transparent p-4 animate-fade-in">
       <InteractiveBackground />
-      <div className="flex items-center justify-center gap-4 mb-8 z-10 p-4 rounded-lg animate-slide-up">
+      <div className="flex items-center justify-center gap-4 mb-8 z-10 p-4 rounded-lg animate-slide-up bg-gradient-to-r from-green-500 via-white to-red-500">
           <Image
             src="/escudo.jpg"
             alt="Escudo Institucional"
             width={80}
             height={80}
-            className="transition-all duration-300 drop-shadow-[0_0_8px_hsl(var(--primary)/0.6)] hover:scale-110 hover:drop-shadow-[0_0_15px_hsl(var(--primary)/0.8)]"
+            className="transition-all duration-300 hover:scale-110"
           />
           <div className="text-left">
-            <h1 className="text-2xl font-headline font-bold uppercase animate-background-shine bg-[linear-gradient(110deg,#939393,45%,#1e293b,55%,#939393)] bg-[length:250%_100%] bg-clip-text text-transparent tracking-wider">
+            <h1 className="text-2xl font-headline font-bold uppercase text-black tracking-wider">
               Institucion Educativa Alfonso Spath Spath
             </h1>
-            <p className="text-base text-muted-foreground font-medium">Martinez- Cereté</p>
+            <p className="text-base text-black/80 font-medium">Martinez- Cereté</p>
           </div>
       </div>
       <Card className="w-full max-w-md shadow-2xl z-10">
