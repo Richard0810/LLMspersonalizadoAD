@@ -5,7 +5,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Lightbulb, Users, Bot, ArrowRight, BookOpenCheck, Brain, GraduationCap } from 'lucide-react';
-import { Bar, BarChart, Pie, PieChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts';
+import { Bar, BarChart, Pie, PieChart, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 
 const InfoCard = ({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) => (
@@ -20,8 +20,8 @@ const InfoCard = ({ icon, title, description }: { icon: React.ReactNode, title: 
 
 const objectiveData = [
   { metric: 'Innovación', value: 85, fill: 'hsl(var(--chart-1))' },
-  { metric: 'Comprensión', value: 92, fill: 'hsl(var(--chart-2))' },
-  { metric: 'Ahorro Tiempo', value: 78, fill: 'hsl(var(--chart-3))' },
+  { metric: 'Apoyo', value: 92, fill: 'hsl(var(--chart-2))' },
+  { metric: 'Acceso', value: 78, fill: 'hsl(var(--chart-3))' },
 ];
 
 const audienceData = [
@@ -35,15 +35,15 @@ const chartConfig = {
     label: "Valor",
   },
   Innovación: {
-    label: "Innovación",
+    label: "Innovación Didáctica",
     color: "hsl(var(--chart-1))",
   },
-  Comprensión: {
-    label: "Comprensión",
+  Apoyo: {
+    label: "Apoyo Docente",
     color: "hsl(var(--chart-2))",
   },
-  'Ahorro Tiempo': {
-    label: "Ahorro de Tiempo",
+  Acceso: {
+    label: "Acceso Equitativo",
     color: "hsl(var(--chart-3))",
   },
    'Doc. Tecnología': {
@@ -90,15 +90,15 @@ const ProjectInfo = () => {
           <TabsContent value="objective" className="flex-grow">
             <div className="space-y-4 h-full flex flex-col justify-around">
                 <ChartContainer config={chartConfig} className="w-full h-[150px]">
-                  <BarChart data={objectiveData} layout="vertical" margin={{ left: 10 }}>
-                    <XAxis type="number" hide />
-                    <YAxis type="category" dataKey="metric" hide />
-                    <Tooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-                    <Bar dataKey="value" radius={5} />
+                  <BarChart data={objectiveData} accessibilityLayer>
+                    <CartesianGrid vertical={false} />
+                    <XAxis dataKey="metric" tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => chartConfig[value as keyof typeof chartConfig]?.label.toString().substring(0,3) ?? value} />
+                    <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+                    <Bar dataKey="value" radius={8} />
                   </BarChart>
                 </ChartContainer>
                 <p className="text-muted-foreground text-center italic">
-                    Nuestra misión es cerrar la brecha entre la tecnología y la educación, proporcionando herramientas de IA para crear experiencias de aprendizaje desconectadas y efectivas.
+                    Nuestra misión es asistir a docentes de tecnología en el diseño de actividades desconectadas que desarrollen el pensamiento computacional, especialmente en contextos con baja o nula conectividad.
                 </p>
             </div>
           </TabsContent>
