@@ -105,6 +105,10 @@ export default {
           from: { backgroundPosition: '0 0' },
           to: { backgroundPosition: '-200% 0' },
         },
+        'neon-pulse': {
+          '0%, 100%': { textShadow: '0 0 2px hsl(var(--primary)), 0 0 5px hsl(var(--primary)), 0 0 10px hsl(var(--accent))', color: 'hsl(var(--primary))' },
+          '50%': { textShadow: '0 0 5px hsl(var(--primary)), 0 0 10px hsl(var(--primary)), 0 0 20px hsl(var(--accent))', color: 'hsl(var(--primary))' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -113,6 +117,7 @@ export default {
         'slide-up': 'slide-up 0.5s ease-out forwards',
         'pulse-slow': 'pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'background-shine': 'background-shine 2s linear infinite',
+        'neon-pulse': 'neon-pulse 4s ease-in-out infinite',
       },
     },
   },
