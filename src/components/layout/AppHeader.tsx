@@ -51,17 +51,22 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ page, lessonParams, onRese
 
   return (
     <header className="flex items-center justify-between p-3 border-b bg-card shadow-sm z-20">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-4">
         <Image 
           src="/escudo.jpg"
-          alt="Escudo Institucional"
-          width={40}
-          height={40}
-          className="animate-pulse-slow transition-transform duration-300 hover:scale-110"
+          alt="Escudo Institucional IE Alfonso Spath Spath"
+          width={56}
+          height={56}
+          className="transition-transform duration-300 hover:scale-110"
         />
-        <h1 className="text-xl font-headline text-primary">
-          {page === 'chat' ? 'Chat EduSpark AI' : 'Configuración de Actividad'}
-        </h1>
+        <div>
+          <h1 className="text-sm font-bold text-foreground/80">
+            IE Alfonso Spath Spath
+          </h1>
+          <h2 className="text-xl font-headline text-primary">
+            {page === 'chat' ? 'Asistente EduSpark AI' : 'Configuración de Actividad'}
+          </h2>
+        </div>
       </div>
       <div className="flex items-center gap-2">
         {page === 'chat' && (
