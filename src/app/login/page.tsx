@@ -56,7 +56,7 @@ export default function LoginPage() {
 
       <div className="w-full flex-grow p-4 lg:p-6 flex items-center justify-center">
         <main className="flex flex-col lg:flex-row items-stretch justify-center w-full gap-8 z-10">
-          <div className="w-full max-w-md">
+          <div className="w-full max-w-lg">
               <Card className="shadow-2xl h-full">
                 <CardHeader className="text-center">
                   <div className="inline-block mx-auto p-3 bg-primary/10 rounded-full mb-4">
@@ -121,7 +121,7 @@ export default function LoginPage() {
                 </CardFooter>
               </Card>
           </div>
-          <div className="w-full max-w-lg">
+          <div className="w-full max-w-md">
               <ProjectInfo />
           </div>
         </main>
