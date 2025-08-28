@@ -61,7 +61,7 @@ const InitialSetupForm: React.FC<InitialSetupFormProps> = ({ onSetupComplete }) 
                 id="topicName"
                 value={topicName}
                 onChange={(e) => setTopicName(e.target.value)}
-                placeholder="Ej: El ciclo del agua, Suma de fracciones"
+                placeholder="Ej: Partes del computador, ¿Qué es un algoritmo?"
                 required
               />
             </div>
