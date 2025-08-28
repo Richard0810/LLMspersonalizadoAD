@@ -2,13 +2,14 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useAuth } from '@/hooks/useAuth';
 import type { Activity, LessonParams } from '@/types';
 import { getActivityHistoryFromLocalStorage } from '@/lib/localStorageUtils';
-import { Send, LogOut, History, Edit3, Bot, Settings, Brain, BookOpen, Target, GraduationCap, Loader2, Copy, User } from 'lucide-react';
+import { LogOut, History, Edit3, Settings, Brain, BookOpen, Target, GraduationCap, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 interface AppHeaderProps {
@@ -51,7 +52,13 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ page, lessonParams, onRese
   return (
     <header className="flex items-center justify-between p-3 border-b bg-card shadow-sm z-20">
       <div className="flex items-center gap-2">
-        <Bot className="h-8 w-8 text-primary" />
+        <Image 
+          src="/escudo.png"
+          alt="Escudo Institucional"
+          width={40}
+          height={40}
+          className="animate-pulse-slow transition-transform duration-300 hover:scale-110"
+        />
         <h1 className="text-xl font-headline text-primary">
           {page === 'chat' ? 'Chat EduSpark AI' : 'Configuración de Actividad'}
         </h1>
