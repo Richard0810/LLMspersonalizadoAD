@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import InteractiveBackground from '@/components/shared/InteractiveBackground';
 import { Eye, EyeOff, LogInIcon } from 'lucide-react';
+import Image from 'next/image';
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
@@ -33,6 +34,21 @@ export default function LoginPage() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-transparent p-4 animate-fade-in">
       <InteractiveBackground />
+      <div className="flex items-center justify-center gap-4 mb-8 z-10">
+          <Image
+            src="/escudo.jpg"
+            alt="Escudo Institucional"
+            width={80}
+            height={80}
+            className="transition-transform duration-300 hover:scale-110"
+          />
+          <div className="text-left">
+            <h1 className="text-2xl font-bold uppercase animate-background-shine bg-[linear-gradient(110deg,#939393,45%,#1e293b,55%,#939393)] bg-[length:250%_100%] bg-clip-text text-transparent">
+              Institucion Educativa Alfonso Spath Spath
+            </h1>
+            <p className="text-sm text-muted-foreground">Martinez- Cereté</p>
+          </div>
+      </div>
       <Card className="w-full max-w-md shadow-2xl z-10">
         <CardHeader className="text-center">
           <div className="inline-block mx-auto p-3 bg-primary/10 rounded-full mb-4">
