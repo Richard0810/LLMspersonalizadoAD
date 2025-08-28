@@ -1,4 +1,4 @@
-// src/components/layout/AppHeader.tsx
+
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -53,7 +53,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ page, lessonParams, onRese
     <header className="flex items-center justify-between p-3 border-b bg-card shadow-sm z-20">
       <div className="flex items-center gap-2">
         <Image 
-          src="/escudo.png"
+          src="/escudo.jpg"
           alt="Escudo Institucional"
           width={40}
           height={40}
