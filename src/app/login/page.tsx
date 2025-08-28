@@ -12,6 +12,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import InteractiveBackground from '@/components/shared/InteractiveBackground';
 import { Eye, EyeOff, LogInIcon } from 'lucide-react';
 import Image from 'next/image';
+import ProjectInfo from '@/components/auth/ProjectInfo';
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
@@ -32,10 +33,10 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-start min-h-screen bg-transparent animate-fade-in">
+    <div className="flex flex-col items-center justify-start min-h-screen bg-background animate-fade-in p-4 lg:p-6">
       <InteractiveBackground />
       
-      <header className="w-full bg-gradient-to-r from-green-500 via-white to-red-500 shadow-md z-10 animate-slide-down-fade">
+      <header className="w-full bg-gradient-to-r from-green-500 via-white to-red-500 shadow-md z-10 animate-slide-down-fade mb-6">
         <div className="container mx-auto flex items-center justify-center p-3 gap-3 md:gap-4">
             <Image
               src="/escudo.jpg"
@@ -53,70 +54,75 @@ export default function LoginPage() {
         </div>
       </header>
 
-      <main className="flex flex-col items-center justify-center flex-grow w-full p-4">
-        <Card className="w-full max-w-md shadow-2xl z-10">
-          <CardHeader className="text-center">
-            <div className="inline-block mx-auto p-3 bg-primary/10 rounded-full mb-4">
-              <LogInIcon className="w-10 h-10 text-primary" />
-            </div>
-            <CardTitle className="text-3xl font-headline text-primary">Bienvenido de Nuevo a EduSpark AI</CardTitle>
-            <CardDescription className="text-muted-foreground">
-              Ingresa tus credenciales para acceder a tu cuenta.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="username">Nombre de Usuario</Label>
-                <Input
-                  id="username"
-                  type="text"
-                  placeholder="Ingresa tu nombre de usuario"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                  className="text-base"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Contraseña</Label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="Ingresa tu contraseña"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="text-base pr-10"
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-muted-foreground hover:text-foreground"
-                    onClick={() => setShowPassword(!showPassword)}
-                    tabIndex={-1}
-                  >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                    <span className="sr-only">{showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}</span>
-                  </Button>
+      <main className="flex flex-col lg:flex-row items-center justify-center w-full gap-8 z-10">
+        <div className="w-full max-w-md">
+            <Card className="shadow-2xl">
+              <CardHeader className="text-center">
+                <div className="inline-block mx-auto p-3 bg-primary/10 rounded-full mb-4">
+                  <LogInIcon className="w-10 h-10 text-primary" />
                 </div>
-              </div>
-              <Button type="submit" className="w-full text-lg py-6" disabled={isLoading}>
-                {isLoading ? 'Iniciando Sesión...' : 'Iniciar Sesión'}
-              </Button>
-            </form>
-          </CardContent>
-          <CardFooter className="flex flex-col items-center space-y-2">
-            <p className="text-sm text-muted-foreground">
-              ¿No tienes una cuenta?{' '}
-              <Link href="/register" className="font-medium text-primary hover:underline">
-                Regístrate aquí
-              </Link>
-            </p>
-          </CardFooter>
-        </Card>
+                <CardTitle className="text-3xl font-headline text-primary">Bienvenido a EduSpark AI</CardTitle>
+                <CardDescription className="text-muted-foreground">
+                  Ingresa tus credenciales para acceder a tu cuenta.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="username">Nombre de Usuario</Label>
+                    <Input
+                      id="username"
+                      type="text"
+                      placeholder="Ingresa tu nombre de usuario"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      required
+                      className="text-base"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Contraseña</Label>
+                    <div className="relative">
+                      <Input
+                        id="password"
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder="Ingresa tu contraseña"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        className="text-base pr-10"
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-muted-foreground hover:text-foreground"
+                        onClick={() => setShowPassword(!showPassword)}
+                        tabIndex={-1}
+                      >
+                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        <span className="sr-only">{showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}</span>
+                      </Button>
+                    </div>
+                  </div>
+                  <Button type="submit" className="w-full text-lg py-6" disabled={isLoading}>
+                    {isLoading ? 'Iniciando Sesión...' : 'Iniciar Sesión'}
+                  </Button>
+                </form>
+              </CardContent>
+              <CardFooter className="flex flex-col items-center space-y-2">
+                <p className="text-sm text-muted-foreground">
+                  ¿No tienes una cuenta?{' '}
+                  <Link href="/register" className="font-medium text-primary hover:underline">
+                    Regístrate aquí
+                  </Link>
+                </p>
+              </CardFooter>
+            </Card>
+        </div>
+        <div className="w-full max-w-lg">
+            <ProjectInfo />
+        </div>
       </main>
     </div>
   );
