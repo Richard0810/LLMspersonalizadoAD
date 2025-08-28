@@ -71,12 +71,12 @@ const ProjectInfo = () => {
                 <InfoCard
                     icon={<Rocket size={24} />}
                     title="Innovación Pedagógica"
-                    description="Personalizar un LLM para asesorar a docentes en el diseño de actividades desconectadas que desarrollen el pensamiento computacional."
+                    description="Asesorar a docentes en el diseño de actividades desconectadas que desarrollen el pensamiento computacional de forma creativa."
                 />
                 <InfoCard
                     icon={<Handshake size={24} />}
                     title="Apoyo Docente"
-                    description="Analizar y responder a las necesidades de los educadores para crear recursos didácticos efectivos en entornos rurales o sin conectividad."
+                    description="Crear recursos didácticos efectivos y adaptados a las necesidades de los educadores en entornos con y sin conectividad."
                 />
                  <InfoCard
                     icon={<Globe size={24} />}
