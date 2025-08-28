@@ -17,7 +17,7 @@ export interface Activity {
 export type MessageSender = 'user' | 'ai' | 'system';
 
 export interface ChatMessage {
-  id: string;
+  id:string;
   sender: MessageSender;
   text?: string;
   activities?: Activity[];
@@ -46,9 +46,12 @@ export const subjectAreas = [
 ];
 
 export const gradeLevels = [
-  "Preescolar", "1º Grado", "2º Grado", "3º Grado", "4º Grado", "5º Grado",
-  "6º Grado", "7º Grado", "8º Grado", "9º Grado", "10º Grado", "11º Grado", "12º Grado",
-  "Educación Superior", "Todas las Edades"
+  "Transición (Preescolar)",
+  "Básica Primaria (Grados 1º a 3º)",
+  "Básica Primaria (Grados 4º a 5º)",
+  "Básica Secundaria (Grados 6º a 7º)",
+  "Básica Secundaria (Grados 8º a 9º)",
+  "Educación Media (Grados 10º a 11º)",
 ];
 
 export const computationalConcepts = [
@@ -58,4 +61,5 @@ export const computationalConcepts = [
   "Algoritmos",
   "Todos los conceptos"
 ];
+
 
