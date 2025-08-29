@@ -169,11 +169,10 @@ Generando actividades iniciales...`,
       type: 'text',
     };
     addMessage(userMessage);
-
     const lowerInputValue = inputValue.toLowerCase();
+
     if (editingField) {
       handleParameterInputChange(editingField, inputValue);
-      setEditingField(null);
     } else if (lowerInputValue.includes('cambiar tema')) {
       editFieldHandler('topicName');
     } else if (lowerInputValue.includes('cambiar concepto')) {
@@ -183,6 +182,13 @@ Generando actividades iniciales...`,
     } else if (lowerInputValue.includes('cambiar nivel de grado') || lowerInputValue.includes('cambiar grado')) {
        editFieldHandler('gradeLevel');
     } else if (lowerInputValue.includes('generar nuevas actividades') || lowerInputValue.includes('generar actividades')) {
+      addMessage({
+        id: Date.now().toString(),
+        sender: 'system',
+        text: '¡Entendido! Generando un nuevo set de actividades con los parámetros actuales.',
+        timestamp: Date.now(),
+        type: 'text',
+      });
       handleGenerateActivities(currentLessonParams);
     }
     else {
@@ -195,6 +201,7 @@ Generando actividades iniciales...`,
     const updatedParams = { ...currentLessonParams, [field]: value };
     setCurrentLessonParams(updatedParams);
     saveLessonParamsToLocalStorage(updatedParams); 
+    setEditingField(null);
     
     let fieldLabel = '';
     switch(field) {
@@ -208,11 +215,10 @@ Generando actividades iniciales...`,
     addMessage({
       id: Date.now().toString(),
       sender: 'system',
-      text: `${fieldLabel} actualizado a: ${value}. Escribe "generar nuevas actividades" o haz una pregunta.`,
+      text: `${fieldLabel} actualizado a: "${value}".\nPuedes escribir "generar nuevas actividades" para usar este nuevo parámetro, o hacer otra pregunta.`,
       timestamp: Date.now(),
       type: 'text',
     });
-    setEditingField(null);
   };
   
   const handleSelectParameterChange = (field: keyof LessonParams, value: string) => {
@@ -226,12 +232,13 @@ Generando actividades iniciales...`,
     } else if (field === 'gradeLevel') {
       addMessage({id: Date.now().toString(), sender: 'system', text: "Por favor, selecciona el nuevo nivel de grado:", lessonParams: currentLessonParams, timestamp: Date.now(), type: 'parameter_select_grade'});
     } else {
-      let questionText = `¿Cuál debería ser el nuevo ${field.toLowerCase()}?`;
-      if (field === 'topicName') questionText = `¿Cuál debería ser el nuevo tema?`;
-      else if (field === 'computationalConcept') questionText = `¿Cuál debería ser el nuevo concepto computacional?`;
-      
-      addMessage({ id: Date.now().toString(), sender: 'system', text: questionText, timestamp: Date.now(), type: 'text' });
+      let fieldLabel = 'parámetro';
+      if (field === 'topicName') fieldLabel = `tema`;
+      if (field === 'computationalConcept') fieldLabel = `concepto computacional`;
+
+      addMessage({ id: Date.now().toString(), sender: 'system', text: `¿Cuál es el nuevo ${fieldLabel} que deseas establecer?`, timestamp: Date.now(), type: 'text' });
       setEditingField(field);
+      inputRef.current?.focus();
     }
   }, [currentLessonParams]);
 
@@ -330,3 +337,5 @@ Generando actividades iniciales...`,
 };
 
 export default ChatInterface;
+
+    
