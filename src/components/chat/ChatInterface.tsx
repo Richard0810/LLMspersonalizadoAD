@@ -173,15 +173,7 @@ Generando actividades iniciales...`,
 
     if (editingField) {
       handleParameterInputChange(editingField, inputValue);
-    } else if (lowerInputValue.includes('cambiar tema')) {
-      editFieldHandler('topicName');
-    } else if (lowerInputValue.includes('cambiar concepto')) {
-       editFieldHandler('computationalConcept');
-    } else if (lowerInputValue.includes('cambiar área temática') || lowerInputValue.includes('cambiar área')) {
-       editFieldHandler('subjectArea');
-    } else if (lowerInputValue.includes('cambiar nivel de grado') || lowerInputValue.includes('cambiar grado')) {
-       editFieldHandler('gradeLevel');
-    } else if (lowerInputValue.includes('generar nuevas actividades') || lowerInputValue.includes('generar actividades')) {
+    } else if (lowerInputValue.includes('generar nuevas actividades') || lowerInputValue.includes('generar más actividades')) {
       addMessage({
         id: Date.now().toString(),
         sender: 'system',
@@ -190,6 +182,14 @@ Generando actividades iniciales...`,
         type: 'text',
       });
       handleGenerateActivities(currentLessonParams);
+    } else if (lowerInputValue.includes('cambiar tema')) {
+      editFieldHandler('topicName');
+    } else if (lowerInputValue.includes('cambiar concepto')) {
+       editFieldHandler('computationalConcept');
+    } else if (lowerInputValue.includes('cambiar área temática') || lowerInputValue.includes('cambiar área')) {
+       editFieldHandler('subjectArea');
+    } else if (lowerInputValue.includes('cambiar nivel de grado') || lowerInputValue.includes('cambiar grado')) {
+       editFieldHandler('gradeLevel');
     }
     else {
       handleConsultAI(inputValue);
@@ -337,5 +337,7 @@ Generando actividades iniciales...`,
 };
 
 export default ChatInterface;
+
+    
 
     
