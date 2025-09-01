@@ -7,7 +7,7 @@ import InitialSetupForm from '@/components/chat/InitialSetupForm';
 import ChatInterface from '@/components/chat/ChatInterface';
 import { HelpModal } from '@/components/shared/HelpModal';
 import type { LessonParams } from '@/types';
-import { getLessonParamsFromLocalStorage, clearLessonParamsFromLocalStorage } from '@/lib/localStorageUtils';
+import { getLessonParamsFromLocalStorage, clearLessonParamsFromLocalStorage, clearChatHistoryFromLocalStorage } from '@/lib/localStorageUtils';
 import { Loader2 } from 'lucide-react';
 import { PageWrapper } from '@/components/layout/PageWrapper';
 
@@ -34,6 +34,7 @@ export default function HomePage() {
 
   const handleResetSetup = () => {
     clearLessonParamsFromLocalStorage();
+    clearChatHistoryFromLocalStorage(); // Also clear chat history
     setLessonParams(null);
   };
   
@@ -70,3 +71,5 @@ export default function HomePage() {
     </ProtectedRoute>
   );
 }
+
+    

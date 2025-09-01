@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -10,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { BookOpenCheck, Brain, GraduationCap, Target, Lightbulb } from 'lucide-react';
 import type { LessonParams } from '@/types';
-import { saveLessonParamsToLocalStorage, getLessonParamsFromLocalStorage } from '@/lib/localStorageUtils';
+import { saveLessonParamsToLocalStorage, getLessonParamsFromLocalStorage, clearChatHistoryFromLocalStorage } from '@/lib/localStorageUtils';
 import { subjectAreas, gradeLevels, computationalConcepts } from '@/types'; 
 
 interface InitialSetupFormProps {
@@ -37,6 +36,8 @@ const InitialSetupForm: React.FC<InitialSetupFormProps> = ({ onSetupComplete }) 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    // Clear any previous chat history when starting a new setup
+    clearChatHistoryFromLocalStorage();
     const params: LessonParams = { topicName, computationalConcept, subjectArea, gradeLevel };
     saveLessonParamsToLocalStorage(params);
     onSetupComplete(params);
@@ -114,3 +115,5 @@ const InitialSetupForm: React.FC<InitialSetupFormProps> = ({ onSetupComplete }) 
 };
 
 export default InitialSetupForm;
+
+    

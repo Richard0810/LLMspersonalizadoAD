@@ -12,7 +12,13 @@ import { generateEducationalActivities, GenerateEducationalActivitiesInput } fro
 import { consultAIOnLesson, ConsultAIOnLessonInput } from '@/ai/flows/consult-ai-on-lesson';
 import type { ChatMessage, Activity, LessonParams } from '@/types';
 import ChatMessageItem from './ChatMessageItem';
-import { addActivitiesToHistoryLocalStorage, getActivityHistoryFromLocalStorage, saveLessonParamsToLocalStorage } from '@/lib/localStorageUtils';
+import { 
+  addActivitiesToHistoryLocalStorage, 
+  saveLessonParamsToLocalStorage,
+  saveChatHistoryToLocalStorage,
+  getChatHistoryFromLocalStorage,
+  clearChatHistoryFromLocalStorage
+} from '@/lib/localStorageUtils';
 import { Send, Loader2, Copy } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -22,7 +28,7 @@ interface ChatInterfaceProps {
   handleParameterEdit: (func: (field: keyof LessonParams) => void) => void;
 }
 
-const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialParams, onResetSetup, handleParameterEdit }) => {
+const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialParams, onResetSetup: externalOnResetSetup, handleParameterEdit }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoadingAi, setIsLoadingAi] = useState(false);
@@ -50,10 +56,20 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialParams, onResetSet
   };
   
   useEffect(scrollToBottom, [messages, isEditorOpen]);
+
+  // Save messages to local storage whenever they change
+  useEffect(() => {
+    saveChatHistoryToLocalStorage(messages);
+  }, [messages]);
   
   const notifyHistoryUpdate = () => {
     window.dispatchEvent(new CustomEvent('activityHistoryUpdated'));
   };
+  
+  const onResetSetup = () => {
+    clearChatHistoryFromLocalStorage();
+    externalOnResetSetup();
+  }
 
   const handleGenerateActivities = async (params: LessonParams) => {
     setIsLoadingAi(true);
@@ -100,20 +116,25 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialParams, onResetSet
   };
 
   useEffect(() => {
-    const systemMessage: ChatMessage = {
-      id: Date.now().toString(),
-      sender: 'system',
-      text: `¡Hola ${user?.username}! Parámetros de la actividad establecidos:
+    const savedChat = getChatHistoryFromLocalStorage();
+    if (savedChat && savedChat.length > 0) {
+      setMessages(savedChat);
+    } else {
+      const systemMessage: ChatMessage = {
+        id: Date.now().toString(),
+        sender: 'system',
+        text: `¡Hola ${user?.username}! Parámetros de la actividad establecidos:
 - Tema: ${initialParams.topicName}
 - Concepto: ${initialParams.computationalConcept}
 - Área: ${initialParams.subjectArea}
 - Grado: ${initialParams.gradeLevel}
 Generando actividades iniciales...`,
-      timestamp: Date.now(),
-      type: 'text',
-    };
-    setMessages([systemMessage]);
-    handleGenerateActivities(initialParams);
+        timestamp: Date.now(),
+        type: 'text',
+      };
+      setMessages([systemMessage]);
+      handleGenerateActivities(initialParams);
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialParams, user?.username]);
   
@@ -337,9 +358,5 @@ Generando actividades iniciales...`,
 };
 
 export default ChatInterface;
-
-    
-
-    
 
     

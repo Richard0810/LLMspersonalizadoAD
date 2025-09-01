@@ -1,8 +1,9 @@
 
-import type { User, Activity, LessonParams } from '@/types';
+import type { User, Activity, LessonParams, ChatMessage } from '@/types';
 
 const LESSON_PARAMS_KEY = 'eduspark_lesson_params';
 const ACTIVITY_HISTORY_KEY = 'eduspark_activity_history';
+const CHAT_HISTORY_KEY = 'eduspark_chat_history';
 const MAX_HISTORY_ITEMS = 10;
 
 // Lesson Parameters
@@ -70,3 +71,26 @@ export const getActivityByIdFromLocalStorage = (id: string): Activity | null => 
   }
   return null;
 };
+
+// Chat History
+export const saveChatHistoryToLocalStorage = (messages: ChatMessage[]): void => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(messages));
+  }
+};
+
+export const getChatHistoryFromLocalStorage = (): ChatMessage[] | null => {
+  if (typeof window !== 'undefined') {
+    const chatJson = localStorage.getItem(CHAT_HISTORY_KEY);
+    return chatJson ? JSON.parse(chatJson) : null;
+  }
+  return null;
+};
+
+export const clearChatHistoryFromLocalStorage = (): void => {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem(CHAT_HISTORY_KEY);
+  }
+};
+
+    
