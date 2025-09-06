@@ -59,7 +59,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialParams, onResetSet
 
   // Save messages to local storage whenever they change
   useEffect(() => {
-    saveChatHistoryToLocalStorage(messages);
+    if (messages.length > 0) { // Only save if there are messages
+      saveChatHistoryToLocalStorage(messages);
+    }
   }, [messages]);
   
   const notifyHistoryUpdate = () => {
@@ -136,7 +138,7 @@ Generando actividades iniciales...`,
       handleGenerateActivities(initialParams);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialParams, user?.username]);
+  }, []); // <-- EMPTY DEPENDENCY ARRAY. This is crucial.
   
   const addMessage = (message: ChatMessage) => {
     setMessages(prev => [...prev, message]);
