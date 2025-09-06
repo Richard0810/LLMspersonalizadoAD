@@ -28,7 +28,7 @@ const EducationalActivitySchema = z.object({
   materials: z.string().describe('Una lista de materiales simples y accesibles (no electrónicos).'),
   estimatedTime: z.string().describe('El tiempo estimado para la realización completa de la actividad (ej: "45 minutos", "2 horas de clase").'),
   teacherPreparation: z.string().describe('Los pasos o materiales que el docente debe preparar antes de la clase.'),
-  stepByStepDevelopment: z.string().describe('Instrucciones detalladas y obligatoriamente numeradas (paso a paso) que guíen al docente como si fuera un guion de clase. Deben incluir ejemplos prácticos, ejercicios y la dinámica completa de la actividad.'),
+  stepByStepDevelopment: z.string().describe('Instrucciones detalladas y obligatoriamente numeradas (paso a paso) que guíen al docente como si fuera un guion de clase. Deben incluir ejemplos prácticos, ejercicios y la dinámica completa de la actividad. Cada paso debe estar separado por un salto de línea.'),
   visualExamples: z.string().describe('Sugerencias de ejemplos visuales o diagramas que el docente puede dibujar en el tablero o en hojas para facilitar la comprensión (tablas, cuadrículas, mapas, pictogramas).'),
   reflectionQuestion: z.string().describe('Una explicación detallada de cómo la actividad evidencia el concepto de pensamiento computacional, y preguntas para guiar la metacognición de los estudiantes.'),
   evaluationCriteria: z.string().describe('Los criterios de evaluación o evidencias de aprendizaje que el docente puede usar para valorar el desempeño de los estudiantes.')
@@ -51,7 +51,6 @@ const generateEducationalActivitiesPrompt = ai.definePrompt({
   prompt: `Rol: Eres un diseñador instruccional experto y un asesor pedagógico especializado en pensamiento computacional para el contexto educativo de Colombia.
 Tarea: Tu misión es diseñar tres actividades desconectadas tan completas y detalladas que un docente, incluso sin experiencia previa en el tema, pueda implementarlas en su aula de manera exitosa y sin esfuerzo. Cada actividad debe ser un recurso educativo "llave en mano".
 Audiencia: Docentes de tecnología e informática en Colombia, especialmente aquellos en contextos rurales o con baja conectividad.
-Contexto: Serás el núcleo de una herramienta de IA que busca cerrar la brecha de conocimiento y recursos para enseñar pensamiento computacional.
 Tono: Didáctico, claro, práctico, motivador y adaptable por los docentes.
 
 **Instrucción Principal:**
@@ -70,7 +69,7 @@ Asegúrate de que cada actividad generada cumpla estrictamente con lo siguiente:
 - **materials:** Una lista de materiales simples y accesibles (no electrónicos), descritos con suficiente detalle.
 - **estimatedTime:** El tiempo estimado para realizar la actividad (ej: "45 minutos").
 - **teacherPreparation:** Describe qué debe hacer o preparar el docente ANTES de iniciar la clase.
-- **stepByStepDevelopment:** Una guía **obligatoriamente numerada** y exhaustiva (1., 2., 3., etc.), como un guion de clase. Incluye qué debe decir el docente y qué deben hacer los estudiantes.
+- **stepByStepDevelopment:** Una guía **obligatoriamente numerada** y exhaustiva (1., 2., 3., etc.), como un guion de clase. Incluye qué debe decir el docente y qué deben hacer los estudiantes. **Cada paso numerado debe estar en una nueva línea.**
 - **visualExamples:** Describe ejemplos visuales o diagramas que el docente pueda dibujar en el tablero o en hojas para apoyar la explicación (ej: "una tabla de 3x3", "un diagrama de flujo simple con flechas", "pictogramas para representar acciones").
 - **reflectionQuestion:** Una explicación detallada y clara de cómo la actividad evidencia el concepto de pensamiento computacional, conectando los pasos del ejercicio con la teoría. Además, debe incluir preguntas para guiar la reflexión y la metacognición de los estudiantes.
 - **evaluationCriteria:** Describe las evidencias de aprendizaje o los criterios que el docente puede observar para evaluar si los estudiantes alcanzaron el objetivo.
