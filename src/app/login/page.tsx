@@ -64,11 +64,11 @@ export default function LoginPage() {
                 <p className="text-sm md:text-base text-muted-foreground font-medium">Maestría en Informática Educativa</p>
               </div>
                <Image
-                src="/logo_unicor.png"
+                src="https://www.unicordoba.edu.co/wp-content/uploads/2021/11/logo-unicordoba.png"
                 alt="Logo Universidad de Córdoba"
                 width={64}
                 height={64}
-                className="transition-all duration-300 hover:scale-110 w-12 h-12 md:w-16 md:h-16"
+                className="transition-all duration-300 hover:scale-110 w-auto h-12 md:h-16"
               />
             </div>
         </div>
