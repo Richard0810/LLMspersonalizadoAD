@@ -56,7 +56,7 @@ export default function LoginPage() {
             </div>
 
             {/* Universidad de Cordoba */}
-             <div className="flex items-end gap-3 md:gap-4">
+             <div className="flex items-center gap-3 md:gap-4">
               <div className="text-right">
                 <h1 className="text-base md:text-xl font-headline font-bold uppercase text-foreground tracking-wider">
                   Universidad de Córdoba
