@@ -64,7 +64,7 @@ export default function LoginPage() {
                 <p className="text-sm md:text-base text-muted-foreground font-medium">Licenciatura en Informática</p>
               </div>
                <Image
-                src="https://www.unicordoba.edu.co/wp-content/uploads/2021/11/logo-unicordoba.png"
+                src="/logo_unicor.png"
                 alt="Logo Universidad de Córdoba"
                 width={64}
                 height={64}
