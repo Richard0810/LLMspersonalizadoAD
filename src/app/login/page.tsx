@@ -67,7 +67,7 @@ export default function LoginPage() {
                 src="/logo_unicor.png"
                 alt="Logo Universidad de Córdoba"
                 width={200}
-                height={60}
+                height={70}
                 className="transition-all duration-300 hover:scale-110 w-auto h-12 md:h-20"
               />
             </div>
