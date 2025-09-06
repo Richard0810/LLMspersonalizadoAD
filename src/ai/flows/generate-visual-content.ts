@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview A flow to generate visual content for an educational activity.
@@ -12,7 +13,7 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
-export const GenerateVisualContentInputSchema = z.object({
+const GenerateVisualContentInputSchema = z.object({
   materials: z.string().describe('The materials section of the activity.'),
   instructions: z.string().describe('The instructions section of the activity.'),
   reflection: z.string().describe('The reflection section of the activity.'),
@@ -29,7 +30,7 @@ const VisualStepSchema = z.object({
   image: z.string().optional().describe('The generated image as a Base64 data URI.'),
 });
 
-export const GenerateVisualContentOutputSchema = z.object({
+const GenerateVisualContentOutputSchema = z.object({
   materials: z.array(VisualStepSchema),
   instructions: z.array(VisualStepSchema),
   reflection: z.array(VisualStepSchema),
@@ -56,20 +57,19 @@ Text to analyze: "${chunk}"`,
                 config: { temperature: 0.2 },
             });
 
-            const decision = llmResponse.output();
+            const decision = llmResponse.output;
             if (!decision) {
                 return { step: chunk };
             }
 
             if (decision.shouldGenerate && decision.imagePrompt) {
-                const imageResponse = await ai.generate({
+                const {media} = await ai.generate({
                     model: 'imagen',
                     prompt: decision.imagePrompt,
                 });
-                const image = imageResponse.media();
                 return {
                     step: chunk,
-                    image: image?.url,
+                    image: media?.url,
                 };
             }
 
@@ -81,7 +81,7 @@ Text to analyze: "${chunk}"`,
 }
 
 
-export const generateVisualContentFlow = ai.defineFlow(
+const generateVisualContentFlow = ai.defineFlow(
   {
     name: 'generateVisualContentFlow',
     inputSchema: GenerateVisualContentInputSchema,

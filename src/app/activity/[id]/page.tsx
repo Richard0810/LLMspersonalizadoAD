@@ -7,7 +7,7 @@ import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import InteractiveBackground from '@/components/shared/InteractiveBackground';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Download, ListChecks, BookOpen, Target, ThumbsUp, Sparkles, Image as ImageIcon, Loader2, Volume2, DownloadCloud } from 'lucide-react';
+import { ArrowLeft, Download, ListChecks, BookOpen, Target, ThumbsUp, Sparkles, Loader2, Volume2, DownloadCloud } from 'lucide-react';
 import type { Activity, VisualContent } from '@/types';
 import { getActivityByIdFromLocalStorage } from '@/lib/localStorageUtils';
 import { useToast } from '@/hooks/use-toast';
@@ -16,19 +16,11 @@ import { generateVisualContent } from '@/ai/flows/generate-visual-content';
 import { textToSpeech } from '@/ai/flows/text-to-speech';
 import Image from 'next/image';
 
-const SectionContent = ({ title, icon, content, generatedContent, isLoading, onGenerate, showGenerateButton }) => (
+const SectionContent = ({ title, icon, content, generatedContent }) => (
   <div>
-    <div className="flex justify-between items-center mb-2">
-      <h3 className="text-xl font-semibold flex items-center gap-2 text-accent font-headline">
-        {icon} {title}
-      </h3>
-      {showGenerateButton && !generatedContent && (
-        <Button onClick={onGenerate} disabled={isLoading} size="sm">
-          {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ImageIcon className="mr-2 h-4 w-4" />}
-          Crear Contenido Visual
-        </Button>
-      )}
-    </div>
+    <h3 className="text-xl font-semibold flex items-center gap-2 text-accent font-headline mb-2">
+      {icon} {title}
+    </h3>
     {generatedContent ? (
       <div className="space-y-4">
         {generatedContent.map((item, index) => (
@@ -250,8 +242,6 @@ export default function ActivityDetailPage() {
     );
   }
 
-  const showGenerateButton = !generatedContent && !isGeneratingContent;
-
   return (
     <ProtectedRoute>
       <div className="flex flex-col items-center min-h-screen bg-background p-4 md:p-8 animate-fade-in">
@@ -276,29 +266,20 @@ export default function ActivityDetailPage() {
               icon={<ListChecks className="h-6 w-6" />}
               content={activity.materials}
               generatedContent={generatedContent?.materials}
-              isLoading={isGeneratingContent}
-              onGenerate={handleGenerateAllContent}
-              showGenerateButton={showGenerateButton}
             />
             <SectionContent
               title="Instrucciones"
               icon={<Target className="h-6 w-6" />}
               content={activity.instructions}
               generatedContent={generatedContent?.instructions}
-              isLoading={isGeneratingContent}
-              onGenerate={handleGenerateAllContent}
-              showGenerateButton={showGenerateButton}
             />
              <SectionContent
               title="Reflexión"
               icon={<ThumbsUp className="h-6 w-6" />}
               content={activity.reflectionQuestion}
               generatedContent={generatedContent?.reflection}
-              isLoading={isGeneratingContent}
-              onGenerate={handleGenerateAllContent}
-              showGenerateButton={showGenerateButton}
             />
-            {isGeneratingAudio && (
+            {isGeneratingAudio && !generatedAudio &&(
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Loader2 className="h-5 w-5 animate-spin" />
                 Generando audio...
