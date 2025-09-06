@@ -172,7 +172,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({ message, onParameterC
         className={cn("p-3 rounded-lg max-w-xs lg:max-w-md shadow-sm", 
           isUser ? "bg-primary text-black" : 
           isAI ? "bg-card text-card-foreground" : // This case is now handled above mostly
-          "bg-accent/20 text-accent-foreground"
+          "bg-accent/20 text-accent"
         )}
       >
         <p className="text-sm whitespace-pre-wrap">{message.text}</p>
