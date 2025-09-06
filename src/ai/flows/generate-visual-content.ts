@@ -65,7 +65,7 @@ Text to analyze: "${chunk}"`,
 
             if (decision.shouldGenerate && decision.imagePrompt) {
                 const {media} = await ai.generate({
-                    model: 'imagen',
+                    model: 'googleai/imagen-4.0-fast-generate-001',
                     prompt: decision.imagePrompt,
                 });
                 return {
