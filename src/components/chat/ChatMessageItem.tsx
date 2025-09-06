@@ -82,7 +82,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({ message, onParameterC
     <div className="flex flex-col space-y-2">
       {message.text && (
          <Card className={cn("p-3 rounded-lg max-w-xs lg:max-w-md shadow", 
-            isAI ? "bg-primary/10 text-primary-foreground" : "bg-card")}>
+            isAI ? "bg-primary/10 text-card-foreground" : "bg-card")}>
             <p className="text-sm whitespace-pre-wrap">{message.text}</p>
         </Card>
       )}
