@@ -15,35 +15,51 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { generateVisualContent } from '@/ai/flows/generate-visual-content';
 import Image from 'next/image';
 
-const SectionContent = ({ title, icon, content, generatedContent, className = "" }) => (
-  <div className={className}>
-    <h3 className="text-xl font-semibold flex items-center gap-2 text-accent font-headline mb-2">
-      {icon} {title}
-    </h3>
-    {generatedContent ? (
-      <div className="space-y-4">
-        {generatedContent.map((item, index) => (
-          <div key={index} className="p-3 bg-muted/50 rounded-lg">
-            <p className="text-muted-foreground whitespace-pre-line mb-2">{item.step}</p>
-            {item.image && (
-              <div className="mt-2 text-center">
-                <Image 
-                  src={item.image} 
-                  alt={`Ilustración para: ${item.step.substring(0, 50)}`} 
-                  width={400} 
-                  height={400} 
-                  className="rounded-md shadow-md mx-auto"
-                />
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    ) : (
-      <p className="text-muted-foreground whitespace-pre-line">{content}</p>
-    )}
-  </div>
-);
+const SectionContent = ({ title, icon, content, generatedContent, className = "" }) => {
+  // Helper to convert markdown bold to strong tags
+  const createMarkup = (text) => {
+    if (!text) return { __html: '' };
+    const htmlText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    return { __html: htmlText };
+  };
+
+  return (
+    <div className={className}>
+      <h3 className="text-xl font-semibold flex items-center gap-2 text-accent font-headline mb-2">
+        {icon} {title}
+      </h3>
+      {generatedContent ? (
+        <div className="space-y-4">
+          {generatedContent.map((item, index) => (
+            <div key={index} className="p-3 bg-muted/50 rounded-lg">
+              <p
+                className="text-muted-foreground whitespace-pre-line mb-2"
+                dangerouslySetInnerHTML={createMarkup(item.step)}
+              />
+              {item.image && (
+                <div className="mt-2 text-center">
+                  <Image 
+                    src={item.image} 
+                    alt={`Ilustración para: ${item.step.substring(0, 50)}`} 
+                    width={400} 
+                    height={400} 
+                    className="rounded-md shadow-md mx-auto"
+                  />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p
+          className="text-muted-foreground whitespace-pre-line"
+          dangerouslySetInnerHTML={createMarkup(content)}
+        />
+      )}
+    </div>
+  );
+};
+
 
 export default function ActivityDetailPage() {
   const params = useParams();
@@ -144,7 +160,7 @@ export default function ActivityDetailPage() {
           
           <div class="section">
             <h2>Desarrollo Paso a Paso</h2>
-            ${generatedContent?.instructions.map(item => `<p>${item.step}</p>${item.image ? `<img src="${item.image}" alt="Ilustración">` : ''}`).join('') || `<p>${activity.stepByStepDevelopment}</p>`}
+            ${generatedContent?.instructions.map(item => `<p>${item.step.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>${item.image ? `<img src="${item.image}" alt="Ilustración">` : ''}`).join('') || `<p>${activity.stepByStepDevelopment.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>`}
           </div>
 
            <div class="section">
