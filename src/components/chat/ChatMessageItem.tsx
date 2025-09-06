@@ -170,7 +170,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({ message, onParameterC
       )}
       <Card 
         className={cn("p-3 rounded-lg max-w-xs lg:max-w-md shadow-sm", 
-          isUser ? "bg-primary text-primary-foreground" : 
+          isUser ? "bg-primary text-black" : 
           isAI ? "bg-card text-card-foreground" : // This case is now handled above mostly
           "bg-accent/20 text-accent-foreground"
         )}
