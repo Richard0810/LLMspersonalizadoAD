@@ -61,7 +61,7 @@ export default function LoginPage() {
                 <h1 className="text-base md:text-xl font-headline font-bold uppercase text-foreground tracking-wider">
                   Universidad de Córdoba
                 </h1>
-                <p className="text-sm md:text-base text-muted-foreground font-medium">Maestría en Informática Educativa</p>
+                <p className="text-sm md:text-base text-muted-foreground font-medium">Licenciatura en Informática</p>
               </div>
                <Image
                 src="https://www.unicordoba.edu.co/wp-content/uploads/2021/11/logo-unicordoba.png"

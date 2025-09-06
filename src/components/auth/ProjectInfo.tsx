@@ -76,7 +76,7 @@ const ProjectInfo = () => {
                  <InfoCard
                     icon={<School size={24} />}
                     title="Iniciativa de Investigación"
-                    description="Este proyecto se desarrolla en el marco de la Maestría en Informática Educativa de la Universidad de Córdoba, Colombia."
+                    description="Este proyecto se desarrolla en el marco de la Licenciatura en Informática de la Universidad de Córdoba, Colombia."
                 />
                  <InfoCard
                     icon={<Globe size={24} />}
