@@ -4,7 +4,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Lightbulb, Users, Bot, ArrowRight, BookOpenCheck, Brain, GraduationCap, Target, Rocket, Handshake, Globe } from 'lucide-react';
+import { Lightbulb, Users, Bot, ArrowRight, BookOpenCheck, Brain, GraduationCap, Target, Rocket, Handshake, Globe, School } from 'lucide-react';
 import { Pie, PieChart } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 
@@ -73,10 +73,10 @@ const ProjectInfo = () => {
                     title="Innovación Pedagógica"
                     description="Asesorar a docentes en el diseño de actividades desconectadas que desarrollen el pensamiento computacional de forma creativa."
                 />
-                <InfoCard
-                    icon={<Handshake size={24} />}
-                    title="Apoyo Docente"
-                    description="Crear recursos didácticos efectivos y adaptados a las necesidades de los educadores en entornos con y sin conectividad."
+                 <InfoCard
+                    icon={<School size={24} />}
+                    title="Iniciativa de Investigación"
+                    description="Este proyecto se desarrolla en el marco de la Maestría en Informática Educativa de la Universidad de Córdoba, Colombia."
                 />
                  <InfoCard
                     icon={<Globe size={24} />}
