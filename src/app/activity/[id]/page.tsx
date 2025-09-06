@@ -7,13 +7,12 @@ import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import InteractiveBackground from '@/components/shared/InteractiveBackground';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Download, ListChecks, BookOpen, Target, ThumbsUp, Sparkles, Loader2, Volume2, DownloadCloud } from 'lucide-react';
+import { ArrowLeft, Download, ListChecks, BookOpen, Target, ThumbsUp, Sparkles, Loader2 } from 'lucide-react';
 import type { Activity, VisualContent } from '@/types';
 import { getActivityByIdFromLocalStorage } from '@/lib/localStorageUtils';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { generateVisualContent } from '@/ai/flows/generate-visual-content';
-import { textToSpeech } from '@/ai/flows/text-to-speech';
 import Image from 'next/image';
 
 const SectionContent = ({ title, icon, content, generatedContent }) => (
@@ -53,9 +52,7 @@ export default function ActivityDetailPage() {
   const [activity, setActivity] = useState<Activity | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isGeneratingContent, setIsGeneratingContent] = useState(false);
-  const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
   const [generatedContent, setGeneratedContent] = useState<VisualContent | null>(null);
-  const [generatedAudio, setGeneratedAudio] = useState<string | null>(null);
 
   useEffect(() => {
     if (params.id) {
@@ -66,44 +63,26 @@ export default function ActivityDetailPage() {
     setIsLoading(false);
   }, [params.id]);
 
-  const handleGenerateAllContent = async () => {
+  const handleGenerateVisualContent = async () => {
     if (!activity) return;
     setIsGeneratingContent(true);
-    setIsGeneratingAudio(true);
 
     toast({
       title: "Generación en Proceso",
-      description: "La IA está creando el contenido visual y el audio. Esto puede tardar un momento...",
+      description: "La IA está creando el contenido visual. Esto puede tardar un momento...",
     });
 
     try {
-      const visualPromise = generateVisualContent({
+      const visualResult = await generateVisualContent({
         materials: activity.materials,
         instructions: activity.instructions,
         reflection: activity.reflectionQuestion,
       });
       
-      const fullText = `
-        Objetivo: ${activity.learningObjective}.
-        Materiales: ${activity.materials}.
-        Instrucciones: ${activity.instructions}.
-        Reflexión: ${activity.reflectionQuestion}.
-      `;
-      const audioPromise = textToSpeech({ text: fullText });
-
-      const [visualResult, audioResult] = await Promise.all([visualPromise, audioPromise]);
-      
       setGeneratedContent(visualResult);
-      setIsGeneratingContent(false);
-
-      if(audioResult.media){
-         setGeneratedAudio(audioResult.media);
-      }
-      setIsGeneratingAudio(false);
-
       toast({
         title: "¡Contenido Generado!",
-        description: "El contenido visual y el audio están listos.",
+        description: "El contenido visual está listo.",
       });
 
     } catch (error) {
@@ -113,25 +92,13 @@ export default function ActivityDetailPage() {
         description: `No se pudo generar el contenido. ${error instanceof Error ? error.message : 'Error desconocido.'}`,
         variant: "destructive",
       });
-      setIsGeneratingContent(false);
-      setIsGeneratingAudio(false);
+    } finally {
+        setIsGeneratingContent(false);
     }
   };
 
-  const handleDownload = (format: 'html' | 'audio') => {
+  const handleDownload = () => {
     if (!activity) return;
-
-    if (format === 'audio') {
-      if (!generatedAudio) return;
-      const link = document.createElement('a');
-      link.href = generatedAudio;
-      const fileName = `${activity.activityName.replace(/[^a-zA-Z0-9_ ]/g, '') || 'Audio Actividad'}.wav`;
-      link.download = fileName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      return;
-    }
 
     const htmlContent = `
       <html>
@@ -279,32 +246,13 @@ export default function ActivityDetailPage() {
               content={activity.reflectionQuestion}
               generatedContent={generatedContent?.reflection}
             />
-            {isGeneratingAudio && !generatedAudio &&(
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Loader2 className="h-5 w-5 animate-spin" />
-                Generando audio...
-              </div>
-            )}
-            {generatedAudio && (
-              <div>
-                <h3 className="text-xl font-semibold mb-2 flex items-center gap-2 text-accent font-headline">
-                  <Volume2 className="h-6 w-6" /> Audio de la Actividad
-                </h3>
-                <audio controls src={generatedAudio} className="w-full">
-                  Tu navegador no soporta el elemento de audio.
-                </audio>
-                 <Button onClick={() => handleDownload('audio')} variant="outline" size="sm" className="mt-2">
-                    <DownloadCloud className="mr-2 h-4 w-4"/> Descargar Audio (.wav)
-                </Button>
-              </div>
-            )}
           </CardContent>
           <CardFooter className="border-t p-6 flex-wrap gap-2 justify-between">
-             <Button onClick={handleGenerateAllContent} disabled={isGeneratingContent || isGeneratingAudio} className="text-lg py-3 px-6">
-              {(isGeneratingContent || isGeneratingAudio) ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Sparkles className="mr-2 h-5 w-5" />}
-              {(isGeneratingContent || isGeneratingAudio) ? 'Generando...' : 'Crear Contenido Visual y Audio'}
+             <Button onClick={handleGenerateVisualContent} disabled={isGeneratingContent} className="text-lg py-3 px-6">
+              {isGeneratingContent ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Sparkles className="mr-2 h-5 w-5" />}
+              {isGeneratingContent ? 'Generando...' : 'Crear Contenido Visual'}
             </Button>
-            <Button onClick={() => handleDownload('html')} variant="secondary" className="text-lg py-3 px-6">
+            <Button onClick={() => handleDownload()} variant="secondary" className="text-lg py-3 px-6">
               <Download className="mr-2 h-5 w-5" /> Descargar (HTML)
             </Button>
           </CardFooter>

@@ -11,6 +11,7 @@
  */
 
 import { ai } from '@/ai/genkit';
+import { googleAI } from '@genkit-ai/googleai';
 import { z } from 'genkit';
 
 const GenerateVisualContentInputSchema = z.object({
@@ -49,7 +50,7 @@ async function processSection(text: string): Promise<z.infer<typeof VisualStepSc
     const processedChunks = await Promise.all(
         chunks.map(async (chunk) => {
             const llmResponse = await ai.generate({
-                model: 'gemini',
+                model: googleAI('gemini-2.0-flash'),
                 prompt: `Analyze the following text from an educational activity. Decide if a simple, clear, and helpful visual aid (like a simple drawing, diagram, or graphic) would enhance it for a teacher or student. If so, create a specific DALL-E 3 style prompt to generate it. If not, indicate that no image is needed. The visual should be simple, almost like a line drawing or a basic graphic.
 
 Text to analyze: "${chunk}"`,
@@ -80,7 +81,6 @@ Text to analyze: "${chunk}"`,
     return processedChunks.filter(Boolean) as z.infer<typeof VisualStepSchema>[];
 }
 
-
 const generateVisualContentFlow = ai.defineFlow(
   {
     name: 'generateVisualContentFlow',
@@ -101,7 +101,6 @@ const generateVisualContentFlow = ai.defineFlow(
     };
   }
 );
-
 
 export async function generateVisualContent(input: GenerateVisualContentInput): Promise<GenerateVisualContentOutput> {
   return generateVisualContentFlow(input);

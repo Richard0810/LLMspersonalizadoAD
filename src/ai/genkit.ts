@@ -11,7 +11,6 @@ export const ai = genkit({
   models: {
     'gemini': 'googleai/gemini-2.0-flash',
     'imagen': 'googleai/imagen-4.0-fast-generate-001',
-    'tts': 'googleai/gemini-2.5-flash-preview-tts',
   },
   model: 'gemini',
 });

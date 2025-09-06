@@ -4,4 +4,3 @@ config();
 import '@/ai/flows/consult-ai-on-lesson.ts';
 import '@/ai/flows/generate-educational-activity.ts';
 import '@/ai/flows/generate-visual-content.ts';
-import '@/ai/flows/text-to-speech.ts';
