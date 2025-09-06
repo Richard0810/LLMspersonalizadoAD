@@ -37,7 +37,7 @@ export default function LoginPage() {
       <InteractiveBackground />
       
       <header className="w-full bg-card shadow-md z-10 animate-slide-down-fade">
-        <div className="container mx-auto flex items-center justify-between p-3 gap-3 md:gap-4">
+        <div className="flex items-center justify-between p-3 gap-3 md:gap-4">
             {/* Institucion Educativa */}
             <div className="flex items-center gap-3 md:gap-4">
               <Image

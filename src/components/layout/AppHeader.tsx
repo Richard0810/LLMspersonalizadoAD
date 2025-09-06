@@ -43,41 +43,51 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ page, lessonParams, onRese
     };
   }, [loadHistory]);
 
-  const ParameterEditButton = ({ field, label, icon: IconComp }: { field: keyof LessonParams, label: string, icon: React.ElementType }) => (
-    <Button variant="outline" size="sm" onClick={() => onParameterEdit?.(field)} className="flex items-center gap-2 w-full justify-start">
-      <IconComp className="h-4 w-4" /> {label}
-    </Button>
-  );
-
   return (
-    <header className="flex items-center justify-between p-3 border-b bg-card shadow-sm z-20">
-      <div className="flex-1">
-        <div className="flex items-center gap-4 bg-gradient-to-r from-green-100 via-white to-red-100 p-2 rounded-xl shadow-md">
-            <Image 
-              src="/escudo.jpg"
-              alt="Escudo Institucional IE Alfonso Spath Spath"
-              width={56}
-              height={56}
-              className="transition-transform duration-300 hover:scale-110"
-            />
-            <div className="text-left">
-              <h1 className="text-xl font-bold text-gray-800">
-                Institucion Educativa Alfonso Spath Spath
-              </h1>
-              <h2 className="text-base text-gray-600">
-                {page === 'chat' ? 'Asistente EduSpark AI' : 'Configuración de Actividad'}
-              </h2>
-            </div>
+    <header className="flex items-center justify-between p-3 border-b bg-card shadow-sm z-20 gap-3 md:gap-4">
+      {/* Institucion Educativa */}
+      <div className="flex items-center gap-3 md:gap-4">
+        <Image
+          src="/escudo.jpg"
+          alt="Escudo Institucional"
+          width={64}
+          height={64}
+          className="transition-all duration-300 hover:scale-110 w-12 h-12 md:w-16 md:h-16"
+        />
+        <div className="text-left">
+          <h1 className="text-base md:text-xl font-headline font-bold uppercase text-foreground tracking-wider">
+            I.E. Alfonso Spath Spath
+          </h1>
+          <p className="text-sm md:text-base text-muted-foreground font-medium">
+             {page === 'chat' ? 'Asistente EduSpark AI' : 'Configuración de Actividad'}
+          </p>
         </div>
       </div>
 
-      <div className="flex items-center gap-2 ml-4">
+       {/* Universidad de Cordoba */}
+       <div className="flex items-center gap-3 md:gap-4">
+        <div className="hidden md:block text-right">
+          <h1 className="text-base md:text-xl font-headline font-bold uppercase text-foreground tracking-wider">
+            Universidad de Córdoba
+          </h1>
+          <p className="text-sm md:text-base text-muted-foreground font-medium">Licenciatura en Informática</p>
+        </div>
+         <Image
+          src={`/logo_unicor.png?t=${new Date().getTime()}`}
+          alt="Logo Universidad de Córdoba"
+          width={180}
+          height={60}
+          className="transition-all duration-300 hover:scale-110 w-auto h-10 md:h-12"
+        />
+      </div>
+
+      <div className="flex items-center gap-2">
         {page === 'chat' && (
           <>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="flex items-center gap-1">
-                  <Settings className="h-4 w-4" /> Modificar Parámetros
+                  <Settings className="h-4 w-4" /> <span className="hidden md:inline">Modificar Parámetros</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
@@ -111,7 +121,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ page, lessonParams, onRese
          <DropdownMenu onOpenChange={(open) => { if(open) loadHistory(); }}>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm" className="flex items-center gap-1">
-              <History className="h-4 w-4" /> Historial
+              <History className="h-4 w-4" /> <span className="hidden md:inline">Historial</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
