@@ -50,7 +50,7 @@ async function processSection(text: string): Promise<z.infer<typeof VisualStepSc
     const processedChunks = await Promise.all(
         chunks.map(async (chunk) => {
             const llmResponse = await ai.generate({
-                model: googleAI('gemini-2.0-flash'),
+                model: 'gemini',
                 prompt: `Analyze the following text from an educational activity. Decide if a simple, clear, and helpful visual aid (like a simple drawing, diagram, or graphic) would enhance it for a teacher or student. If so, create a specific DALL-E 3 style prompt to generate it. If not, indicate that no image is needed. The visual should be simple, almost like a line drawing or a basic graphic.
 
 Text to analyze: "${chunk}"`,
@@ -65,7 +65,7 @@ Text to analyze: "${chunk}"`,
 
             if (decision.shouldGenerate && decision.imagePrompt) {
                 const {media} = await ai.generate({
-                    model: 'googleai/imagen-4.0-fast-generate-001',
+                    model: 'imagen',
                     prompt: decision.imagePrompt,
                 });
                 return {
