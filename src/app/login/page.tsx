@@ -45,7 +45,7 @@ export default function LoginPage() {
                 alt="Escudo Institucional"
                 width={64}
                 height={64}
-                className="transition-all duration-300 hover:scale-110 w-12 h-12 md:w-16 md:h-16"
+                className="transition-all duration-300 hover:scale-110 w-12 h-12 md:w-20 md:h-20"
               />
               <div className="text-left">
                 <h1 className="text-base md:text-xl font-headline font-bold uppercase text-foreground tracking-wider">
