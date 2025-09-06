@@ -18,10 +18,10 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity }) => {
       <CardHeader>
         <div className="flex items-center gap-2 mb-2">
           <ActivityIcon className="h-6 w-6 text-primary" />
-          <CardTitle className="text-lg font-headline text-primary truncate">{activity.activityName}</CardTitle>
+          <CardTitle className="text-lg font-headline text-primary truncate">{activity.title}</CardTitle>
         </div>
         <CardDescription className="text-sm text-muted-foreground line-clamp-3 h-[3.75rem] whitespace-pre-line">
-          <strong>Objetivo:</strong> {activity.learningObjective}
+          <strong>Objetivo:</strong> {activity.objective}
         </CardDescription>
       </CardHeader>
       <CardContent>

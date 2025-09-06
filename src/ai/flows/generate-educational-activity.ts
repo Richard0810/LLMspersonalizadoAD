@@ -22,11 +22,16 @@ const GenerateEducationalActivitiesInputSchema = z.object({
 export type GenerateEducationalActivitiesInput = z.infer<typeof GenerateEducationalActivitiesInputSchema>;
 
 const EducationalActivitySchema = z.object({
-  activityName: z.string().describe('Un nombre creativo y detallado para la actividad desconectada.'),
-  learningObjective: z.string().describe('Un objetivo de aprendizaje claro, medible y específico.'),
-  materials: z.string().describe('Una lista de materiales simples y accesibles (no electrónicos), descritos con suficiente detalle para que el docente pueda prepararlos fácilmente. Si se usan tarjetas, describir qué deben contener.'),
-  instructions: z.string().describe('Instrucciones detalladas y obligatoriamente numeradas (paso a paso) que guíen al docente como si fuera un guion de clase. Deben incluir ejemplos prácticos, ejercicios y la dinámica completa de la actividad. No se debe usar NINGÚN tipo de formato especial como asteriscos para negrita.'),
-  reflectionQuestion: z.string().describe('Una explicación detallada y clara de cómo la actividad evidencia el concepto de pensamiento computacional, conectando los pasos del ejercicio con la teoría. Además, debe incluir una pregunta o tema para la reflexión y el cierre pedagógico de la actividad.'),
+  title: z.string().describe('Título de la actividad.'),
+  objective: z.string().describe('Un objetivo de aprendizaje claro, medible, específico y en coherencia con los lineamientos del MEN de Colombia.'),
+  computationalConcept: z.string().describe('El concepto o conceptos de pensamiento computacional trabajados en la actividad.'),
+  materials: z.string().describe('Una lista de materiales simples y accesibles (no electrónicos).'),
+  estimatedTime: z.string().describe('El tiempo estimado para la realización completa de la actividad (ej: "45 minutos", "2 horas de clase").'),
+  teacherPreparation: z.string().describe('Los pasos o materiales que el docente debe preparar antes de la clase.'),
+  stepByStepDevelopment: z.string().describe('Instrucciones detalladas y obligatoriamente numeradas (paso a paso) que guíen al docente como si fuera un guion de clase. Deben incluir ejemplos prácticos, ejercicios y la dinámica completa de la actividad.'),
+  visualExamples: z.string().describe('Sugerencias de ejemplos visuales o diagramas que el docente puede dibujar en el tablero o en hojas para facilitar la comprensión (tablas, cuadrículas, mapas, pictogramas).'),
+  reflectionQuestion: z.string().describe('Una explicación detallada de cómo la actividad evidencia el concepto de pensamiento computacional, y preguntas para guiar la metacognición de los estudiantes.'),
+  evaluationCriteria: z.string().describe('Los criterios de evaluación o evidencias de aprendizaje que el docente puede usar para valorar el desempeño de los estudiantes.')
 });
 
 const GenerateEducationalActivitiesOutputSchema = z.array(EducationalActivitySchema).length(3).describe('Tres actividades desconectadas, muy detalladas y listas para ser implementadas por un docente con poca experiencia en el tema.');
@@ -43,11 +48,11 @@ const generateEducationalActivitiesPrompt = ai.definePrompt({
   name: 'generateEducationalActivitiesPrompt',
   input: {schema: GenerateEducationalActivitiesInputSchema},
   output: {schema: GenerateEducationalActivitiesOutputSchema},
-  prompt: `Rol: Eres un diseñador instruccional experto y un asesor pedagógico especializado en pensamiento computacional.
-Tarea: Tu misión es diseñar actividades desconectadas tan completas y detalladas que un docente, incluso sin experiencia previa en el tema, pueda implementarlas en su aula de manera exitosa y sin esfuerzo. Cada actividad debe ser un recurso educativo "llave en mano".
-Audiencia: Docentes de tecnología e informática, especialmente aquellos en contextos rurales o con baja conectividad que necesitan recursos didácticos muy claros, intuitivos y prácticos.
-Contexto: Serás el núcleo de una herramienta de IA que busca cerrar la brecha de conocimiento y recursos para enseñar pensamiento computacional de manera efectiva sin necesidad de tecnología en el aula.
-Tono: Didáctico, claro, alentador y extremadamente práctico.
+  prompt: `Rol: Eres un diseñador instruccional experto y un asesor pedagógico especializado en pensamiento computacional para el contexto educativo de Colombia.
+Tarea: Tu misión es diseñar tres actividades desconectadas tan completas y detalladas que un docente, incluso sin experiencia previa en el tema, pueda implementarlas en su aula de manera exitosa y sin esfuerzo. Cada actividad debe ser un recurso educativo "llave en mano".
+Audiencia: Docentes de tecnología e informática en Colombia, especialmente aquellos en contextos rurales o con baja conectividad.
+Contexto: Serás el núcleo de una herramienta de IA que busca cerrar la brecha de conocimiento y recursos para enseñar pensamiento computacional.
+Tono: Didáctico, claro, práctico, motivador y adaptable por los docentes.
 
 **Instrucción Principal:**
 Genera tres actividades desconectadas distintas y muy detalladas, basadas en la siguiente información. **Todo el contenido debe estar en español.**
@@ -57,17 +62,20 @@ Genera tres actividades desconectadas distintas y muy detalladas, basadas en la 
 - Área Temática: {{{subjectArea}}}
 - Nivel de Grado: {{{gradeLevel}}}
 
-**Formato de Salida Requerido para cada actividad (Debes ser muy riguroso con esta estructura):**
+**Formato de Salida Requerido para cada actividad (Debes ser MUY RIGUROSO con esta estructura):**
 Asegúrate de que cada actividad generada cumpla estrictamente con lo siguiente:
-- **Nombre de la actividad:** Un título creativo, claro y descriptivo que enganche al estudiante.
-- **Objetivo de aprendizaje:** Un objetivo pedagógico preciso y medible.
-- **Materiales necesarios:** Describe los elementos de forma muy detallada. Si se usan tarjetas, especifica qué deben contener (ej: "10 tarjetas de acción con verbos como 'Avanzar', 'Girar Izquierda'", "5 tarjetas de condición con dibujos de 'obstáculo' o 'camino libre'").
-- **Instrucciones paso a paso:** Presenta una guía **obligatoriamente numerada** y exhaustiva (1., 2., 3., etc.), como un guion de clase. Incluye qué debe decir el docente, qué deben hacer los estudiantes, y ejemplos prácticos o un ejercicio guiado. La guía debe ser tan clara que no deje lugar a dudas. **IMPORTANTE: No uses NUNCA asteriscos (**) para resaltar texto. El texto debe ser plano, solo estructurado con números y saltos de línea.**
-- **Reflexión y Conexión:** Este apartado es crucial y debe tener dos partes bien diferenciadas:
-    1.  **Conexión con el Pensamiento Computacional:** Explica con sumo detalle cómo la dinámica y cada parte de la actividad demuestran y ayudan a comprender el concepto clave solicitado (ej. "En esta actividad, la descomposición se manifiesta cuando los estudiantes dividen el problema grande de 'crear un mapa' en las siguientes subtareas: 1. Dibujar el punto de inicio, 2. Trazar el camino principal, 3. Añadir los obstáculos..."). La conexión debe ser explícita y didáctica.
-    2.  **Cierre Pedagógico:** Propón una pregunta de reflexión profunda o una dinámica final que consolide el aprendizaje y permita a los estudiantes articular lo que aprendieron.
+- **title:** Un nombre creativo y descriptivo para la actividad.
+- **objective:** Un objetivo de aprendizaje claro, medible y específico, que esté en coherencia con los lineamientos del Ministerio de Educación Nacional (MEN) de Colombia para el grado especificado.
+- **computationalConcept:** Menciona explícitamente el concepto de pensamiento computacional que se trabaja (Descomposición, Abstracción, Algoritmos, etc.).
+- **materials:** Una lista de materiales simples y accesibles (no electrónicos), descritos con suficiente detalle.
+- **estimatedTime:** El tiempo estimado para realizar la actividad (ej: "45 minutos").
+- **teacherPreparation:** Describe qué debe hacer o preparar el docente ANTES de iniciar la clase.
+- **stepByStepDevelopment:** Una guía **obligatoriamente numerada** y exhaustiva (1., 2., 3., etc.), como un guion de clase. Incluye qué debe decir el docente y qué deben hacer los estudiantes.
+- **visualExamples:** Describe ejemplos visuales o diagramas que el docente pueda dibujar en el tablero o en hojas para apoyar la explicación (ej: "una tabla de 3x3", "un diagrama de flujo simple con flechas", "pictogramas para representar acciones").
+- **reflectionQuestion:** Una explicación detallada y clara de cómo la actividad evidencia el concepto de pensamiento computacional, conectando los pasos del ejercicio con la teoría. Además, debe incluir preguntas para guiar la reflexión y la metacognición de los estudiantes.
+- **evaluationCriteria:** Describe las evidencias de aprendizaje o los criterios que el docente puede observar para evaluar si los estudiantes alcanzaron el objetivo.
 
-La salida debe ser un JSON array con tres objetos, donde cada objeto representa una actividad completa y detallada, conteniendo los campos: activityName, learningObjective, materials, instructions, y reflectionQuestion.
+La salida debe ser un JSON array con tres objetos, donde cada objeto representa una actividad completa y detallada, conteniendo los campos especificados.
   `,
 });
 
@@ -82,7 +90,3 @@ const generateEducationalActivitiesFlow = ai.defineFlow(
     return output!;
   }
 );
-
-    
-
-    

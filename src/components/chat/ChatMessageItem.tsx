@@ -29,11 +29,16 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({ message, onParameterC
     let fullText = introText ? `${introText}\n\n` : "";
     if (activities && activities.length > 0) {
       activities.forEach((activity, index) => {
-        fullText += `--- Actividad ${index + 1}: ${activity.activityName} ---\n`;
-        fullText += `Objetivo de Aprendizaje:\n${activity.learningObjective}\n\n`;
+        fullText += `--- Actividad ${index + 1}: ${activity.title} ---\n`;
+        fullText += `Objetivo de Aprendizaje:\n${activity.objective}\n\n`;
+        fullText += `Concepto de Pensamiento Computacional:\n${activity.computationalConcept}\n\n`;
         fullText += `Materiales:\n${activity.materials}\n\n`;
-        fullText += `Instrucciones:\n${activity.instructions}\n\n`;
+        fullText += `Tiempo Estimado:\n${activity.estimatedTime}\n\n`;
+        fullText += `Preparación Previa:\n${activity.teacherPreparation}\n\n`;
+        fullText += `Desarrollo Paso a Paso:\n${activity.stepByStepDevelopment}\n\n`;
+        fullText += `Ejemplos Visuales:\n${activity.visualExamples}\n\n`;
         fullText += `Pregunta de Reflexión:\n${activity.reflectionQuestion}\n\n`;
+        fullText += `Criterios de Evaluación:\n${activity.evaluationCriteria}\n\n`;
         if (index < activities.length - 1) {
           fullText += "---\n\n";
         }

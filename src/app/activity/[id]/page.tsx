@@ -7,7 +7,7 @@ import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import InteractiveBackground from '@/components/shared/InteractiveBackground';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Download, ListChecks, BookOpen, Target, ThumbsUp, Sparkles, Loader2 } from 'lucide-react';
+import { ArrowLeft, Download, ListChecks, BookOpen, Target, ThumbsUp, Sparkles, Loader2, Clock, ClipboardCheck, Brain, Eye, UserCheck } from 'lucide-react';
 import type { Activity, VisualContent } from '@/types';
 import { getActivityByIdFromLocalStorage } from '@/lib/localStorageUtils';
 import { useToast } from '@/hooks/use-toast';
@@ -15,8 +15,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { generateVisualContent } from '@/ai/flows/generate-visual-content';
 import Image from 'next/image';
 
-const SectionContent = ({ title, icon, content, generatedContent }) => (
-  <div>
+const SectionContent = ({ title, icon, content, generatedContent, className = "" }) => (
+  <div className={className}>
     <h3 className="text-xl font-semibold flex items-center gap-2 text-accent font-headline mb-2">
       {icon} {title}
     </h3>
@@ -75,7 +75,7 @@ export default function ActivityDetailPage() {
     try {
       const visualResult = await generateVisualContent({
         materials: activity.materials,
-        instructions: activity.instructions,
+        instructions: activity.stepByStepDevelopment,
         reflection: activity.reflectionQuestion,
       });
       
@@ -104,7 +104,7 @@ export default function ActivityDetailPage() {
       <html>
         <head>
           <meta charset="UTF-8">
-          <title>${activity.activityName}</title>
+          <title>${activity.title}</title>
           <style>
             body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; color: #333; }
             h1 { color: #229954; }
@@ -115,11 +115,26 @@ export default function ActivityDetailPage() {
           </style>
         </head>
         <body>
-          <h1>${activity.activityName}</h1>
+          <h1>${activity.title}</h1>
           
           <div class="section">
             <h2>Objetivo de Aprendizaje</h2>
-            <p>${activity.learningObjective}</p>
+            <p>${activity.objective}</p>
+          </div>
+
+          <div class="section">
+            <h2>Concepto de Pensamiento Computacional</h2>
+            <p>${activity.computationalConcept}</p>
+          </div>
+
+           <div class="section">
+            <h2>Tiempo Estimado</h2>
+            <p>${activity.estimatedTime}</p>
+          </div>
+
+           <div class="section">
+            <h2>Preparación Previa del Docente</h2>
+            <p>${activity.teacherPreparation}</p>
           </div>
           
           <div class="section">
@@ -128,13 +143,23 @@ export default function ActivityDetailPage() {
           </div>
           
           <div class="section">
-            <h2>Instrucciones</h2>
-            ${generatedContent?.instructions.map(item => `<p>${item.step}</p>${item.image ? `<img src="${item.image}" alt="Ilustración">` : ''}`).join('') || `<p>${activity.instructions}</p>`}
+            <h2>Desarrollo Paso a Paso</h2>
+            ${generatedContent?.instructions.map(item => `<p>${item.step}</p>${item.image ? `<img src="${item.image}" alt="Ilustración">` : ''}`).join('') || `<p>${activity.stepByStepDevelopment}</p>`}
+          </div>
+
+           <div class="section">
+            <h2>Ejemplos Visuales Sugeridos</h2>
+            <p>${activity.visualExamples}</p>
           </div>
           
           <div class="section">
-            <h2>Reflexión</h2>
+            <h2>Reflexión y Conexión</h2>
              ${generatedContent?.reflection.map(item => `<p>${item.step}</p>${item.image ? `<img src="${item.image}" alt="Ilustración">` : ''}`).join('') || `<p>${activity.reflectionQuestion}</p>`}
+          </div>
+
+           <div class="section">
+            <h2>Criterios de Evaluación</h2>
+            <p>${activity.evaluationCriteria}</p>
           </div>
         </body>
       </html>
@@ -144,7 +169,7 @@ export default function ActivityDetailPage() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    const fileName = `${activity.activityName.replace(/[^a-zA-Z0-9_ ]/g, '') || 'Actividad'}.html`;
+    const fileName = `${activity.title.replace(/[^a-zA-Z0-9_ ]/g, '') || 'Actividad'}.html`;
     link.download = fileName;
     document.body.appendChild(link);
     link.click();
@@ -223,11 +248,30 @@ export default function ActivityDetailPage() {
                 <div className="p-2 bg-primary/20 rounded-full">
                     <BookOpen className="h-8 w-8 text-primary" />
                 </div>
-                <CardTitle className="text-3xl font-headline text-primary">{activity.activityName}</CardTitle>
+                <CardTitle className="text-3xl font-headline text-primary">{activity.title}</CardTitle>
              </div>
-            <CardDescription className="text-base text-foreground/80 whitespace-pre-line">{activity.learningObjective}</CardDescription>
+            <CardDescription className="text-base text-foreground/80 whitespace-pre-line">{activity.objective}</CardDescription>
           </CardHeader>
           <CardContent className="p-6 space-y-8">
+            
+            <SectionContent
+                title="Concepto de Pensamiento Computacional"
+                icon={<Brain className="h-6 w-6" />}
+                content={activity.computationalConcept}
+              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <SectionContent
+                title="Tiempo Estimado"
+                icon={<Clock className="h-6 w-6" />}
+                content={activity.estimatedTime}
+              />
+              <SectionContent
+                title="Preparación Previa del Docente"
+                icon={<ClipboardCheck className="h-6 w-6" />}
+                content={activity.teacherPreparation}
+              />
+            </div>
+
             <SectionContent
               title="Materiales Necesarios"
               icon={<ListChecks className="h-6 w-6" />}
@@ -235,16 +279,26 @@ export default function ActivityDetailPage() {
               generatedContent={generatedContent?.materials}
             />
             <SectionContent
-              title="Instrucciones"
+              title="Desarrollo Paso a Paso"
               icon={<Target className="h-6 w-6" />}
-              content={activity.instructions}
+              content={activity.stepByStepDevelopment}
               generatedContent={generatedContent?.instructions}
             />
-             <SectionContent
-              title="Reflexión"
+            <SectionContent
+              title="Ejemplos Visuales Sugeridos"
+              icon={<Eye className="h-6 w-6" />}
+              content={activity.visualExamples}
+            />
+            <SectionContent
+              title="Reflexión y Conexión"
               icon={<ThumbsUp className="h-6 w-6" />}
               content={activity.reflectionQuestion}
               generatedContent={generatedContent?.reflection}
+            />
+            <SectionContent
+              title="Criterios de Evaluación"
+              icon={<UserCheck className="h-6 w-6" />}
+              content={activity.evaluationCriteria}
             />
           </CardContent>
           <CardFooter className="border-t p-6 flex-wrap gap-2 justify-between">

@@ -7,11 +7,16 @@ export interface User {
 
 export interface Activity {
   id: string;
-  activityName: string;
-  learningObjective: string;
+  title: string;
+  objective: string;
+  computationalConcept: string;
   materials: string;
-  instructions: string;
+  estimatedTime: string;
+  teacherPreparation: string;
+  stepByStepDevelopment: string;
+  visualExamples: string;
   reflectionQuestion: string;
+  evaluationCriteria: string;
 }
 
 export type MessageSender = 'user' | 'ai' | 'system';
