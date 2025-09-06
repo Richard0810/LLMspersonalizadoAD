@@ -68,7 +68,7 @@ export default function LoginPage() {
                 alt="Logo Universidad de Córdoba"
                 width={200}
                 height={60}
-                className="transition-all duration-300 hover:scale-110 w-auto h-12 md:h-16"
+                className="transition-all duration-300 hover:scale-110 w-auto h-12 md:h-20"
               />
             </div>
         </div>
