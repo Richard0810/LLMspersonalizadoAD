@@ -66,9 +66,9 @@ export default function LoginPage() {
                <Image
                 src={`/logo_unicor.png?t=${new Date().getTime()}`}
                 alt="Logo Universidad de Córdoba"
-                width={200}
-                height={70}
-                className="transition-all duration-300 hover:scale-110 w-auto h-12 md:h-20"
+                width={180}
+                height={60}
+                className="transition-all duration-300 hover:scale-110 w-auto h-10 md:h-12"
               />
             </div>
         </div>
