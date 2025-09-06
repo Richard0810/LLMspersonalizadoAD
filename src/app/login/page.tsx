@@ -64,7 +64,7 @@ export default function LoginPage() {
                 <p className="text-sm md:text-base text-muted-foreground font-medium">Licenciatura en Informática</p>
               </div>
                <Image
-                src="/logo_unicor.png"
+                src={`/logo_unicor.png?t=${new Date().getTime()}`}
                 alt="Logo Universidad de Córdoba"
                 width={200}
                 height={70}
