@@ -8,5 +8,10 @@ export const ai = genkit({
   plugins: [googleAI({
     apiKey: process.env.GEMINI_API_KEY,
   })],
-  model: 'googleai/gemini-2.0-flash',
+  models: {
+    'gemini': 'googleai/gemini-2.0-flash',
+    'imagen': 'googleai/imagen-4.0-fast-generate-001',
+    'tts': 'googleai/gemini-2.5-flash-preview-tts',
+  },
+  model: 'gemini',
 });

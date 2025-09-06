@@ -62,5 +62,13 @@ export const computationalConcepts = [
   "Todos los conceptos"
 ];
 
+export interface InstructionStep {
+  step: string;
+  image?: string; // Base64 encoded image data URI
+}
 
-
+export interface VisualContent {
+  materials: InstructionStep[];
+  instructions: InstructionStep[];
+  reflection: InstructionStep[];
+}
