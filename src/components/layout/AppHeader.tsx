@@ -45,16 +45,26 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ page, lessonParams, onRese
 
   return (
     <header className="flex items-center justify-between p-3 border-b bg-card shadow-sm z-20 gap-3 md:gap-4">
+      {/* Universidad de Cordoba */}
+      <div className="flex items-center gap-3 md:gap-4">
+         <Image
+          src={`/logo_unicor.png?t=${new Date().getTime()}`}
+          alt="Logo Universidad de Córdoba"
+          width={180}
+          height={60}
+          className="transition-all duration-300 hover:scale-110 w-auto h-10 md:h-12"
+        />
+        <div className="hidden md:block text-left">
+          <h1 className="text-base md:text-xl font-headline font-bold uppercase text-foreground tracking-wider">
+            Universidad de Córdoba
+          </h1>
+          <p className="text-sm md:text-base text-muted-foreground font-medium">Licenciatura en Informática</p>
+        </div>
+      </div>
+      
       {/* Institucion Educativa */}
       <div className="flex items-center gap-3 md:gap-4">
-        <Image
-          src="/escudo.jpg"
-          alt="Escudo Institucional"
-          width={64}
-          height={64}
-          className="transition-all duration-300 hover:scale-110 w-12 h-12 md:w-16 md:h-16"
-        />
-        <div className="text-left">
+        <div className="text-right">
           <h1 className="text-base md:text-xl font-headline font-bold uppercase text-foreground tracking-wider">
             I.E. Alfonso Spath Spath
           </h1>
@@ -62,22 +72,12 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ page, lessonParams, onRese
              {page === 'chat' ? 'Asistente EduSpark AI' : 'Configuración de Actividad'}
           </p>
         </div>
-      </div>
-
-       {/* Universidad de Cordoba */}
-       <div className="flex items-center gap-3 md:gap-4">
-        <div className="hidden md:block text-right">
-          <h1 className="text-base md:text-xl font-headline font-bold uppercase text-foreground tracking-wider">
-            Universidad de Córdoba
-          </h1>
-          <p className="text-sm md:text-base text-muted-foreground font-medium">Licenciatura en Informática</p>
-        </div>
-         <Image
-          src={`/logo_unicor.png?t=${new Date().getTime()}`}
-          alt="Logo Universidad de Córdoba"
-          width={180}
-          height={60}
-          className="transition-all duration-300 hover:scale-110 w-auto h-10 md:h-12"
+        <Image
+          src="/escudo.jpg"
+          alt="Escudo Institucional"
+          width={64}
+          height={64}
+          className="transition-all duration-300 hover:scale-110 w-12 h-12 md:w-16 md:h-16"
         />
       </div>
 
@@ -130,7 +130,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ page, lessonParams, onRese
             {activityHistory.length > 0 ? (
               activityHistory.map(activity => (
                 <DropdownMenuItem key={activity.id} onClick={() => router.push(`/activity/${activity.id}`)}>
-                  {activity.activityName}
+                  {activity.title}
                 </DropdownMenuItem>
               ))
             ) : (
