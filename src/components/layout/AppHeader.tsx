@@ -69,7 +69,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ page, lessonParams, onRese
             I.E. Alfonso Spath Spath
           </h1>
           <p className="text-sm md:text-base text-muted-foreground font-medium">
-             {page === 'chat' ? 'Asistente EduSpark AI' : 'Configuración de Actividad'}
+             Martinez - Cereté, Córdoba
           </p>
         </div>
         <Image
