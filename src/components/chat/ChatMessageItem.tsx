@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -24,6 +23,12 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({ message, onParameterC
   const isUser = message.sender === 'user';
   const isAI = message.sender === 'ai';
   const isSystem = message.sender === 'system';
+
+  const createMarkup = (text?: string) => {
+    if (!text) return { __html: '' };
+    const htmlText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    return { __html: htmlText };
+  };
 
   const formatActivitiesForEditing = (introText?: string, activities?: Activity[]): string => {
     let fullText = introText ? `${introText}\n\n` : "";
@@ -88,7 +93,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({ message, onParameterC
       {message.text && (
          <Card className={cn("p-3 rounded-lg max-w-xs lg:max-w-md shadow", 
             isAI ? "bg-primary/10 text-card-foreground" : "bg-card")}>
-            <p className="text-sm whitespace-pre-wrap">{message.text}</p>
+            <p className="text-sm whitespace-pre-wrap" dangerouslySetInnerHTML={createMarkup(message.text)} />
         </Card>
       )}
       {message.type === 'activity_cards' && message.activities && (
