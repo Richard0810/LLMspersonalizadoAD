@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -91,7 +92,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({ message, onParameterC
   const aiMessageContent = (
     <div className="flex flex-col space-y-2">
       {message.text && (
-         <Card className={cn("p-3 rounded-lg max-w-lg lg:max-w-2xl shadow", 
+         <Card className={cn("p-3 rounded-lg max-w-lg lg:max-w-4xl shadow", 
             isAI ? "bg-primary/10 text-card-foreground" : "bg-card")}>
             <p className="text-sm whitespace-pre-wrap" dangerouslySetInnerHTML={createMarkup(message.text)} />
         </Card>
@@ -197,3 +198,5 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({ message, onParameterC
 };
 
 export default ChatMessageItem;
+
+    

@@ -291,7 +291,7 @@ Generando actividades iniciales...`,
 
   return (
     <div className="flex flex-col h-full w-full bg-transparent">
-      <ScrollArea className="flex-grow p-4 w-full max-w-4xl" ref={scrollAreaRef}>
+      <ScrollArea className="flex-grow p-4 w-full" ref={scrollAreaRef}>
         <div className="space-y-4">
           {messages.map((msg) => (
             <ChatMessageItem 
@@ -305,7 +305,7 @@ Generando actividades iniciales...`,
         </div>
       </ScrollArea>
 
-      <footer className="p-3 border-t bg-card w-full max-w-4xl">
+      <footer className="p-3 border-t bg-card w-full">
         <div className="flex items-center gap-2">
           <Input
             ref={inputRef}
@@ -360,5 +360,7 @@ Generando actividades iniciales...`,
 };
 
 export default ChatInterface;
+
+    
 
     
