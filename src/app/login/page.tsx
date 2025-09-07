@@ -49,9 +49,9 @@ export default function LoginPage() {
               />
               <div className="text-left">
                 <h1 className="text-base md:text-xl font-headline font-bold uppercase text-foreground tracking-wider">
-                  Universidad de Córdoba
+                  Licenciatura en Informática
                 </h1>
-                <p className="text-sm md:text-base text-muted-foreground font-medium">Licenciatura en Informática</p>
+                <p className="text-sm md:text-base text-muted-foreground font-medium">Facultad de Educación y Ciencias Humanas</p>
               </div>
             </div>
             
