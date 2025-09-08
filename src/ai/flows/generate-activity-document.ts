@@ -35,7 +35,34 @@ const GenerateActivityDocumentOutputSchema = z.object({
 });
 
 /**
- * Creates an array of Paragraphs from a given text string.
+ * Parses a string with markdown-style bolding (**text**) into an array of TextRun objects.
+ * @param text The input string.
+ * @returns An array of TextRun objects with appropriate bolding.
+ */
+const createTextRunsFromMarkdown = (text: string): TextRun[] => {
+    if (!text || typeof text !== 'string') return [];
+
+    const parts = text.split(/(\*\*.*?\*\*)/g).filter(part => part);
+    return parts.map(part => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+            return new TextRun({
+                text: part.slice(2, -2),
+                bold: true,
+                font: 'Arial',
+                size: 22, // 11pt
+            });
+        }
+        return new TextRun({
+            text: part,
+            font: 'Arial',
+            size: 22, // 11pt
+        });
+    });
+};
+
+
+/**
+ * Creates an array of Paragraphs from a given text string, parsing markdown bolding.
  * Each line break in the text results in a new Paragraph.
  * @param text - The text to be converted.
  * @returns An array of Paragraph objects.
@@ -45,13 +72,13 @@ const createParagraphsFromText = (text: string): Paragraph[] => {
   const lines = text.split('\n').filter(line => line.trim() !== '');
   if (lines.length === 0) return [];
   return lines.map(line => new Paragraph({
-      children: [new TextRun({ text: line, size: 22 })], // 11pt font size
+      children: createTextRunsFromMarkdown(line),
       spacing: { after: 120 } // Spacing after paragraph
   }));
 };
 
 /**
- * Creates a numbered list (array of Paragraphs) from a text string.
+ * Creates a numbered list (array of Paragraphs) from a text string, parsing markdown bolding.
  * Each line in the text becomes a numbered item.
  * @param text - The text to be converted into a list.
  * @returns An array of Paragraph objects formatted as a numbered list.
@@ -62,7 +89,7 @@ const createNumberedList = (text: string): Paragraph[] => {
     if (lines.length === 0) return [];
     return lines.map((line) =>
         new Paragraph({
-            children: [new TextRun({ text: line, size: 22 })], // 11pt font size
+            children: createTextRunsFromMarkdown(line),
             numbering: {
                 reference: 'default-numbering',
                 level: 0,
@@ -115,11 +142,11 @@ const generateActivityDocumentFlow = ai.defineFlow(
                             }),
                             new Paragraph({
                                 alignment: AlignmentType.CENTER,
-                                children: [new TextRun({ text: "Licenciatura en Informática", bold: true, size: 22 })],
+                                children: [new TextRun({ text: "Licenciatura en Informática", bold: true, size: 22, font: "Arial" })],
                             }),
                             new Paragraph({
                                 alignment: AlignmentType.CENTER,
-                                children: [new TextRun({ text: "Facultad de Educación y Ciencias Humanas", size: 20 })],
+                                children: [new TextRun({ text: "Facultad de Educación y Ciencias Humanas", size: 20, font: "Arial" })],
                             }),
                         ],
                         verticalAlign: VerticalAlign.CENTER,
@@ -139,11 +166,11 @@ const generateActivityDocumentFlow = ai.defineFlow(
                             }),
                             new Paragraph({
                                 alignment: AlignmentType.CENTER,
-                                children: [new TextRun({ text: "I.E. Alfonso Spath Spath", bold: true, size: 22 })],
+                                children: [new TextRun({ text: "I.E. Alfonso Spath Spath", bold: true, size: 22, font: "Arial" })],
                             }),
                              new Paragraph({
                                 alignment: AlignmentType.CENTER,
-                                children: [new TextRun({ text: "Martinez - Cereté, Córdoba", size: 20 })],
+                                children: [new TextRun({ text: "Martinez - Cereté, Córdoba", size: 20, font: "Arial" })],
                             }),
                         ],
                          verticalAlign: VerticalAlign.CENTER,
@@ -156,7 +183,16 @@ const generateActivityDocumentFlow = ai.defineFlow(
     
     // --- 3. Build Document Content ---
     const doc = new Document({
+      creator: "EduSpark AI",
+      title: activity.title,
       styles: {
+        default: {
+            document: {
+                run: {
+                    font: "Arial",
+                },
+            },
+        },
         paragraphStyles: [
             {
                 id: "section-title",
@@ -167,6 +203,7 @@ const generateActivityDocumentFlow = ai.defineFlow(
                     size: 24, // 12pt
                     bold: true,
                     color: "229954",
+                    font: "Arial",
                 },
                 paragraph: {
                     spacing: { before: 240, after: 120 },
@@ -194,7 +231,7 @@ const generateActivityDocumentFlow = ai.defineFlow(
           children: [
             headerTable,
             new Paragraph({ 
-                children: [new TextRun({ text: activity.title, size: 30, bold: true })], 
+                children: [new TextRun({ text: activity.title, size: 30, bold: true, font: "Arial" })], 
                 heading: HeadingLevel.TITLE, 
                 alignment: AlignmentType.CENTER,
                 spacing: { after: 400, before: 200 }
