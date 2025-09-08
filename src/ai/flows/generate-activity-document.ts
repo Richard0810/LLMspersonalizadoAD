@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview A flow to generate a DOCX document from an activity object.
@@ -21,6 +22,7 @@ import {
   WidthType,
   ImageRun,
   VerticalAlign,
+  BorderStyle,
 } from 'docx';
 import * as fs from 'fs/promises';
 import * as path from 'path';
@@ -36,13 +38,16 @@ const GenerateActivityDocumentOutputSchema = z.object({
  * Creates an array of Paragraphs from a given text string.
  * Each line break in the text results in a new Paragraph.
  * @param text - The text to be converted.
- * @param options - Optional styling for the paragraphs.
  * @returns An array of Paragraph objects.
  */
-const createParagraphsFromText = (text: string, options: any = {}): Paragraph[] => {
-  if (!text) return [];
-  const lines = text.split('\n');
-  return lines.map(line => new Paragraph({ ...options, children: [new TextRun(line)] }));
+const createParagraphsFromText = (text: string): Paragraph[] => {
+  if (!text || typeof text !== 'string') return [];
+  const lines = text.split('\n').filter(line => line.trim() !== '');
+  if (lines.length === 0) return [];
+  return lines.map(line => new Paragraph({
+      children: [new TextRun({ text: line, size: "22pt" })], // 11pt font size
+      spacing: { after: 120 } // Spacing after paragraph
+  }));
 };
 
 /**
@@ -52,19 +57,20 @@ const createParagraphsFromText = (text: string, options: any = {}): Paragraph[] 
  * @returns An array of Paragraph objects formatted as a numbered list.
  */
 const createNumberedList = (text: string): Paragraph[] => {
-  if (!text) return [];
-  const lines = text.split('\n');
-  return lines.map((line, index) =>
+  if (!text || typeof text !== 'string') return [];
+  const lines = text.split('\n').filter(line => line.trim() !== '');
+  if (lines.length === 0) return [];
+  return lines.map((line) =>
     new Paragraph({
-      children: [new TextRun(line)],
+      children: [new TextRun({ text: line, size: "22pt" })], // 11pt font size
       numbering: {
         reference: 'default-numbering',
         level: 0,
       },
+      spacing: { after: 120 }
     })
   );
 };
-
 
 // Define the Genkit flow
 const generateActivityDocumentFlow = ai.defineFlow(
@@ -75,7 +81,6 @@ const generateActivityDocumentFlow = ai.defineFlow(
   },
   async (activity) => {
     // --- 1. Load Logo Images ---
-    // Note: process.cwd() points to the root of your Next.js project.
     const logoUnicorPath = path.join(process.cwd(), 'public', 'logo_unicor.png');
     const logoEscudoPath = path.join(process.cwd(), 'public', 'escudo.jpg');
 
@@ -85,6 +90,12 @@ const generateActivityDocumentFlow = ai.defineFlow(
     ]);
     
     // --- 2. Create Header Table ---
+    const borderStyle = {
+        style: BorderStyle.SINGLE,
+        size: 1,
+        color: "000000",
+    };
+
     const headerTable = new Table({
         width: { size: 100, type: WidthType.PERCENTAGE },
         rows: [
@@ -94,6 +105,7 @@ const generateActivityDocumentFlow = ai.defineFlow(
                     new TableCell({
                         children: [
                             new Paragraph({
+                                alignment: AlignmentType.CENTER,
                                 children: [
                                     new ImageRun({
                                         data: logoUnicorBuffer,
@@ -102,21 +114,22 @@ const generateActivityDocumentFlow = ai.defineFlow(
                                 ],
                             }),
                             new Paragraph({
-                                children: [new TextRun({ text: "Licenciatura en Informática", bold: true, size: "11pt" })],
-                                style: 'Normal',
+                                alignment: AlignmentType.CENTER,
+                                children: [new TextRun({ text: "Licenciatura en Informática", bold: true, size: "22pt" })],
                             }),
                             new Paragraph({
-                                children: [new TextRun({ text: "Facultad de Educación y Ciencias Humanas", size: "10pt" })],
-                                style: 'Normal',
+                                alignment: AlignmentType.CENTER,
+                                children: [new TextRun({ text: "Facultad de Educación y Ciencias Humanas", size: "20pt" })],
                             }),
                         ],
                         verticalAlign: VerticalAlign.CENTER,
+                        borders: { top: borderStyle, bottom: borderStyle, left: borderStyle, right: borderStyle },
                     }),
                     // Right Cell: School Logo and Text
                     new TableCell({
                         children: [
                            new Paragraph({
-                                alignment: AlignmentType.RIGHT,
+                                alignment: AlignmentType.CENTER,
                                 children: [
                                     new ImageRun({
                                         data: logoEscudoBuffer,
@@ -125,26 +138,48 @@ const generateActivityDocumentFlow = ai.defineFlow(
                                 ],
                             }),
                             new Paragraph({
-                                alignment: AlignmentType.RIGHT,
-                                children: [new TextRun({ text: "I.E. Alfonso Spath Spath", bold: true, size: "11pt" })],
-                                style: 'Normal',
+                                alignment: AlignmentType.CENTER,
+                                children: [new TextRun({ text: "I.E. Alfonso Spath Spath", bold: true, size: "22pt" })],
                             }),
                              new Paragraph({
-                                alignment: AlignmentType.RIGHT,
-                                children: [new TextRun({ text: "Martinez - Cereté, Córdoba", size: "10pt" })],
-                                style: 'Normal',
+                                alignment: AlignmentType.CENTER,
+                                children: [new TextRun({ text: "Martinez - Cereté, Córdoba", size: "20pt" })],
                             }),
                         ],
                          verticalAlign: VerticalAlign.CENTER,
+                         borders: { top: borderStyle, bottom: borderStyle, left: borderStyle, right: borderStyle },
                     }),
                 ],
             }),
         ],
     });
 
-
+    const sectionTitleStyle = {
+        heading: HeadingLevel.HEADING_2,
+        children: [new TextRun({ color: "229954", bold: true, size: "28pt" })],
+        spacing: { before: 240, after: 120 }
+    };
+    
     // --- 3. Build Document Content ---
     const doc = new Document({
+      styles: {
+        paragraphStyles: [
+            {
+                id: "section-title",
+                name: "Section Title",
+                basedOn: "Normal",
+                next: "Normal",
+                run: {
+                    size: "28pt", // 14pt
+                    bold: true,
+                    color: "229954",
+                },
+                paragraph: {
+                    spacing: { before: 240, after: 120 },
+                },
+            },
+        ],
+      },
       numbering: {
         config: [
           {
@@ -164,24 +199,38 @@ const generateActivityDocumentFlow = ai.defineFlow(
         {
           children: [
             headerTable,
-            new Paragraph({ text: activity.title, heading: HeadingLevel.TITLE, alignment: AlignmentType.CENTER }),
-            new Paragraph({ text: "Objetivo de Aprendizaje", heading: HeadingLevel.HEADING_2 }),
+            new Paragraph({ 
+                text: activity.title, 
+                heading: HeadingLevel.TITLE, 
+                alignment: AlignmentType.CENTER,
+                spacing: { after: 400 }
+            }),
+
+            new Paragraph({ text: "Objetivo de Aprendizaje", style: "section-title" }),
             ...createParagraphsFromText(activity.objective),
-            new Paragraph({ text: "Concepto de Pensamiento Computacional", heading: HeadingLevel.HEADING_2 }),
+
+            new Paragraph({ text: "Concepto de Pensamiento Computacional", style: "section-title" }),
             ...createParagraphsFromText(activity.computationalConcept),
-            new Paragraph({ text: "Tiempo Estimado", heading: HeadingLevel.HEADING_2 }),
+
+            new Paragraph({ text: "Tiempo Estimado", style: "section-title" }),
             ...createParagraphsFromText(activity.estimatedTime),
-            new Paragraph({ text: "Preparación Previa del Docente", heading: HeadingLevel.HEADING_2 }),
+
+            new Paragraph({ text: "Preparación Previa del Docente", style: "section-title" }),
             ...createParagraphsFromText(activity.teacherPreparation),
-            new Paragraph({ text: "Materiales Necesarios", heading: HeadingLevel.HEADING_2 }),
+
+            new Paragraph({ text: "Materiales Necesarios", style: "section-title" }),
             ...createParagraphsFromText(activity.materials),
-            new Paragraph({ text: "Desarrollo Paso a Paso", heading: HeadingLevel.HEADING_2 }),
+
+            new Paragraph({ text: "Desarrollo Paso a Paso", style: "section-title" }),
             ...createNumberedList(activity.stepByStepDevelopment),
-            new Paragraph({ text: "Ejemplos Visuales Sugeridos", heading: HeadingLevel.HEADING_2 }),
+
+            new Paragraph({ text: "Ejemplos Visuales Sugeridos", style: "section-title" }),
             ...createParagraphsFromText(activity.visualExamples),
-            new Paragraph({ text: "Reflexión y Conexión", heading: HeadingLevel.HEADING_2 }),
+
+            new Paragraph({ text: "Reflexión y Conexión", style: "section-title" }),
             ...createParagraphsFromText(activity.reflectionQuestion),
-            new Paragraph({ text: "Criterios de Evaluación", heading: HeadingLevel.HEADING_2 }),
+
+            new Paragraph({ text: "Criterios de Evaluación", style: "section-title" }),
             ...createParagraphsFromText(activity.evaluationCriteria),
           ],
         },
