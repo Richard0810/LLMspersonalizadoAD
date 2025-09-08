@@ -87,16 +87,18 @@ const createNumberedList = (text: string): Paragraph[] => {
     if (!text || typeof text !== 'string') return [];
     const lines = text.split('\n').filter(line => line.trim() !== '');
     if (lines.length === 0) return [];
-    return lines.map((line) =>
-        new Paragraph({
-            children: createTextRunsFromMarkdown(line),
+    return lines.map((line) => {
+        // Clean up any existing numbering from the AI's text (e.g., "1. ", "2. ")
+        const cleanedLine = line.trim().replace(/^\d+\.\s*/, '');
+        return new Paragraph({
+            children: createTextRunsFromMarkdown(cleanedLine),
             numbering: {
                 reference: 'default-numbering',
                 level: 0,
             },
             spacing: { after: 120 }
         })
-    );
+    });
 };
 
 // Define the Genkit flow
