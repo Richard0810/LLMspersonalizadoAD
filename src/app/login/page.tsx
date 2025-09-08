@@ -12,7 +12,14 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import InteractiveBackground from '@/components/shared/InteractiveBackground';
 import { Eye, EyeOff, LogInIcon } from 'lucide-react';
 import Image from 'next/image';
-import ProjectInfo from '@/components/auth/ProjectInfo';
+import dynamic from 'next/dynamic';
+import { Skeleton } from '@/components/ui/skeleton';
+
+const ProjectInfo = dynamic(() => import('@/components/auth/ProjectInfo'), {
+  ssr: false,
+  loading: () => <Skeleton className="h-full w-full" />,
+});
+
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
@@ -41,10 +48,11 @@ export default function LoginPage() {
             {/* Universidad de Cordoba */}
             <div className="flex items-center gap-3 md:gap-4">
                <Image
-                src={`/logo_unicor.png?t=${new Date().getTime()}`}
+                src="/logo_unicor.png"
                 alt="Logo Universidad de Córdoba"
                 width={180}
                 height={60}
+                priority
                 className="transition-all duration-300 hover:scale-110 w-auto h-10 md:h-12"
               />
               <div className="text-left">
@@ -68,6 +76,7 @@ export default function LoginPage() {
                 alt="Escudo Institucional"
                 width={64}
                 height={64}
+                priority
                 className="transition-all duration-300 hover:scale-110 w-12 h-12 md:w-16 md:h-16"
               />
             </div>

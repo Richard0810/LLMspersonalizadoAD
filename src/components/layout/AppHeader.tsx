@@ -48,10 +48,11 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ page, lessonParams, onRese
       {/* Universidad de Cordoba */}
       <div className="flex items-center gap-3 md:gap-4">
          <Image
-          src={`/logo_unicor.png?t=${new Date().getTime()}`}
+          src="/logo_unicor.png"
           alt="Logo Universidad de Córdoba"
           width={180}
           height={60}
+          priority
           className="transition-all duration-300 hover:scale-110 w-auto h-10 md:h-12"
         />
         <div className="hidden md:block text-left">
@@ -77,6 +78,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ page, lessonParams, onRese
           alt="Escudo Institucional"
           width={64}
           height={64}
+          priority
           className="transition-all duration-300 hover:scale-110 w-12 h-12 md:w-16 md:h-16"
         />
       </div>
