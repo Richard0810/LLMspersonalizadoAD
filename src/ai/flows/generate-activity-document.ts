@@ -57,19 +57,19 @@ const createParagraphsFromText = (text: string): Paragraph[] => {
  * @returns An array of Paragraph objects formatted as a numbered list.
  */
 const createNumberedList = (text: string): Paragraph[] => {
-  if (!text || typeof text !== 'string') return [];
-  const lines = text.split('\n').filter(line => line.trim() !== '');
-  if (lines.length === 0) return [];
-  return lines.map((line) =>
-    new Paragraph({
-      children: [new TextRun({ text: line, size: "22pt" })], // 11pt font size
-      numbering: {
-        reference: 'default-numbering',
-        level: 0,
-      },
-      spacing: { after: 120 }
-    })
-  );
+    if (!text || typeof text !== 'string') return [];
+    const lines = text.split('\n').filter(line => line.trim() !== '');
+    if (lines.length === 0) return [];
+    return lines.map((line) =>
+        new Paragraph({
+            children: [new TextRun({ text: line, size: "22pt" })], // 11pt font size
+            numbering: {
+                reference: 'default-numbering',
+                level: 0,
+            },
+            spacing: { after: 120 }
+        })
+    );
 };
 
 // Define the Genkit flow
@@ -153,12 +153,6 @@ const generateActivityDocumentFlow = ai.defineFlow(
             }),
         ],
     });
-
-    const sectionTitleStyle = {
-        heading: HeadingLevel.HEADING_2,
-        children: [new TextRun({ color: "229954", bold: true, size: "28pt" })],
-        spacing: { before: 240, after: 120 }
-    };
     
     // --- 3. Build Document Content ---
     const doc = new Document({
@@ -170,7 +164,7 @@ const generateActivityDocumentFlow = ai.defineFlow(
                 basedOn: "Normal",
                 next: "Normal",
                 run: {
-                    size: "28pt", // 14pt
+                    size: "24pt", // 12pt
                     bold: true,
                     color: "229954",
                 },
@@ -200,10 +194,10 @@ const generateActivityDocumentFlow = ai.defineFlow(
           children: [
             headerTable,
             new Paragraph({ 
-                text: activity.title, 
+                children: [new TextRun({ text: activity.title, size: "30pt", bold: true })], 
                 heading: HeadingLevel.TITLE, 
                 alignment: AlignmentType.CENTER,
-                spacing: { after: 400 }
+                spacing: { after: 400, before: 200 }
             }),
 
             new Paragraph({ text: "Objetivo de Aprendizaje", style: "section-title" }),
