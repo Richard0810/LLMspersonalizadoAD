@@ -7,12 +7,13 @@ import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import InteractiveBackground from '@/components/shared/InteractiveBackground';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Download, ListChecks, BookOpen, Target, ThumbsUp, Sparkles, Loader2, Clock, ClipboardCheck, Brain, Eye, UserCheck } from 'lucide-react';
+import { ArrowLeft, Download, ListChecks, BookOpen, Target, ThumbsUp, Sparkles, Loader2, Clock, ClipboardCheck, Brain, Eye, UserCheck, FileDown } from 'lucide-react';
 import type { Activity, VisualContent } from '@/types';
 import { getActivityByIdFromLocalStorage } from '@/lib/localStorageUtils';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { generateVisualContent } from '@/ai/flows/generate-visual-content';
+import { generateActivityDocument } from '@/ai/flows/generate-activity-document';
 import Image from 'next/image';
 
 const SectionContent = ({ title, icon, content, generatedContent, className = "" }) => {
@@ -68,6 +69,7 @@ export default function ActivityDetailPage() {
   const [activity, setActivity] = useState<Activity | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isGeneratingContent, setIsGeneratingContent] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const [generatedContent, setGeneratedContent] = useState<VisualContent | null>(null);
 
   useEffect(() => {
@@ -113,89 +115,57 @@ export default function ActivityDetailPage() {
     }
   };
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (!activity) return;
 
-    const htmlContent = `
-      <html>
-        <head>
-          <meta charset="UTF-8">
-          <title>${activity.title}</title>
-          <style>
-            body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; color: #333; }
-            h1 { color: #229954; }
-            h2 { color: #D94444; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-            p { margin-bottom: 10px; white-space: pre-wrap; }
-            .section { margin-bottom: 20px; }
-            img { max-width: 100%; height: auto; border-radius: 8px; margin-top: 10px; }
-          </style>
-        </head>
-        <body>
-          <h1>${activity.title}</h1>
-          
-          <div class="section">
-            <h2>Objetivo de Aprendizaje</h2>
-            <p>${activity.objective}</p>
-          </div>
-
-          <div class="section">
-            <h2>Concepto de Pensamiento Computacional</h2>
-            <p>${activity.computationalConcept}</p>
-          </div>
-
-           <div class="section">
-            <h2>Tiempo Estimado</h2>
-            <p>${activity.estimatedTime}</p>
-          </div>
-
-           <div class="section">
-            <h2>Preparación Previa del Docente</h2>
-            <p>${activity.teacherPreparation}</p>
-          </div>
-          
-          <div class="section">
-            <h2>Materiales Necesarios</h2>
-            ${generatedContent?.materials.map(item => `<p>${item.step}</p>${item.image ? `<img src="${item.image}" alt="Ilustración">` : ''}`).join('') || `<p>${activity.materials}</p>`}
-          </div>
-          
-          <div class="section">
-            <h2>Desarrollo Paso a Paso</h2>
-            ${generatedContent?.instructions.map(item => `<p>${item.step.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>${item.image ? `<img src="${item.image}" alt="Ilustración">` : ''}`).join('') || `<p>${activity.stepByStepDevelopment.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>`}
-          </div>
-
-           <div class="section">
-            <h2>Ejemplos Visuales Sugeridos</h2>
-            <p>${activity.visualExamples}</p>
-          </div>
-          
-          <div class="section">
-            <h2>Reflexión y Conexión</h2>
-             ${generatedContent?.reflection.map(item => `<p>${item.step}</p>${item.image ? `<img src="${item.image}" alt="Ilustración">` : ''}`).join('') || `<p>${activity.reflectionQuestion}</p>`}
-          </div>
-
-           <div class="section">
-            <h2>Criterios de Evaluación</h2>
-            <p>${activity.evaluationCriteria}</p>
-          </div>
-        </body>
-      </html>
-    `;
-
-    const blob = new Blob([htmlContent], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    const fileName = `${activity.title.replace(/[^a-zA-Z0-9_ ]/g, '') || 'Actividad'}.html`;
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-
+    setIsDownloading(true);
     toast({
-      title: "Descarga Iniciada",
-      description: `Se ha descargado "${fileName}". Puedes abrir este archivo HTML con Word o un navegador.`,
+        title: "Preparando Descarga...",
+        description: "El documento de Word se está generando en el servidor. Esto puede tardar unos segundos.",
     });
+
+    try {
+        const result = await generateActivityDocument(activity);
+        
+        if (!result.docxBase64) {
+            throw new Error("El servidor no devolvió un archivo.");
+        }
+
+        // Convert Base64 to a Blob
+        const byteCharacters = atob(result.docxBase64);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+
+        // Create a link and trigger the download
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        const fileName = `${activity.title.replace(/[^a-zA-Z0-9_ ]/g, '') || 'Actividad'}.docx`;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        toast({
+            title: "¡Descarga Exitosa!",
+            description: `Se ha descargado "${fileName}".`,
+        });
+
+    } catch (error) {
+        console.error("Error al descargar el documento:", error);
+        toast({
+            title: "Error de Descarga",
+            description: `No se pudo generar el documento. ${error instanceof Error ? error.message : 'Error desconocido.'}`,
+            variant: "destructive",
+        });
+    } finally {
+        setIsDownloading(false);
+    }
   };
   
   if (isLoading) {
@@ -318,12 +288,13 @@ export default function ActivityDetailPage() {
             />
           </CardContent>
           <CardFooter className="border-t p-6 flex-wrap gap-2 justify-between">
-             <Button onClick={handleGenerateVisualContent} disabled={isGeneratingContent} className="text-lg py-3 px-6">
+             <Button onClick={handleGenerateVisualContent} disabled={isGeneratingContent || isDownloading} className="text-lg py-3 px-6">
               {isGeneratingContent ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Sparkles className="mr-2 h-5 w-5" />}
               {isGeneratingContent ? 'Generando...' : 'Crear Contenido Visual'}
             </Button>
-            <Button onClick={() => handleDownload()} variant="secondary" className="text-lg py-3 px-6">
-              <Download className="mr-2 h-5 w-5" /> Descargar (HTML)
+            <Button onClick={handleDownload} disabled={isDownloading || isGeneratingContent} variant="secondary" className="text-lg py-3 px-6">
+              {isDownloading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <FileDown className="mr-2 h-5 w-5" />}
+              {isDownloading ? 'Generando DOCX...' : 'Descargar (DOCX)'}
             </Button>
           </CardFooter>
         </Card>

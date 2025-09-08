@@ -1,0 +1,204 @@
+'use server';
+/**
+ * @fileOverview A flow to generate a DOCX document from an activity object.
+ * This flow uses the 'docx' library to build a Word document from scratch,
+ * ensuring high-quality formatting and embedding of images.
+ *
+ * - generateActivityDocument - The main function to trigger the DOCX generation.
+ */
+import { ai } from '@/ai/genkit';
+import { z } from 'genkit';
+import {
+  Document,
+  Packer,
+  Paragraph,
+  TextRun,
+  HeadingLevel,
+  AlignmentType,
+  Table,
+  TableRow,
+  TableCell,
+  WidthType,
+  ImageRun,
+  VerticalAlign,
+} from 'docx';
+import * as fs from 'fs/promises';
+import * as path from 'path';
+import type { Activity } from '@/types';
+
+// Define Zod schemas for input and output
+const GenerateActivityDocumentInputSchema = z.custom<Activity>();
+const GenerateActivityDocumentOutputSchema = z.object({
+  docxBase64: z.string().describe('The generated DOCX file as a Base64 encoded string.'),
+});
+
+/**
+ * Creates an array of Paragraphs from a given text string.
+ * Each line break in the text results in a new Paragraph.
+ * @param text - The text to be converted.
+ * @param options - Optional styling for the paragraphs.
+ * @returns An array of Paragraph objects.
+ */
+const createParagraphsFromText = (text: string, options: any = {}): Paragraph[] => {
+  if (!text) return [];
+  const lines = text.split('\n');
+  return lines.map(line => new Paragraph({ ...options, children: [new TextRun(line)] }));
+};
+
+/**
+ * Creates a numbered list (array of Paragraphs) from a text string.
+ * Each line in the text becomes a numbered item.
+ * @param text - The text to be converted into a list.
+ * @returns An array of Paragraph objects formatted as a numbered list.
+ */
+const createNumberedList = (text: string): Paragraph[] => {
+  if (!text) return [];
+  const lines = text.split('\n');
+  return lines.map((line, index) =>
+    new Paragraph({
+      children: [new TextRun(line)],
+      numbering: {
+        reference: 'default-numbering',
+        level: 0,
+      },
+    })
+  );
+};
+
+
+// Define the Genkit flow
+const generateActivityDocumentFlow = ai.defineFlow(
+  {
+    name: 'generateActivityDocumentFlow',
+    inputSchema: GenerateActivityDocumentInputSchema,
+    outputSchema: GenerateActivityDocumentOutputSchema,
+  },
+  async (activity) => {
+    // --- 1. Load Logo Images ---
+    // Note: process.cwd() points to the root of your Next.js project.
+    const logoUnicorPath = path.join(process.cwd(), 'public', 'logo_unicor.png');
+    const logoEscudoPath = path.join(process.cwd(), 'public', 'escudo.jpg');
+
+    const [logoUnicorBuffer, logoEscudoBuffer] = await Promise.all([
+        fs.readFile(logoUnicorPath),
+        fs.readFile(logoEscudoPath)
+    ]);
+    
+    // --- 2. Create Header Table ---
+    const headerTable = new Table({
+        width: { size: 100, type: WidthType.PERCENTAGE },
+        rows: [
+            new TableRow({
+                children: [
+                    // Left Cell: Unicor Logo and Text
+                    new TableCell({
+                        children: [
+                            new Paragraph({
+                                children: [
+                                    new ImageRun({
+                                        data: logoUnicorBuffer,
+                                        transformation: { width: 180, height: 60 },
+                                    }),
+                                ],
+                            }),
+                            new Paragraph({
+                                children: [new TextRun({ text: "Licenciatura en Informática", bold: true, size: "11pt" })],
+                                style: 'Normal',
+                            }),
+                            new Paragraph({
+                                children: [new TextRun({ text: "Facultad de Educación y Ciencias Humanas", size: "10pt" })],
+                                style: 'Normal',
+                            }),
+                        ],
+                        verticalAlign: VerticalAlign.CENTER,
+                    }),
+                    // Right Cell: School Logo and Text
+                    new TableCell({
+                        children: [
+                           new Paragraph({
+                                alignment: AlignmentType.RIGHT,
+                                children: [
+                                    new ImageRun({
+                                        data: logoEscudoBuffer,
+                                        transformation: { width: 64, height: 64 },
+                                    }),
+                                ],
+                            }),
+                            new Paragraph({
+                                alignment: AlignmentType.RIGHT,
+                                children: [new TextRun({ text: "I.E. Alfonso Spath Spath", bold: true, size: "11pt" })],
+                                style: 'Normal',
+                            }),
+                             new Paragraph({
+                                alignment: AlignmentType.RIGHT,
+                                children: [new TextRun({ text: "Martinez - Cereté, Córdoba", size: "10pt" })],
+                                style: 'Normal',
+                            }),
+                        ],
+                         verticalAlign: VerticalAlign.CENTER,
+                    }),
+                ],
+            }),
+        ],
+    });
+
+
+    // --- 3. Build Document Content ---
+    const doc = new Document({
+      numbering: {
+        config: [
+          {
+            reference: 'default-numbering',
+            levels: [
+              {
+                level: 0,
+                format: 'decimal',
+                text: '%1.',
+                alignment: AlignmentType.START,
+              },
+            ],
+          },
+        ],
+      },
+      sections: [
+        {
+          children: [
+            headerTable,
+            new Paragraph({ text: activity.title, heading: HeadingLevel.TITLE, alignment: AlignmentType.CENTER }),
+            new Paragraph({ text: "Objetivo de Aprendizaje", heading: HeadingLevel.HEADING_2 }),
+            ...createParagraphsFromText(activity.objective),
+            new Paragraph({ text: "Concepto de Pensamiento Computacional", heading: HeadingLevel.HEADING_2 }),
+            ...createParagraphsFromText(activity.computationalConcept),
+            new Paragraph({ text: "Tiempo Estimado", heading: HeadingLevel.HEADING_2 }),
+            ...createParagraphsFromText(activity.estimatedTime),
+            new Paragraph({ text: "Preparación Previa del Docente", heading: HeadingLevel.HEADING_2 }),
+            ...createParagraphsFromText(activity.teacherPreparation),
+            new Paragraph({ text: "Materiales Necesarios", heading: HeadingLevel.HEADING_2 }),
+            ...createParagraphsFromText(activity.materials),
+            new Paragraph({ text: "Desarrollo Paso a Paso", heading: HeadingLevel.HEADING_2 }),
+            ...createNumberedList(activity.stepByStepDevelopment),
+            new Paragraph({ text: "Ejemplos Visuales Sugeridos", heading: HeadingLevel.HEADING_2 }),
+            ...createParagraphsFromText(activity.visualExamples),
+            new Paragraph({ text: "Reflexión y Conexión", heading: HeadingLevel.HEADING_2 }),
+            ...createParagraphsFromText(activity.reflectionQuestion),
+            new Paragraph({ text: "Criterios de Evaluación", heading: HeadingLevel.HEADING_2 }),
+            ...createParagraphsFromText(activity.evaluationCriteria),
+          ],
+        },
+      ],
+    });
+
+    // --- 4. Pack and Encode Document ---
+    const buffer = await Packer.toBuffer(doc);
+    const docxBase64 = buffer.toString('base64');
+
+    return { docxBase64 };
+  }
+);
+
+// Export the wrapper function to be called from the client
+export async function generateActivityDocument(
+  input: Activity
+): Promise<z.infer<typeof GenerateActivityDocumentOutputSchema>> {
+  return generateActivityDocumentFlow(input);
+}
