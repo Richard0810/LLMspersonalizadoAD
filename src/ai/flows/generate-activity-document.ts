@@ -21,7 +21,6 @@ import {
   TableCell,
   WidthType,
   ImageRun,
-  VerticalAlign,
   BorderStyle,
 } from 'docx';
 import * as fs from 'fs/promises';
@@ -119,9 +118,10 @@ const generateActivityDocumentFlow = ai.defineFlow(
     
     // --- 2. Create Header Table ---
     const invisibleBorderStyle = {
-        style: BorderStyle.NONE,
-        size: 1,
-        color: "000000",
+        top: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+        bottom: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+        left: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+        right: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
     };
 
     const headerTable = new Table({
@@ -150,8 +150,7 @@ const generateActivityDocumentFlow = ai.defineFlow(
                                 children: [new TextRun({ text: "Facultad de Educación y Ciencias Humanas", size: 20, font: "Arial" })],
                             }),
                         ],
-                        verticalAlign: VerticalAlign.CENTER,
-                        borders: { top: invisibleBorderStyle, bottom: invisibleBorderStyle, left: invisibleBorderStyle, right: invisibleBorderStyle },
+                        borders: invisibleBorderStyle,
                     }),
                     // Right Cell: School Logo and Text
                     new TableCell({
@@ -174,8 +173,7 @@ const generateActivityDocumentFlow = ai.defineFlow(
                                 children: [new TextRun({ text: "Martinez - Cereté, Córdoba", size: 20, font: "Arial" })],
                             }),
                         ],
-                         verticalAlign: VerticalAlign.CENTER,
-                         borders: { top: invisibleBorderStyle, bottom: invisibleBorderStyle, left: invisibleBorderStyle, right: invisibleBorderStyle },
+                         borders: invisibleBorderStyle,
                     }),
                 ],
             }),
