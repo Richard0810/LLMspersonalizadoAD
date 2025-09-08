@@ -15,6 +15,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { generateVisualContent } from '@/ai/flows/generate-visual-content';
 import { generateActivityDocument } from '@/ai/flows/generate-activity-document';
 import Image from 'next/image';
+import WordIcon from '@/components/icons/WordIcon';
 
 const SectionContent = ({ title, icon, content, generatedContent, className = "" }) => {
   // Helper to convert markdown bold to strong tags
@@ -292,8 +293,8 @@ export default function ActivityDetailPage() {
               {isGeneratingContent ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Sparkles className="mr-2 h-5 w-5" />}
               {isGeneratingContent ? 'Generando...' : 'Crear Contenido Visual'}
             </Button>
-            <Button onClick={handleDownload} disabled={isDownloading || isGeneratingContent} variant="secondary" className="text-lg py-3 px-6">
-              {isDownloading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <FileDown className="mr-2 h-5 w-5" />}
+            <Button onClick={handleDownload} disabled={isDownloading || isGeneratingContent} variant="secondary" className="text-lg py-3 px-6 text-primary hover:text-primary/90">
+              {isDownloading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <WordIcon className="mr-2 h-5 w-5" />}
               {isDownloading ? 'Generando DOCX...' : 'Descargar (DOCX)'}
             </Button>
           </CardFooter>
