@@ -8,7 +8,7 @@
  * - generateActivityDocument - The main function to trigger the DOCX generation.
  */
 import { ai } from '@/ai/genkit';
-import { z } from 'genkit';
+import { z } from 'zod';
 import {
   Document,
   Packer,
@@ -85,13 +85,12 @@ const createParagraphsFromText = (text: string): Paragraph[] => {
  */
 const createNumberedList = (text: string): Paragraph[] => {
     if (!text || typeof text !== 'string') return [];
-    const lines = text.split('\n').filter(line => line.trim() !== '');
+    // Clean up any existing numbering from the AI's text (e.g., "1. ", "2. ") and filter out empty lines
+    const lines = text.split('\n').map(line => line.trim().replace(/^\d+\.\s*/, '')).filter(line => line);
     if (lines.length === 0) return [];
     return lines.map((line) => {
-        // Clean up any existing numbering from the AI's text (e.g., "1. ", "2. ")
-        const cleanedLine = line.trim().replace(/^\d+\.\s*/, '');
         return new Paragraph({
-            children: createTextRunsFromMarkdown(cleanedLine),
+            children: createTextRunsFromMarkdown(line),
             numbering: {
                 reference: 'default-numbering',
                 level: 0,
@@ -119,8 +118,8 @@ const generateActivityDocumentFlow = ai.defineFlow(
     ]);
     
     // --- 2. Create Header Table ---
-    const borderStyle = {
-        style: BorderStyle.SINGLE,
+    const invisibleBorderStyle = {
+        style: BorderStyle.NONE,
         size: 1,
         color: "000000",
     };
@@ -152,7 +151,7 @@ const generateActivityDocumentFlow = ai.defineFlow(
                             }),
                         ],
                         verticalAlign: VerticalAlign.CENTER,
-                        borders: { top: borderStyle, bottom: borderStyle, left: borderStyle, right: borderStyle },
+                        borders: { top: invisibleBorderStyle, bottom: invisibleBorderStyle, left: invisibleBorderStyle, right: invisibleBorderStyle },
                     }),
                     // Right Cell: School Logo and Text
                     new TableCell({
@@ -176,7 +175,7 @@ const generateActivityDocumentFlow = ai.defineFlow(
                             }),
                         ],
                          verticalAlign: VerticalAlign.CENTER,
-                         borders: { top: borderStyle, bottom: borderStyle, left: borderStyle, right: borderStyle },
+                         borders: { top: invisibleBorderStyle, bottom: invisibleBorderStyle, left: invisibleBorderStyle, right: invisibleBorderStyle },
                     }),
                 ],
             }),
