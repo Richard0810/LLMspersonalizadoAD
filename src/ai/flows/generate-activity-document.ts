@@ -45,7 +45,7 @@ const createParagraphsFromText = (text: string): Paragraph[] => {
   const lines = text.split('\n').filter(line => line.trim() !== '');
   if (lines.length === 0) return [];
   return lines.map(line => new Paragraph({
-      children: [new TextRun({ text: line, size: "22pt" })], // 11pt font size
+      children: [new TextRun({ text: line, size: 22 })], // 11pt font size
       spacing: { after: 120 } // Spacing after paragraph
   }));
 };
@@ -62,7 +62,7 @@ const createNumberedList = (text: string): Paragraph[] => {
     if (lines.length === 0) return [];
     return lines.map((line) =>
         new Paragraph({
-            children: [new TextRun({ text: line, size: "22pt" })], // 11pt font size
+            children: [new TextRun({ text: line, size: 22 })], // 11pt font size
             numbering: {
                 reference: 'default-numbering',
                 level: 0,
@@ -115,11 +115,11 @@ const generateActivityDocumentFlow = ai.defineFlow(
                             }),
                             new Paragraph({
                                 alignment: AlignmentType.CENTER,
-                                children: [new TextRun({ text: "Licenciatura en Informática", bold: true, size: "22pt" })],
+                                children: [new TextRun({ text: "Licenciatura en Informática", bold: true, size: 22 })],
                             }),
                             new Paragraph({
                                 alignment: AlignmentType.CENTER,
-                                children: [new TextRun({ text: "Facultad de Educación y Ciencias Humanas", size: "20pt" })],
+                                children: [new TextRun({ text: "Facultad de Educación y Ciencias Humanas", size: 20 })],
                             }),
                         ],
                         verticalAlign: VerticalAlign.CENTER,
@@ -139,11 +139,11 @@ const generateActivityDocumentFlow = ai.defineFlow(
                             }),
                             new Paragraph({
                                 alignment: AlignmentType.CENTER,
-                                children: [new TextRun({ text: "I.E. Alfonso Spath Spath", bold: true, size: "22pt" })],
+                                children: [new TextRun({ text: "I.E. Alfonso Spath Spath", bold: true, size: 22 })],
                             }),
                              new Paragraph({
                                 alignment: AlignmentType.CENTER,
-                                children: [new TextRun({ text: "Martinez - Cereté, Córdoba", size: "20pt" })],
+                                children: [new TextRun({ text: "Martinez - Cereté, Córdoba", size: 20 })],
                             }),
                         ],
                          verticalAlign: VerticalAlign.CENTER,
@@ -164,7 +164,7 @@ const generateActivityDocumentFlow = ai.defineFlow(
                 basedOn: "Normal",
                 next: "Normal",
                 run: {
-                    size: "24pt", // 12pt
+                    size: 24, // 12pt
                     bold: true,
                     color: "229954",
                 },
@@ -194,7 +194,7 @@ const generateActivityDocumentFlow = ai.defineFlow(
           children: [
             headerTable,
             new Paragraph({ 
-                children: [new TextRun({ text: activity.title, size: "30pt", bold: true })], 
+                children: [new TextRun({ text: activity.title, size: 30, bold: true })], 
                 heading: HeadingLevel.TITLE, 
                 alignment: AlignmentType.CENTER,
                 spacing: { after: 400, before: 200 }
