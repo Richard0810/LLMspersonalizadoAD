@@ -1,7 +1,10 @@
 
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { Toaster } from '@/components/ui/toaster';
+import { Button } from '@/components/ui/button';
+import { GraduationCap } from 'lucide-react';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -27,6 +30,12 @@ export default function RootLayout({
         <AuthProvider>
           {children}
           <Toaster />
+           <Link href="/learn" passHref>
+            <Button variant="outline" size="icon" className="fixed bottom-4 right-16 z-50 shadow-lg rounded-full h-12 w-12">
+              <GraduationCap className="h-6 w-6 text-primary" />
+              <span className="sr-only">Aprende Más</span>
+            </Button>
+          </Link>
         </AuthProvider>
       </body>
     </html>
