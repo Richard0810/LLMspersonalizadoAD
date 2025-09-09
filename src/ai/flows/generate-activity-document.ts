@@ -140,14 +140,17 @@ const generateActivityDocumentFlow = ai.defineFlow(
                                         transformation: { width: 180, height: 60 },
                                     }),
                                 ],
+                                spacing: { after: 120 },
                             }),
                             new Paragraph({
                                 alignment: AlignmentType.CENTER,
                                 children: [new TextRun({ text: "Licenciatura en Informática", bold: true, size: 22, font: "Arial" })],
+                                spacing: { after: 120 },
                             }),
                             new Paragraph({
                                 alignment: AlignmentType.CENTER,
                                 children: [new TextRun({ text: "Facultad de Educación y Ciencias Humanas", size: 20, font: "Arial" })],
+                                spacing: { after: 120 },
                             }),
                         ],
                         borders: invisibleBorderStyle,
@@ -163,14 +166,17 @@ const generateActivityDocumentFlow = ai.defineFlow(
                                         transformation: { width: 64, height: 64 },
                                     }),
                                 ],
+                                spacing: { after: 120 },
                             }),
                             new Paragraph({
                                 alignment: AlignmentType.CENTER,
                                 children: [new TextRun({ text: "I.E. Alfonso Spath Spath", bold: true, size: 22, font: "Arial" })],
+                                spacing: { after: 120 },
                             }),
                              new Paragraph({
                                 alignment: AlignmentType.CENTER,
                                 children: [new TextRun({ text: "Martinez - Cereté, Córdoba", size: 20, font: "Arial" })],
+                                spacing: { after: 120 },
                             }),
                         ],
                          borders: invisibleBorderStyle,
@@ -233,7 +239,7 @@ const generateActivityDocumentFlow = ai.defineFlow(
                 children: [new TextRun({ text: activity.title, size: 30, bold: true, font: "Arial" })], 
                 heading: HeadingLevel.TITLE, 
                 alignment: AlignmentType.CENTER,
-                spacing: { after: 400, before: 200 }
+                spacing: { after: 480, before: 480 }
             }),
 
             new Paragraph({ text: "Objetivo de Aprendizaje", style: "section-title" }),
@@ -246,10 +252,10 @@ const generateActivityDocumentFlow = ai.defineFlow(
             ...createParagraphsFromText(activity.estimatedTime),
 
             new Paragraph({ text: "Preparación Previa del Docente", style: "section-title" }),
-            ...createParagraphsFromText(activity.teacherPreparation),
+            ...createNumberedList(activity.teacherPreparation),
 
             new Paragraph({ text: "Materiales Necesarios", style: "section-title" }),
-            ...createParagraphsFromText(activity.materials),
+            ...createNumberedList(activity.materials),
 
             new Paragraph({ text: "Desarrollo Paso a Paso", style: "section-title" }),
             ...createNumberedList(activity.stepByStepDevelopment),
@@ -261,7 +267,7 @@ const generateActivityDocumentFlow = ai.defineFlow(
             ...createParagraphsFromText(activity.reflectionQuestion),
 
             new Paragraph({ text: "Criterios de Evaluación", style: "section-title" }),
-            ...createParagraphsFromText(activity.evaluationCriteria),
+            ...createNumberedList(activity.evaluationCriteria),
           ],
         },
       ],
