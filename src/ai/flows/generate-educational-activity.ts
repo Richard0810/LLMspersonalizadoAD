@@ -44,9 +44,14 @@ export async function generateEducationalActivities(
   return generateEducationalActivitiesFlow(input);
 }
 
+// We add the `isAllConcepts` to the input schema for the prompt, but it's not part of the external-facing schema.
+const PromptInputSchema = GenerateEducationalActivitiesInputSchema.extend({
+    isAllConcepts: z.boolean(),
+});
+
 const generateEducationalActivitiesPrompt = ai.definePrompt({
   name: 'generateEducationalActivitiesPrompt',
-  input: {schema: GenerateEducationalActivitiesInputSchema},
+  input: {schema: PromptInputSchema},
   output: {schema: GenerateEducationalActivitiesOutputSchema},
   prompt: `Rol: Eres un diseñador instruccional experto y un asesor pedagógico especializado en pensamiento computacional para el contexto educativo de Colombia.
 Tarea: Tu misión es diseñar tres actividades desconectadas tan completas y detalladas que un docente, incluso sin experiencia previa en el tema, pueda implementarlas en su aula de manera exitosa y sin esfuerzo. Cada actividad debe ser un recurso educativo "llave en mano".
@@ -59,7 +64,7 @@ Genera tres actividades desconectadas distintas y muy detalladas, basadas en la 
 - Tema a Tratar: {{{topicName}}}
 - Área Temática: {{{subjectArea}}}
 - Nivel de Grado: {{{gradeLevel}}}
-{{#if (eq computationalConcept "Todos los conceptos")}}
+{{#if isAllConcepts}}
 - Concepto de Pensamiento Computacional a Tratar: La actividad debe integrar de manera cohesiva los cuatro conceptos clave del pensamiento computacional: Descomposición, Reconocimiento de patrones, Abstracción y Algoritmos. Asegúrate de que la sección 'computationalConcept' y 'reflectionQuestion' expliquen cómo se manifiesta cada uno de estos conceptos en la actividad.
 {{else}}
 - Concepto de Pensamiento Computacional a Tratar: {{{computationalConcept}}}
@@ -94,8 +99,16 @@ const generateEducationalActivitiesFlow = ai.defineFlow(
     inputSchema: GenerateEducationalActivitiesInputSchema,
     outputSchema: GenerateEducationalActivitiesOutputSchema,
   },
-  async input => {
-    const {output} = await generateEducationalActivitiesPrompt(input);
+  async (input) => {
+    // Pre-process the input to create a boolean flag for the prompt.
+    const isAllConcepts = input.computationalConcept === 'Todos los conceptos';
+    
+    const promptInput = {
+      ...input,
+      isAllConcepts,
+    };
+
+    const {output} = await generateEducationalActivitiesPrompt(promptInput);
     return output!;
   }
 );
