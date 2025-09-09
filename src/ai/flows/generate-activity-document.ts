@@ -85,14 +85,14 @@ const createParagraphsFromText = (text: string): Paragraph[] => {
  */
 const createNumberedList = (text: string, numberingRef: string): Paragraph[] => {
     if (!text || typeof text !== 'string') return [];
-
-    const sanitizedText = text.replace(/(\d+)\.\s*/g, (match, number) => {
-        return (number === '1' || number === 1) ? '1. ' : '\n1. ';
-    });
+    
+    // This regex looks for a digit followed by a period and optional space,
+    // but not if it's at the very beginning of the string.
+    const sanitizedText = text.replace(/(\S)\s*(\d+\.\s*)/g, '$1\n$2');
 
     const items = sanitizedText
         .split('\n')
-        .map(item => item.replace(/^1\.\s*/, '').trim())
+        .map(item => item.replace(/^\d+\.\s*/, '').trim())
         .filter(item => item);
 
     if (items.length === 0) return [];
@@ -231,8 +231,8 @@ const generateActivityDocumentFlow = ai.defineFlow(
       },
       numbering: {
         config: [
-          { reference: 'numbering-prep', levels: [{ level: 0, format: 'decimal', text: '%1.', alignment: AlignmentType.START }] },
-          { reference: 'numbering-materials', levels: [{ level: 0, format: 'decimal', text: '%1.', alignment: AlignmentType.START }] },
+          { reference: 'numbering-prep', levels: [{ level: 0, format: 'bullet', text: '-', alignment: AlignmentType.START }] },
+          { reference: 'numbering-materials', levels: [{ level: 0, format: 'bullet', text: '-', alignment: AlignmentType.START }] },
           { reference: 'numbering-steps', levels: [{ level: 0, format: 'decimal', text: '%1.', alignment: AlignmentType.START }] },
           { reference: 'numbering-eval', levels: [{ level: 0, format: 'decimal', text: '%1.', alignment: AlignmentType.START }] },
         ],
