@@ -33,10 +33,21 @@ const VideoEmbed = ({ videoId, title }) => (
     ></iframe>
 );
 
+const PresentationEmbed = ({ presentationId, title }) => (
+    <iframe
+        src={`https://docs.google.com/presentation/d/${presentationId}/embed?start=false&loop=false&delayms=3000`}
+        title={title}
+        frameBorder="0"
+        allowFullScreen={true}
+        className="w-full h-[450px] rounded-md shadow-md border"
+    ></iframe>
+);
+
 
 export default function LearnPage() {
     const router = useRouter();
-    const presentationUrl = "https://docs.google.com/presentation/d/1_Iys9XP0Te5-spn3DO5vhB01vm1OVC5d/edit?usp=drive_link&ouid=105808271510700269082&rtpof=true&sd=true";
+    const presentationId = "1_Iys9XP0Te5-spn3DO5vhB01vm1OVC5d";
+    const presentationUrl = `https://docs.google.com/presentation/d/${presentationId}/edit?usp=drive_link&ouid=105808271510700269082&rtpof=true&sd=true`;
 
     return (
         <ProtectedRoute>
@@ -129,17 +140,18 @@ export default function LearnPage() {
                                 </CardHeader>
                                 <CardContent>
                                     <VideoEmbed videoId="5fU2PT03_Gc" title="Actividades Desconectadas para el aula" />
-                                </CardContent>
+                                 </CardContent>
                             </Card>
                         </InfoSection>
 
                         <InfoSection title="Presentación: PC y AD en el Contexto Rural" icon={Presentation}>
-                            <p className="text-base text-muted-foreground">
+                            <p className="text-base text-muted-foreground mb-4">
                                 Explora esta presentación de diapositivas para obtener una visión más profunda de cómo aplicar estos conceptos en entornos rurales, con ejemplos y estrategias adaptadas.
                             </p>
-                            <Link href={presentationUrl} target="_blank" rel="noopener noreferrer">
-                                <Button size="lg" className="w-full mt-4">
-                                    Ver Presentación <ExternalLink className="ml-2 h-5 w-5" />
+                            <PresentationEmbed presentationId={presentationId} title="Presentación sobre PC y AD en el Contexto Rural" />
+                             <Link href={presentationUrl} target="_blank" rel="noopener noreferrer" className="mt-4 inline-block">
+                                <Button size="sm" variant="outline">
+                                    Abrir en nueva pestaña <ExternalLink className="ml-2 h-4 w-4" />
                                 </Button>
                             </Link>
                         </InfoSection>
