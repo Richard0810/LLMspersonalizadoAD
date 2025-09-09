@@ -57,28 +57,28 @@ export default function LearnPage() {
                                     <AccordionTrigger className="text-lg font-semibold">Descomposición</AccordionTrigger>
                                     <AccordionContent className="text-base text-muted-foreground space-y-2">
                                         <p>Dividir un problema complejo en partes más pequeñas y manejables.</p>
-                                        <p className="italic"><strong>Ejemplo:</strong> Planificar la siembra de un campo dividiéndola en tareas como preparar el suelo, sembrar, regar y cosechar.</p>
+                                        <p className="italic"><strong>Ejemplo:</strong> Al armar un rompecabezas, primero separas las piezas por colores o si tienen bordes rectos.</p>
                                     </AccordionContent>
                                 </AccordionItem>
                                 <AccordionItem value="item-2">
                                     <AccordionTrigger className="text-lg font-semibold">Reconocimiento de patrones</AccordionTrigger>
                                     <AccordionContent className="text-base text-muted-foreground space-y-2">
                                         <p>Identificar similitudes, tendencias o elementos que se repiten en datos o problemas.</p>
-                                        <p className="italic"><strong>Ejemplo:</strong> Analizar registros climáticos históricos para prever épocas de lluvia y sequía.</p>
+                                        <p className="italic"><strong>Ejemplo:</strong> Buscas piezas con formas o colores similares (como todas las piezas del cielo azul) para unirlas.</p>
                                     </AccordionContent>
                                 </AccordionItem>
                                 <AccordionItem value="item-3">
                                     <AccordionTrigger className="text-lg font-semibold">Abstracción</AccordionTrigger>
                                     <AccordionContent className="text-base text-muted-foreground space-y-2">
                                         <p>Enfocarse solo en la información esencial del problema y omitir detalles innecesarios.</p>
-                                        <p className="italic"><strong>Ejemplo:</strong> Crear un mapa de riego que muestre únicamente las zonas críticas y las fuentes de agua.</p>
+                                        <p className="italic"><strong>Ejemplo:</strong> Te concentras en armar el marco del rompecabezas primero, ignorando temporalmente todas las piezas del centro.</p>
                                     </AccordionContent>
                                 </AccordionItem>
                                 <AccordionItem value="item-4">
                                     <AccordionTrigger className="text-lg font-semibold">Algoritmos</AccordionTrigger>
                                     <AccordionContent className="text-base text-muted-foreground space-y-2">
                                         <p>Desarrollar una secuencia lógica y ordenada de pasos para resolver un problema o realizar una tarea.</p>
-                                        <p className="italic"><strong>Ejemplo:</strong> Diseñar una rutina diaria para el cuidado de animales: alimentar, limpiar y vacunar.</p>
+                                        <p className="italic"><strong>Ejemplo:</strong> Creas una serie de pasos: 1. Buscar las esquinas. 2. Armar el borde. 3. Agrupar piezas por color. 4. Armar las secciones de colores.</p>
                                     </AccordionContent>
                                 </AccordionItem>
                             </Accordion>
