@@ -19,10 +19,11 @@ import WordIcon from '@/components/icons/WordIcon';
 
 const SectionContent = ({ title, icon, content, generatedContent, className = "" }) => {
   const formatWithBold = (text: string) => {
-    // Handles both **word** and *word:*
+    // Handles both **word** and *word:* and cleans up leading hyphens
     return text
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?):\*/g, '<strong>$1:</strong>');
+      .replace(/\*(.*?):\*/g, '<strong>$1:</strong>')
+      .replace(/^\s*-\s*/, '');
   };
 
   const formatContent = (text: string | undefined, listType: 'bullet' | 'numeric' | 'paragraph') => {
@@ -38,27 +39,50 @@ const SectionContent = ({ title, icon, content, generatedContent, className = ""
             <li 
               key={index} 
               className="text-muted-foreground whitespace-pre-line relative before:content-['-_'] before:absolute before:left-[-1.25rem] before:top-0 before:text-primary before:font-bold"
-              dangerouslySetInnerHTML={{ __html: formatWithBold(line.replace(/^\s*-\s*/, '')) }} 
+              dangerouslySetInnerHTML={{ __html: formatWithBold(line) }} 
             />
           ))}
         </ul>
       );
     }
-
+    
     if (listType === 'numeric') {
-       return (
-        <ol className="list-decimal list-outside pl-5 space-y-1">
-          {lines.map((line, index) => (
-            <li 
-              key={index} 
-              className="text-muted-foreground whitespace-pre-line"
-              dangerouslySetInnerHTML={{ __html: formatWithBold(line.replace(/^\d+\.\s*/, '')) }} 
-            />
+      const groupedLines: string[][] = [];
+      let currentGroup: string[] = [];
+      const stepRegex = /^\(?\d+.?|^\(\d+.*?\)/; // Matches "1.", "1", "(1...)"
+
+      lines.forEach(line => {
+        if (stepRegex.test(line.trim())) {
+          if (currentGroup.length > 0) {
+            groupedLines.push(currentGroup);
+          }
+          currentGroup = [line];
+        } else {
+          if (currentGroup.length > 0) {
+            currentGroup.push(line);
+          } else {
+             // Handle case where first line is not a step
+             currentGroup = [line];
+          }
+        }
+      });
+      if (currentGroup.length > 0) {
+        groupedLines.push(currentGroup);
+      }
+
+      return (
+        <ol className="list-decimal list-outside pl-5 space-y-4">
+          {groupedLines.map((group, index) => (
+            <li key={index} className="text-muted-foreground whitespace-pre-line">
+              {group.map((line, lineIndex) => (
+                 <p key={lineIndex} dangerouslySetInnerHTML={{ __html: formatWithBold(line.replace(stepRegex, '').trim()) }} />
+              ))}
+            </li>
           ))}
         </ol>
       );
     }
-    
+
     // Default paragraph rendering
     return lines.map((line, index) => (
         <p 
