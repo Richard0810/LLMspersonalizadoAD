@@ -22,18 +22,14 @@ const InfoSection = ({ title, children, icon: Icon }) => (
 );
 
 const VideoEmbed = ({ videoId, title }) => (
-    <div className="aspect-w-4 aspect-h-3">
-        <iframe
-            width="560"
-            height="315"
-            src={`https://www.youtube.com/embed/${videoId}`}
-            title={title}
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-            className="w-full h-full rounded-md shadow-md"
-        ></iframe>
-    </div>
+    <iframe
+        src={`https://www.youtube.com/embed/${videoId}`}
+        title={title}
+        frameBorder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+        className="w-full h-[315px] rounded-md shadow-md"
+    ></iframe>
 );
 
 
