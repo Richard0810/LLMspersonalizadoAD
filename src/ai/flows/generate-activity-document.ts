@@ -40,12 +40,21 @@ const GenerateActivityDocumentOutputSchema = z.object({
  */
 const createTextRunsFromMarkdown = (text: string): TextRun[] => {
     if (!text || typeof text !== 'string') return [];
-
-    const parts = text.split(/(\*\*.*?\*\*)/g).filter(part => part);
+    
+    // Unified regex to handle **bold** and *bold:*
+    const parts = text.split(/(\*\*.*?\*\*|\*.*?\*:)/g).filter(part => part);
     return parts.map(part => {
         if (part.startsWith('**') && part.endsWith('**')) {
             return new TextRun({
                 text: part.slice(2, -2),
+                bold: true,
+                font: 'Arial',
+                size: 22, // 11pt
+            });
+        }
+        if (part.startsWith('*') && part.endsWith('*:')) {
+            return new TextRun({
+                text: part.slice(1, -1),
                 bold: true,
                 font: 'Arial',
                 size: 22, // 11pt
@@ -68,7 +77,8 @@ const createTextRunsFromMarkdown = (text: string): TextRun[] => {
  */
 const createParagraphsFromText = (text: string): Paragraph[] => {
   if (!text || typeof text !== 'string') return [];
-  const lines = text.split('\n').filter(line => line.trim() !== '');
+  // Split by newline, but also handle the case where the AI might add a hyphen for reflection questions
+  const lines = text.split('\n').map(line => line.replace(/^\s*-\s*/, '').trim()).filter(Boolean);
   if (lines.length === 0) return [];
   return lines.map(line => new Paragraph({
       children: createTextRunsFromMarkdown(line),
@@ -78,37 +88,47 @@ const createParagraphsFromText = (text: string): Paragraph[] => {
 
 /**
  * Creates a numbered list (array of Paragraphs) from a text string, parsing markdown bolding.
- * It intelligently splits items whether they are on new lines or run-on in a single line.
+ * It intelligently splits items and handles nested bullet points starting with a hyphen.
  * @param text - The text to be converted into a list.
  * @param numberingRef - The reference ID for the numbering style to use.
  * @returns An array of Paragraph objects formatted as a numbered list.
  */
-const createNumberedList = (text: string, numberingRef: string): Paragraph[] => {
+const createIntelligentList = (text: string, numberingRef: string): Paragraph[] => {
     if (!text || typeof text !== 'string') return [];
-    
-    // This regex looks for a digit followed by a period and optional space,
-    // but not if it's at the very beginning of the string.
-    const sanitizedText = text.replace(/(\S)\s*(\d+\.\s*)/g, '$1\n$2');
 
-    const items = sanitizedText
-        .split('\n')
-        .map(item => item.replace(/^\d+\.\s*/, '').trim())
-        .filter(item => item);
+    const paragraphs: Paragraph[] = [];
+    const lines = text.split('\n').filter(line => line.trim() !== '');
 
-    if (items.length === 0) return [];
+    lines.forEach(line => {
+        const trimmedLine = line.trim();
+        const isSubItem = trimmedLine.startsWith('-');
 
-    return items.map((item) => {
-        return new Paragraph({
-            children: createTextRunsFromMarkdown(item),
-            numbering: {
-                reference: numberingRef,
-                level: 0,
-            },
-            spacing: { after: 120 }
-        })
+        if (isSubItem) {
+            // It's a sub-item, render as a bullet point with indentation
+            paragraphs.push(new Paragraph({
+                children: createTextRunsFromMarkdown(trimmedLine.substring(1).trim()),
+                bullet: {
+                    level: 0,
+                },
+                indent: { left: 720 }, // Indent sub-items (720 dxa = 0.5 inch)
+                spacing: { after: 120 }
+            }));
+        } else {
+            // It's a main numbered item
+            const itemText = trimmedLine.replace(/^\d+\.?\s*/, '');
+             paragraphs.push(new Paragraph({
+                children: createTextRunsFromMarkdown(itemText),
+                numbering: {
+                    reference: numberingRef,
+                    level: 0,
+                },
+                spacing: { after: 120 }
+            }));
+        }
     });
-};
 
+    return paragraphs;
+};
 
 // Define the Genkit flow
 const generateActivityDocumentFlow = ai.defineFlow(
@@ -231,10 +251,7 @@ const generateActivityDocumentFlow = ai.defineFlow(
       },
       numbering: {
         config: [
-          { reference: 'numbering-prep', levels: [{ level: 0, format: 'bullet', text: '-', alignment: AlignmentType.START }] },
-          { reference: 'numbering-materials', levels: [{ level: 0, format: 'bullet', text: '-', alignment: AlignmentType.START }] },
-          { reference: 'numbering-steps', levels: [{ level: 0, format: 'decimal', text: '%1.', alignment: AlignmentType.START }] },
-          { reference: 'numbering-eval', levels: [{ level: 0, format: 'decimal', text: '%1.', alignment: AlignmentType.START }] },
+          { reference: 'numbering-list', levels: [{ level: 0, format: 'decimal', text: '%1.', alignment: AlignmentType.START }] },
         ],
       },
       sections: [
@@ -258,13 +275,13 @@ const generateActivityDocumentFlow = ai.defineFlow(
             ...createParagraphsFromText(activity.estimatedTime),
 
             new Paragraph({ text: "📋 Preparación Previa del Docente", style: "section-title" }),
-            ...createNumberedList(activity.teacherPreparation, 'numbering-prep'),
+            ...createIntelligentList(activity.teacherPreparation, 'numbering-list'),
 
             new Paragraph({ text: "✅ Materiales Necesarios", style: "section-title" }),
-            ...createNumberedList(activity.materials, 'numbering-materials'),
+            ...createIntelligentList(activity.materials, 'numbering-list'),
 
             new Paragraph({ text: "👣 Desarrollo Paso a Paso", style: "section-title" }),
-            ...createNumberedList(activity.stepByStepDevelopment, 'numbering-steps'),
+            ...createIntelligentList(activity.stepByStepDevelopment, 'numbering-list'),
 
             new Paragraph({ text: "👀 Ejemplos Visuales Sugeridos", style: "section-title" }),
             ...createParagraphsFromText(activity.visualExamples),
@@ -273,7 +290,7 @@ const generateActivityDocumentFlow = ai.defineFlow(
             ...createParagraphsFromText(activity.reflectionQuestion),
 
             new Paragraph({ text: "🧑‍🏫 Criterios de Evaluación", style: "section-title" }),
-            ...createNumberedList(activity.evaluationCriteria, 'numbering-eval'),
+            ...createIntelligentList(activity.evaluationCriteria, 'numbering-list'),
           ],
         },
       ],
