@@ -166,6 +166,7 @@ const generateActivityDocumentFlow = ai.defineFlow(
                             }),
                         ],
                         borders: invisibleBorderStyle,
+                        width: { size: 50, type: WidthType.PERCENTAGE },
                     }),
                     // Right Cell: School Logo and Text
                     new TableCell({
@@ -192,6 +193,7 @@ const generateActivityDocumentFlow = ai.defineFlow(
                             }),
                         ],
                          borders: invisibleBorderStyle,
+                         width: { size: 50, type: WidthType.PERCENTAGE },
                     }),
                 ],
             }),
@@ -254,31 +256,31 @@ const generateActivityDocumentFlow = ai.defineFlow(
                 spacing: { after: 480, before: 480 }
             }),
 
-            new Paragraph({ text: "Objetivo de Aprendizaje", style: "section-title" }),
+            new Paragraph({ text: "🎯 Objetivo de Aprendizaje", style: "section-title" }),
             ...createParagraphsFromText(activity.objective),
 
-            new Paragraph({ text: "Concepto de Pensamiento Computacional", style: "section-title" }),
+            new Paragraph({ text: "🧠 Concepto de Pensamiento Computacional", style: "section-title" }),
             ...createParagraphsFromText(activity.computationalConcept),
 
-            new Paragraph({ text: "Tiempo Estimado", style: "section-title" }),
+            new Paragraph({ text: "⏰ Tiempo Estimado", style: "section-title" }),
             ...createParagraphsFromText(activity.estimatedTime),
 
-            new Paragraph({ text: "Preparación Previa del Docente", style: "section-title" }),
+            new Paragraph({ text: "📋 Preparación Previa del Docente", style: "section-title" }),
             ...createNumberedList(activity.teacherPreparation),
 
-            new Paragraph({ text: "Materiales Necesarios", style: "section-title" }),
+            new Paragraph({ text: "✅ Materiales Necesarios", style: "section-title" }),
             ...createNumberedList(activity.materials),
 
-            new Paragraph({ text: "Desarrollo Paso a Paso", style: "section-title" }),
+            new Paragraph({ text: "👣 Desarrollo Paso a Paso", style: "section-title" }),
             ...createNumberedList(activity.stepByStepDevelopment),
 
-            new Paragraph({ text: "Ejemplos Visuales Sugeridos", style: "section-title" }),
+            new Paragraph({ text: "👀 Ejemplos Visuales Sugeridos", style: "section-title" }),
             ...createParagraphsFromText(activity.visualExamples),
 
-            new Paragraph({ text: "Reflexión y Conexión", style: "section-title" }),
+            new Paragraph({ text: "👍 Reflexión y Conexión", style: "section-title" }),
             ...createParagraphsFromText(activity.reflectionQuestion),
 
-            new Paragraph({ text: "Criterios de Evaluación", style: "section-title" }),
+            new Paragraph({ text: "🧑‍🏫 Criterios de Evaluación", style: "section-title" }),
             ...createNumberedList(activity.evaluationCriteria),
           ],
         },
