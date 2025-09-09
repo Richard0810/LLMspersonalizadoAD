@@ -123,15 +123,12 @@ export default function LearnPage() {
 
                         <TabsContent value="ad" className="animate-fade-in">
                             <InfoSection title="Actividades Desconectadas (AD)" icon={Puzzle}>
+                                <div className="space-y-3 mb-4">
+                                    <p><strong>Definición:</strong> Son estrategias didácticas para enseñar Pensamiento Computacional sin computadoras ni dispositivos. Usan juegos, dinámicas grupales y simulaciones para practicar conceptos como algoritmos o patrones.</p>
+                                    <p><strong>Beneficios:</strong> Son muy accesibles ya que no requieren tecnología, fomentan la creatividad, el trabajo en equipo y la resolución de problemas de una manera práctica y tangible.</p>
+                                </div>
                                 <Accordion type="single" collapsible className="w-full">
                                     <AccordionItem value="ad-1">
-                                        <AccordionTrigger className="text-lg font-semibold text-primary/90 hover:text-primary">Definición y Beneficios</AccordionTrigger>
-                                        <AccordionContent className="space-y-3">
-                                            <p><strong>Definición:</strong> Son estrategias didácticas para enseñar Pensamiento Computacional sin computadoras ni dispositivos. Usan juegos, dinámicas grupales y simulaciones para practicar conceptos como algoritmos o patrones.</p>
-                                            <p><strong>Beneficios:</strong> Muy accesibles (no requieren tecnología), fomentan la creatividad, el trabajo en equipo y la resolución de problemas.</p>
-                                        </AccordionContent>
-                                    </AccordionItem>
-                                    <AccordionItem value="ad-2">
                                         <AccordionTrigger className="text-lg font-semibold text-primary/90 hover:text-primary">Ejemplos de Actividades</AccordionTrigger>
                                         <AccordionContent className="space-y-4">
                                             <div>
