@@ -44,40 +44,40 @@ export default function LoginPage() {
       <InteractiveBackground />
       
       <header className="w-full bg-card shadow-md z-10 animate-slide-down-fade">
-        <div className="flex items-center justify-between p-3 gap-3 md:gap-4">
+        <div className="flex items-center justify-between p-3 gap-2">
             {/* Universidad de Cordoba */}
-            <div className="flex items-center gap-3 md:gap-4">
+            <div className="flex items-center gap-2">
                <Image
                 src="/logo_unicor.png"
                 alt="Logo Universidad de Córdoba"
-                width={180}
-                height={60}
+                width={150}
+                height={50}
                 priority
-                className="transition-all duration-300 hover:scale-110 w-auto h-10 md:h-12"
+                className="transition-all duration-300 hover:scale-105 w-auto h-8 md:h-12"
               />
-              <div className="text-left">
-                <h1 className="text-base md:text-xl font-headline font-bold uppercase text-foreground tracking-wider">
+              <div className="hidden md:block text-left">
+                <h1 className="text-sm md:text-xl font-headline font-bold uppercase text-foreground tracking-wider">
                   Licenciatura en Informática
                 </h1>
-                <p className="text-sm md:text-base text-muted-foreground font-medium">Facultad de Educación y Ciencias Humanas</p>
+                <p className="text-xs md:text-base text-muted-foreground font-medium">Facultad de Educación y Ciencias Humanas</p>
               </div>
             </div>
             
             {/* Institucion Educativa */}
-             <div className="flex items-center gap-3 md:gap-4">
-              <div className="text-right">
-                <h1 className="text-base md:text-xl font-headline font-bold uppercase text-foreground tracking-wider">
+             <div className="flex items-center gap-2">
+              <div className="hidden md:block text-right">
+                <h1 className="text-sm md:text-xl font-headline font-bold uppercase text-foreground tracking-wider">
                   I.E. Alfonso Spath Spath
                 </h1>
-                <p className="text-sm md:text-base text-muted-foreground font-medium">Martinez - Cereté, Córdoba</p>
+                <p className="text-xs md:text-base text-muted-foreground font-medium">Martinez - Cereté, Córdoba</p>
               </div>
               <Image
                 src="/escudo.jpg"
                 alt="Escudo Institucional"
-                width={64}
-                height={64}
+                width={60}
+                height={60}
                 priority
-                className="transition-all duration-300 hover:scale-110 w-12 h-12 md:w-16 md:h-16"
+                className="transition-all duration-300 hover:scale-105 w-10 h-10 md:w-16 md:h-16"
               />
             </div>
         </div>

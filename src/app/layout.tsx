@@ -41,7 +41,7 @@ export default function RootLayout({
           <Toaster />
           {showLearnButton && (
              <Link href="/learn" passHref>
-                <Button size="lg" className="fixed bottom-4 right-16 z-50 shadow-lg rounded-full h-14 px-5 transition-transform duration-200 ease-in-out hover:scale-105">
+                <Button size="lg" className="fixed bottom-4 right-4 z-50 shadow-lg rounded-full h-14 px-5 transition-transform duration-200 ease-in-out hover:scale-105">
                   <GraduationCap className="mr-2 h-6 w-6" />
                   <span className="font-bold">Aprende Más</span>
                 </Button>

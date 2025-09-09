@@ -17,7 +17,7 @@ export function HelpModal() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" size="icon" className="fixed bottom-4 right-4 z-50 shadow-lg rounded-full h-12 w-12">
+        <Button variant="outline" size="icon" className="fixed bottom-4 left-4 z-50 shadow-lg rounded-full h-12 w-12">
           <HelpCircle className="h-6 w-6 text-primary" />
           <span className="sr-only">Ayuda y Funcionalidad</span>
         </Button>
