@@ -22,7 +22,7 @@ const InfoSection = ({ title, children, icon: Icon }) => (
 );
 
 const VideoEmbed = ({ videoId, title }) => (
-    <div className="aspect-w-16 aspect-h-9">
+    <div className="aspect-w-4 aspect-h-3">
         <iframe
             width="560"
             height="315"
