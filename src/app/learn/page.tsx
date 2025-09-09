@@ -126,7 +126,7 @@ export default function LearnPage() {
                                     <CardTitle className="text-xl font-headline">Video con Ejemplos</CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                    <VideoEmbed videoId="s1-bbP1m2sA" title="Actividades Desconectadas para el aula" />
+                                    <VideoEmbed videoId="5fU2PT03_Gc" title="Actividades Desconectadas para el aula" />
                                 </CardContent>
                             </Card>
                         </InfoSection>
