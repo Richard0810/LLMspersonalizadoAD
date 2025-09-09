@@ -7,8 +7,9 @@ import { usePathname } from 'next/navigation';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { Toaster } from '@/components/ui/toaster';
 import { Button } from '@/components/ui/button';
-import { GraduationCap } from 'lucide-react';
+import { GraduationCap, HelpCircle } from 'lucide-react';
 import './globals.css';
+import { HelpModal } from '@/components/shared/HelpModal';
 
 // Metadata can still be exported from a client component layout
 // export const metadata: Metadata = {

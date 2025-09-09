@@ -5,7 +5,6 @@ import { useState, useEffect, useCallback } from 'react';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import InitialSetupForm from '@/components/chat/InitialSetupForm';
 import ChatInterface from '@/components/chat/ChatInterface';
-import { HelpModal } from '@/components/shared/HelpModal';
 import type { LessonParams } from '@/types';
 import { getLessonParamsFromLocalStorage, clearLessonParamsFromLocalStorage, clearChatHistoryFromLocalStorage } from '@/lib/localStorageUtils';
 import { Loader2 } from 'lucide-react';
@@ -67,9 +66,6 @@ export default function HomePage() {
             />
           </PageWrapper>
         )}
-      <HelpModal />
     </ProtectedRoute>
   );
 }
-
-    
