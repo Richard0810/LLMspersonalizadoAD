@@ -18,17 +18,25 @@ import Image from 'next/image';
 import WordIcon from '@/components/icons/WordIcon';
 
 const SectionContent = ({ title, icon, content, generatedContent, className = "" }) => {
+  const formatWithBold = (text: string) => {
+    return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  };
+
   const formatContent = (text: string | undefined, listType: 'bullet' | 'numeric' | 'paragraph') => {
     if (!text) return null;
 
     const lines = text.split('\n').filter(line => line.trim() !== '');
+    if (lines.length === 0) return null;
 
     if (listType === 'bullet') {
       return (
         <ul className="list-none pl-5 space-y-1">
           {lines.map((line, index) => (
-            <li key={index} className="text-muted-foreground whitespace-pre-line relative before:content-['-_'] before:absolute before:left-[-1.25rem] before:top-0 before:text-primary before:font-bold"
-                dangerouslySetInnerHTML={{ __html: line.replace(/^\s*-\s*/, '') }} />
+            <li 
+              key={index} 
+              className="text-muted-foreground whitespace-pre-line relative before:content-['-_'] before:absolute before:left-[-1.25rem] before:top-0 before:text-primary before:font-bold"
+              dangerouslySetInnerHTML={{ __html: formatWithBold(line.replace(/^\s*-\s*/, '')) }} 
+            />
           ))}
         </ul>
       );
@@ -38,8 +46,11 @@ const SectionContent = ({ title, icon, content, generatedContent, className = ""
        return (
         <ol className="list-decimal list-outside pl-5 space-y-1">
           {lines.map((line, index) => (
-            <li key={index} className="text-muted-foreground whitespace-pre-line"
-                dangerouslySetInnerHTML={{ __html: line.replace(/^\d+\.\s*/, '') }} />
+            <li 
+              key={index} 
+              className="text-muted-foreground whitespace-pre-line"
+              dangerouslySetInnerHTML={{ __html: formatWithBold(line.replace(/^\d+\.\s*/, '')) }} 
+            />
           ))}
         </ol>
       );
@@ -47,7 +58,11 @@ const SectionContent = ({ title, icon, content, generatedContent, className = ""
     
     // Default paragraph rendering
     return lines.map((line, index) => (
-        <p key={index} className="text-muted-foreground whitespace-pre-line" dangerouslySetInnerHTML={{ __html: line }} />
+        <p 
+          key={index} 
+          className="text-muted-foreground whitespace-pre-line" 
+          dangerouslySetInnerHTML={{ __html: formatWithBold(line) }} 
+        />
     ));
   };
   
@@ -72,7 +87,7 @@ const SectionContent = ({ title, icon, content, generatedContent, className = ""
             <div key={index} className="p-3 bg-muted/50 rounded-lg">
               <p
                 className="text-muted-foreground whitespace-pre-line mb-2"
-                dangerouslySetInnerHTML={{ __html: item.step.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }}
+                dangerouslySetInnerHTML={{ __html: formatWithBold(item.step) }}
               />
               {item.image && (
                 <div className="mt-2 text-center">
