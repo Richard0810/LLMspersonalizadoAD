@@ -80,21 +80,20 @@ const createParagraphsFromText = (text: string): Paragraph[] => {
  * Creates a numbered list (array of Paragraphs) from a text string, parsing markdown bolding.
  * It intelligently splits items whether they are on new lines or run-on in a single line.
  * @param text - The text to be converted into a list.
+ * @param numberingRef - The reference ID for the numbering style to use.
  * @returns An array of Paragraph objects formatted as a numbered list.
  */
-const createNumberedList = (text: string): Paragraph[] => {
+const createNumberedList = (text: string, numberingRef: string): Paragraph[] => {
     if (!text || typeof text !== 'string') return [];
 
-    // Replace any number sequence (2., 3., etc.) with a newline and a "1."
-    // This forces all items into a consistent "1. item" format on separate lines.
     const sanitizedText = text.replace(/(\d+)\.\s*/g, (match, number) => {
         return (number === '1' || number === 1) ? '1. ' : '\n1. ';
     });
 
     const items = sanitizedText
         .split('\n')
-        .map(item => item.replace(/^1\.\s*/, '').trim()) // Remove the leading "1. "
-        .filter(item => item); // Remove any empty items
+        .map(item => item.replace(/^1\.\s*/, '').trim())
+        .filter(item => item);
 
     if (items.length === 0) return [];
 
@@ -102,7 +101,7 @@ const createNumberedList = (text: string): Paragraph[] => {
         return new Paragraph({
             children: createTextRunsFromMarkdown(item),
             numbering: {
-                reference: 'default-numbering',
+                reference: numberingRef,
                 level: 0,
             },
             spacing: { after: 120 }
@@ -232,17 +231,10 @@ const generateActivityDocumentFlow = ai.defineFlow(
       },
       numbering: {
         config: [
-          {
-            reference: 'default-numbering',
-            levels: [
-              {
-                level: 0,
-                format: 'decimal',
-                text: '%1.',
-                alignment: AlignmentType.START,
-              },
-            ],
-          },
+          { reference: 'numbering-prep', levels: [{ level: 0, format: 'decimal', text: '%1.', alignment: AlignmentType.START }] },
+          { reference: 'numbering-materials', levels: [{ level: 0, format: 'decimal', text: '%1.', alignment: AlignmentType.START }] },
+          { reference: 'numbering-steps', levels: [{ level: 0, format: 'decimal', text: '%1.', alignment: AlignmentType.START }] },
+          { reference: 'numbering-eval', levels: [{ level: 0, format: 'decimal', text: '%1.', alignment: AlignmentType.START }] },
         ],
       },
       sections: [
@@ -266,13 +258,13 @@ const generateActivityDocumentFlow = ai.defineFlow(
             ...createParagraphsFromText(activity.estimatedTime),
 
             new Paragraph({ text: "📋 Preparación Previa del Docente", style: "section-title" }),
-            ...createNumberedList(activity.teacherPreparation),
+            ...createNumberedList(activity.teacherPreparation, 'numbering-prep'),
 
             new Paragraph({ text: "✅ Materiales Necesarios", style: "section-title" }),
-            ...createNumberedList(activity.materials),
+            ...createNumberedList(activity.materials, 'numbering-materials'),
 
             new Paragraph({ text: "👣 Desarrollo Paso a Paso", style: "section-title" }),
-            ...createNumberedList(activity.stepByStepDevelopment),
+            ...createNumberedList(activity.stepByStepDevelopment, 'numbering-steps'),
 
             new Paragraph({ text: "👀 Ejemplos Visuales Sugeridos", style: "section-title" }),
             ...createParagraphsFromText(activity.visualExamples),
@@ -281,7 +273,7 @@ const generateActivityDocumentFlow = ai.defineFlow(
             ...createParagraphsFromText(activity.reflectionQuestion),
 
             new Paragraph({ text: "🧑‍🏫 Criterios de Evaluación", style: "section-title" }),
-            ...createNumberedList(activity.evaluationCriteria),
+            ...createNumberedList(activity.evaluationCriteria, 'numbering-eval'),
           ],
         },
       ],
