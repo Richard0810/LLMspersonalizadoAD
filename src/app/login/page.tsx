@@ -36,7 +36,7 @@ export default function LoginPage() {
       <InteractiveBackground />
       
       <header className="w-full bg-card shadow-md z-10 animate-slide-down-fade">
-        <div className="flex items-center justify-between p-3 gap-2">
+        <div className="flex flex-wrap items-center justify-between p-3 gap-2">
             {/* Universidad de Cordoba */}
             <div className="flex items-center gap-2 min-w-0">
                <Image
