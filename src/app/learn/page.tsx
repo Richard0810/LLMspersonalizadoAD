@@ -92,7 +92,7 @@ export default function LearnPage() {
                                     <CardTitle className="text-xl font-headline">Video Explicativo</CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                    <VideoEmbed videoId="y_gM-Hj8B9c" title="¿Qué es el Pensamiento Computacional?" />
+                                    <VideoEmbed videoId="ti315UlVtS4" title="¿Qué es el Pensamiento Computacional?" />
                                 </CardContent>
                             </Card>
                         </InfoSection>
