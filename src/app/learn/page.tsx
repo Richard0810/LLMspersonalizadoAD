@@ -2,10 +2,11 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { ArrowLeft, BrainCircuit, Puzzle, Youtube } from 'lucide-react';
+import { ArrowLeft, BrainCircuit, Puzzle, Youtube, Presentation, ExternalLink } from 'lucide-react';
 import InteractiveBackground from '@/components/shared/InteractiveBackground';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
@@ -35,6 +36,7 @@ const VideoEmbed = ({ videoId, title }) => (
 
 export default function LearnPage() {
     const router = useRouter();
+    const presentationUrl = "https://docs.google.com/presentation/d/1_Iys9XP0Te5-spn3DO5vhB01vm1OVC5d/edit?usp=drive_link&ouid=105808271510700269082&rtpof=true&sd=true";
 
     return (
         <ProtectedRoute>
@@ -129,6 +131,17 @@ export default function LearnPage() {
                                     <VideoEmbed videoId="5fU2PT03_Gc" title="Actividades Desconectadas para el aula" />
                                 </CardContent>
                             </Card>
+                        </InfoSection>
+
+                        <InfoSection title="Presentación: PC y AD en el Contexto Rural" icon={Presentation}>
+                            <p className="text-base text-muted-foreground">
+                                Explora esta presentación de diapositivas para obtener una visión más profunda de cómo aplicar estos conceptos en entornos rurales, con ejemplos y estrategias adaptadas.
+                            </p>
+                            <Link href={presentationUrl} target="_blank" rel="noopener noreferrer">
+                                <Button size="lg" className="w-full mt-4">
+                                    Ver Presentación <ExternalLink className="ml-2 h-5 w-5" />
+                                </Button>
+                            </Link>
                         </InfoSection>
                     </div>
                 </main>
