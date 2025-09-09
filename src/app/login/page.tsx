@@ -38,32 +38,32 @@ export default function LoginPage() {
       <header className="w-full bg-card shadow-md z-10 animate-slide-down-fade">
         <div className="flex items-center justify-between p-3 gap-2">
             {/* Universidad de Cordoba */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 min-w-0">
                <Image
                 src="/logo_unicor.png"
                 alt="Logo Universidad de Córdoba"
                 width={150}
                 height={50}
                 priority
-                className="transition-all duration-300 hover:scale-105 w-auto h-8 md:h-12"
+                className="transition-all duration-300 hover:scale-105 w-auto h-8 md:h-12 flex-shrink-0"
               />
-              <div className="hidden md:block text-left">
-                <h1 className="text-sm md:text-xl font-headline font-bold uppercase text-foreground tracking-wider">
-                  <GraduationCap className="inline-block h-5 w-5 mr-2" />
+              <div className="text-left min-w-0">
+                <h1 className="text-xs md:text-xl font-headline font-bold uppercase text-foreground tracking-wider truncate">
+                  <GraduationCap className="inline-block h-4 w-4 md:h-5 md:w-5 mr-1 md:mr-2" />
                   Licenciatura en Informática
                 </h1>
-                <p className="text-xs md:text-base text-muted-foreground font-medium">Facultad de Educación y Ciencias Humanas</p>
+                <p className="text-[10px] md:text-base text-muted-foreground font-medium truncate">Facultad de Educación y Ciencias Humanas</p>
               </div>
             </div>
             
             {/* Institucion Educativa */}
-             <div className="flex items-center gap-2">
-              <div className="hidden md:block text-right">
-                <h1 className="text-sm md:text-xl font-headline font-bold uppercase text-foreground tracking-wider">
-                   <School className="inline-block h-5 w-5 mr-2" />
+             <div className="flex items-center gap-2 min-w-0">
+              <div className="text-right min-w-0">
+                <h1 className="text-xs md:text-xl font-headline font-bold uppercase text-foreground tracking-wider truncate">
+                   <School className="inline-block h-4 w-4 md:h-5 md:w-5 mr-1 md:mr-2" />
                   I.E. Alfonso Spath Spath
                 </h1>
-                <p className="text-xs md:text-base text-muted-foreground font-medium">Martinez - Cereté, Córdoba</p>
+                <p className="text-[10px] md:text-base text-muted-foreground font-medium truncate">Martinez - Cereté, Córdoba</p>
               </div>
               <Image
                 src="/escudo.jpg"
@@ -71,7 +71,7 @@ export default function LoginPage() {
                 width={60}
                 height={60}
                 priority
-                className="transition-all duration-300 hover:scale-105 w-10 h-10 md:w-16 md:h-16"
+                className="transition-all duration-300 hover:scale-105 w-10 h-10 md:w-16 md:h-16 flex-shrink-0"
               />
             </div>
         </div>
