@@ -47,9 +47,24 @@ const SectionContent = ({ title, icon, content, generatedContent, className = ""
     }
     
     if (listType === 'numeric') {
+        const stepRegex = /^\(?\d+\.?|^\(\d+.*?\)/; // Matches "1.", "1", "(1...)"
+        
+        // For Criterios, just split by lines
+        if (title === "Criterios de Evaluación") {
+          return (
+             <ol className="list-decimal list-outside pl-5 space-y-2">
+                {lines.map((line, index) => (
+                  <li key={index} className="text-muted-foreground whitespace-pre-line"
+                      dangerouslySetInnerHTML={{ __html: formatWithBold(line) }} 
+                  />
+                ))}
+            </ol>
+          );
+        }
+
+      // For Step by Step Development
       const groupedLines: string[][] = [];
       let currentGroup: string[] = [];
-      const stepRegex = /^\(?\d+.?|^\(\d+.*?\)/; // Matches "1.", "1", "(1...)"
 
       lines.forEach(line => {
         if (stepRegex.test(line.trim())) {
@@ -72,11 +87,12 @@ const SectionContent = ({ title, icon, content, generatedContent, className = ""
 
       return (
         <ol className="list-decimal list-outside pl-5 space-y-4">
-          {groupedLines.map((group, index) => (
-            <li key={index} className="text-muted-foreground whitespace-pre-line">
-              {group.map((line, lineIndex) => (
-                 <p key={lineIndex} dangerouslySetInnerHTML={{ __html: formatWithBold(line.replace(stepRegex, '').trim()) }} />
-              ))}
+          {groupedLines.map((group, groupIndex) => (
+            <li key={groupIndex} className="text-muted-foreground whitespace-pre-line">
+              {group.map((line, lineIndex) => {
+                 const formattedLine = formatWithBold(line.replace(stepRegex, '').trim());
+                 return <p key={lineIndex} dangerouslySetInnerHTML={{ __html: formattedLine }} />;
+              })}
             </li>
           ))}
         </ol>
