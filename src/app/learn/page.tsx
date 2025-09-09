@@ -51,6 +51,11 @@ export default function LearnPage() {
 
                     <div className="space-y-8">
                         <InfoSection title="Pensamiento Computacional (PC) – Conceptos Clave" icon={BrainCircuit}>
+                            <div className="text-base text-muted-foreground space-y-4">
+                                <p>El Pensamiento Computacional es un proceso cognitivo de resolución de problemas inspirado en la forma en que los ordenadores procesan la información, pero que trasciende la informática. Consiste en analizar, descomponer y formular soluciones estructuradas para problemas de cualquier ámbito, utilizando principios lógicos, matemáticos y algorítmicos.</p>
+                                <p>No se trata de “pensar como una máquina”, sino de emplear estrategias computacionales para abordar desafíos complejos, de forma que las soluciones puedan ser comprendidas, ejecutadas y reutilizadas tanto por personas como por sistemas tecnológicos.</p>
+                                <p>Este enfoque implica cuatro habilidades fundamentales:</p>
+                            </div>
                             <Accordion type="single" collapsible className="w-full">
                                 <AccordionItem value="item-1">
                                     <AccordionTrigger className="text-lg font-semibold">Descomposición</AccordionTrigger>
