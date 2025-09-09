@@ -78,18 +78,40 @@ const createParagraphsFromText = (text: string): Paragraph[] => {
 
 /**
  * Creates a numbered list (array of Paragraphs) from a text string, parsing markdown bolding.
- * Each line in the text becomes a numbered item.
+ * It intelligently splits items whether they are on new lines or run-on in a single line.
  * @param text - The text to be converted into a list.
  * @returns An array of Paragraph objects formatted as a numbered list.
  */
 const createNumberedList = (text: string): Paragraph[] => {
     if (!text || typeof text !== 'string') return [];
-    // Clean up any existing numbering from the AI's text (e.g., "1. ", "2. ") and filter out empty lines
-    const lines = text.split('\n').map(line => line.trim().replace(/^\d+\.\s*/, '')).filter(line => line);
-    if (lines.length === 0) return [];
-    return lines.map((line) => {
+    
+    // Split by newline first to handle multi-line inputs.
+    const lines = text.split('\n');
+    
+    const items: string[] = [];
+    
+    // Process each line to split run-on lists (e.g., "1. item one 2. item two")
+    lines.forEach(line => {
+        // Regex to split by "2. ", "3. ", etc., but keep the delimiter.
+        // This will split "1. First 2. Second" into ["1. First ", "2. Second"]
+        const splitItems = line.split(/(?=\d+\.\s)/).map(item => item.trim());
+        
+        splitItems.forEach(item => {
+            if (item) {
+                // Clean up the item by removing the leading number and period.
+                const cleanedItem = item.replace(/^\d+\.\s*/, '').trim();
+                if (cleanedItem) {
+                    items.push(cleanedItem);
+                }
+            }
+        });
+    });
+
+    if (items.length === 0) return [];
+
+    return items.map((item) => {
         return new Paragraph({
-            children: createTextRunsFromMarkdown(line),
+            children: createTextRunsFromMarkdown(item),
             numbering: {
                 reference: 'default-numbering',
                 level: 0,
@@ -98,6 +120,7 @@ const createNumberedList = (text: string): Paragraph[] => {
         })
     });
 };
+
 
 // Define the Genkit flow
 const generateActivityDocumentFlow = ai.defineFlow(
