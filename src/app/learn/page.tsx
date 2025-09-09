@@ -30,7 +30,7 @@ const VideoEmbed = ({ videoId, title }) => (
         frameBorder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
-        className="w-full h-[315px] rounded-md shadow-md"
+        className="w-full h-[250px] md:h-[315px] rounded-md shadow-md"
     ></iframe>
 );
 
@@ -40,7 +40,7 @@ const PresentationEmbed = ({ presentationId, title }) => (
         title={title}
         frameBorder="0"
         allowFullScreen={true}
-        className="w-full h-[450px] rounded-md shadow-md border"
+        className="w-full h-[300px] md:h-[450px] rounded-md shadow-md border"
     ></iframe>
 );
 
@@ -177,3 +177,5 @@ export default function LearnPage() {
         </ProtectedRoute>
     );
 }
+
+    
