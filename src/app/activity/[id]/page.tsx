@@ -18,12 +18,49 @@ import Image from 'next/image';
 import WordIcon from '@/components/icons/WordIcon';
 
 const SectionContent = ({ title, icon, content, generatedContent, className = "" }) => {
-  // Helper to convert markdown bold to strong tags
-  const createMarkup = (text) => {
-    if (!text) return { __html: '' };
-    const htmlText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    return { __html: htmlText };
+  const formatContent = (text, type) => {
+    if (!text) return null;
+    const lines = text.split('\n').filter(line => line.trim() !== '');
+
+    if (type === 'bullet') {
+      return (
+        <ul className="list-none pl-0">
+          {lines.map((line, index) => (
+            <li key={index} className="text-muted-foreground whitespace-pre-line before:content-['-_'] before:text-transparent before:w-4 before:inline-block">
+              <span className="relative left-[-1ch]">- {line.replace(/^\s*-\s*/, '')}</span>
+            </li>
+          ))}
+        </ul>
+      );
+    }
+
+    if (type === 'numeric') {
+       return (
+        <ol className="list-decimal list-outside pl-5">
+          {lines.map((line, index) => (
+            <li key={index} className="text-muted-foreground whitespace-pre-line mb-1">
+              {line.replace(/^\d+\.\s*/, '')}
+            </li>
+          ))}
+        </ol>
+      );
+    }
+    
+    // Default paragraph rendering
+    return lines.map((line, index) => (
+        <p key={index} className="text-muted-foreground whitespace-pre-line" dangerouslySetInnerHTML={{ __html: line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
+    ));
   };
+  
+  const getListType = (title) => {
+      const bulletSections = ["Materiales Necesarios", "Preparación Previa del Docente"];
+      const numericSections = ["Desarrollo Paso a Paso", "Criterios de Evaluación"];
+      if (bulletSections.includes(title)) return 'bullet';
+      if (numericSections.includes(title)) return 'numeric';
+      return 'paragraph';
+  }
+
+  const listType = getListType(title);
 
   return (
     <div className={className}>
@@ -36,7 +73,7 @@ const SectionContent = ({ title, icon, content, generatedContent, className = ""
             <div key={index} className="p-3 bg-muted/50 rounded-lg">
               <p
                 className="text-muted-foreground whitespace-pre-line mb-2"
-                dangerouslySetInnerHTML={createMarkup(item.step)}
+                dangerouslySetInnerHTML={{ __html: item.step.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }}
               />
               {item.image && (
                 <div className="mt-2 text-center">
@@ -53,10 +90,7 @@ const SectionContent = ({ title, icon, content, generatedContent, className = ""
           ))}
         </div>
       ) : (
-        <p
-          className="text-muted-foreground whitespace-pre-line"
-          dangerouslySetInnerHTML={createMarkup(content)}
-        />
+        formatContent(content, listType)
       )}
     </div>
   );
@@ -304,3 +338,4 @@ export default function ActivityDetailPage() {
     </ProtectedRoute>
   );
 }
+
