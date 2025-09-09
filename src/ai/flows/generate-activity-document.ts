@@ -88,7 +88,7 @@ const createNumberedList = (text: string): Paragraph[] => {
     // Replace any number sequence (2., 3., etc.) with a newline and a "1."
     // This forces all items into a consistent "1. item" format on separate lines.
     const sanitizedText = text.replace(/(\d+)\.\s*/g, (match, number) => {
-        return (number === '1') ? '1. ' : '\n1. ';
+        return (number === '1' || number === 1) ? '1. ' : '\n1. ';
     });
 
     const items = sanitizedText
