@@ -321,7 +321,7 @@ const generateActivityDocumentFlow = ai.defineFlow(
             ...createStepByStepList(activity.stepByStepDevelopment, 'numbering-list'),
 
             new Paragraph({ text: "👀 Ejemplos Visuales Sugeridos", style: "section-title" }),
-            ...createParagraphsFromText(activity.visualExamples),
+            ...createBulletedList(activity.visualExamples),
 
             new Paragraph({ text: "👍 Reflexión y Conexión", style: "section-title" }),
             ...createParagraphsFromText(activity.reflectionQuestion),
