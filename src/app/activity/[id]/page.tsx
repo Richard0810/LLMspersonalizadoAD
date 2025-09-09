@@ -19,7 +19,10 @@ import WordIcon from '@/components/icons/WordIcon';
 
 const SectionContent = ({ title, icon, content, generatedContent, className = "" }) => {
   const formatWithBold = (text: string) => {
-    return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    // Handles both **word** and *word:*
+    return text
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?):\*/g, '<strong>$1:</strong>');
   };
 
   const formatContent = (text: string | undefined, listType: 'bullet' | 'numeric' | 'paragraph') => {
