@@ -57,15 +57,20 @@ Tono: Didáctico, claro, práctico, motivador y adaptable por los docentes.
 Genera tres actividades desconectadas distintas y muy detalladas, basadas en la siguiente información. **Todo el contenido debe estar en español.**
 
 - Tema a Tratar: {{{topicName}}}
-- Concepto de Pensamiento Computacional a Tratar: {{{computationalConcept}}}
 - Área Temática: {{{subjectArea}}}
 - Nivel de Grado: {{{gradeLevel}}}
+{{#if (eq computationalConcept "Todos los conceptos")}}
+- Concepto de Pensamiento Computacional a Tratar: La actividad debe integrar de manera cohesiva los cuatro conceptos clave del pensamiento computacional: Descomposición, Reconocimiento de patrones, Abstracción y Algoritmos. Asegúrate de que la sección 'computationalConcept' y 'reflectionQuestion' expliquen cómo se manifiesta cada uno de estos conceptos en la actividad.
+{{else}}
+- Concepto de Pensamiento Computacional a Tratar: {{{computationalConcept}}}
+{{/if}}
+
 
 **Formato de Salida Requerido para cada actividad (Debes ser MUY RIGUROSO con esta estructura):**
 Asegúrate de que cada actividad generada cumpla estrictamente con lo siguiente:
 - **title:** Un nombre creativo y descriptivo para la actividad.
 - **objective:** Un objetivo de aprendizaje claro, medible y específico, que esté en coherencia con los lineamientos del Ministerio de Educación Nacional (MEN) de Colombia para el grado especificado.
-- **computationalConcept:** Menciona explícitamente el concepto de pensamiento computacional que se trabaja (Descomposición, Abstracción, Algoritmos, etc.).
+- **computationalConcept:** Menciona explícitamente el concepto o conceptos de pensamiento computacional que se trabajan (Descomposición, Abstracción, Algoritmos, Reconocimiento de patrones, etc.).
 - **materials:** Una lista de materiales simples y accesibles (no electrónicos), descritos con suficiente detalle. **Cada material debe estar en una nueva línea.**
 - **estimatedTime:** El tiempo estimado para realizar la actividad (ej: "45 minutos").
 - **teacherPreparation:** Describe qué debe hacer o preparar el docente ANTES de iniciar la clase. **Cada paso debe estar en una nueva línea.**
@@ -94,3 +99,4 @@ const generateEducationalActivitiesFlow = ai.defineFlow(
     return output!;
   }
 );
+
