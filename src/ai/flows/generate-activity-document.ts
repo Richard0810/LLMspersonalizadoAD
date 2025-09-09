@@ -84,28 +84,17 @@ const createParagraphsFromText = (text: string): Paragraph[] => {
  */
 const createNumberedList = (text: string): Paragraph[] => {
     if (!text || typeof text !== 'string') return [];
-    
-    // Split by newline first to handle multi-line inputs.
-    const lines = text.split('\n');
-    
-    const items: string[] = [];
-    
-    // Process each line to split run-on lists (e.g., "1. item one 2. item two")
-    lines.forEach(line => {
-        // Regex to split by "2. ", "3. ", etc., but keep the delimiter.
-        // This will split "1. First 2. Second" into ["1. First ", "2. Second"]
-        const splitItems = line.split(/(?=\d+\.\s)/).map(item => item.trim());
-        
-        splitItems.forEach(item => {
-            if (item) {
-                // Clean up the item by removing the leading number and period.
-                const cleanedItem = item.replace(/^\d+\.\s*/, '').trim();
-                if (cleanedItem) {
-                    items.push(cleanedItem);
-                }
-            }
-        });
+
+    // Replace any number sequence (2., 3., etc.) with a newline and a "1."
+    // This forces all items into a consistent "1. item" format on separate lines.
+    const sanitizedText = text.replace(/(\d+)\.\s*/g, (match, number) => {
+        return (number === '1') ? '1. ' : '\n1. ';
     });
+
+    const items = sanitizedText
+        .split('\n')
+        .map(item => item.replace(/^1\.\s*/, '').trim()) // Remove the leading "1. "
+        .filter(item => item); // Remove any empty items
 
     if (items.length === 0) return [];
 
