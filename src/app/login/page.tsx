@@ -48,22 +48,22 @@ export default function LoginPage() {
                 className="transition-all duration-300 hover:scale-105 w-auto h-8 md:h-12 flex-shrink-0"
               />
               <div className="text-left min-w-0">
-                <h1 className="text-xs md:text-xl font-headline font-bold uppercase text-foreground tracking-wider truncate">
+                <h1 className="text-xs md:text-sm font-headline font-bold uppercase text-foreground tracking-wider truncate">
                   <GraduationCap className="inline-block h-4 w-4 md:h-5 md:w-5 mr-1 md:mr-2" />
                   Licenciatura en Informática
                 </h1>
-                <p className="text-[10px] md:text-base text-muted-foreground font-medium truncate">Facultad de Educación y Ciencias Humanas</p>
+                <p className="text-[10px] md:text-sm text-muted-foreground font-medium truncate">Facultad de Educación y Ciencias Humanas</p>
               </div>
             </div>
             
             {/* Institucion Educativa */}
              <div className="flex items-center gap-2 min-w-0">
               <div className="text-right min-w-0">
-                <h1 className="text-xs md:text-xl font-headline font-bold uppercase text-foreground tracking-wider truncate">
+                <h1 className="text-xs md:text-sm font-headline font-bold uppercase text-foreground tracking-wider truncate">
                    <School className="inline-block h-4 w-4 md:h-5 md:w-5 mr-1 md:mr-2" />
                   I.E. Alfonso Spath Spath
                 </h1>
-                <p className="text-[10px] md:text-base text-muted-foreground font-medium truncate">Martinez - Cereté, Córdoba</p>
+                <p className="text-[10px] md:text-sm text-muted-foreground font-medium truncate">Martinez - Cereté, Córdoba</p>
               </div>
               <Image
                 src="/escudo.jpg"
