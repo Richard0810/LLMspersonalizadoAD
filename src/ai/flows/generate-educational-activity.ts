@@ -30,7 +30,7 @@ const EducationalActivitySchema = z.object({
   teacherPreparation: z.string().describe('Los pasos o materiales que el docente debe preparar antes de la clase, donde cada paso está en una nueva línea.'),
   stepByStepDevelopment: z.string().describe('Guion de clase para el docente, detallando qué decir y hacer. Debe ser una guía numerada con acciones específicas para estudiantes, gestión de tiempos y ejemplos prácticos. Cada paso debe estar en una nueva línea.'),
   visualExamples: z.string().describe('Sugerencias de ejemplos visuales o diagramas que el docente puede dibujar en el tablero o en hojas para facilitar la comprensión (tablas, cuadrículas, mapas, pictogramas).'),
-  reflectionQuestion: z.string().describe('Una explicación detallada de cómo la actividad evidencia el concepto de pensamiento computacional, seguida de preguntas para guiar la metacognición de los estudiantes, donde cada pregunta está en una nueva línea y comienza con un guion.'),
+  reflectionQuestion: z.string().describe('Una explicación detallada que aclare cómo la actividad evidencia el concepto de pensamiento computacional, seguida por preguntas de reflexión para el estudiante, con cada pregunta en una nueva línea y precedida por un guion.'),
   evaluationCriteria: z.string().describe('Los criterios de evaluación o evidencias de aprendizaje que el docente puede usar para valorar el desempeño de los estudiantes, donde cada criterio está en una nueva línea.')
 });
 
@@ -76,7 +76,7 @@ Asegúrate de que cada actividad generada cumpla estrictamente con lo siguiente:
     - **Ejemplos prácticos:** Incluye ejemplos concretos que el docente pueda usar o dibujar en el tablero.
     - **Cada paso numerado debe estar en una nueva línea.**
 - **visualExamples:** Describe ejemplos visuales o diagramas que el docente pueda dibujar en el tablero o en hojas para apoyar la explicación (ej: "una tabla de 3x3", "un diagrama de flujo simple con flechas", "pictogramas para representar acciones").
-- **reflectionQuestion:** Una explicación detallada y clara de cómo la actividad evidencia el concepto de pensamiento computacional, conectando los pasos específicos del ejercicio con la teoría. A continuación, debe incluir preguntas para guiar la reflexión y la metacognición de los estudiantes. **Cada pregunta debe estar en una nueva línea y comenzar con un guion (-).**
+- **reflectionQuestion:** El contenido debe tener dos partes. Primero, una explicación detallada y clara que demuestre cómo la actividad evidencia el concepto de pensamiento computacional, conectando las acciones específicas del ejercicio con la teoría. Segundo, a continuación de la explicación, debe incluir preguntas para guiar la reflexión y la metacognición de los estudiantes. **Cada pregunta debe estar en una nueva línea y comenzar con un guion (-).**
 - **evaluationCriteria:** Describe las evidencias de aprendizaje o los criterios que el docente puede observar para evaluar si los estudiantes alcanzaron el objetivo. **Cada criterio debe estar en una nueva línea.**
 
 La salida debe ser un JSON array con tres objetos, donde cada objeto representa una actividad completa y detallada, conteniendo los campos especificados.
