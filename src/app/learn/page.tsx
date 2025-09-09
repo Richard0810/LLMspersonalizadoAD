@@ -7,9 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, BrainCircuit, Puzzle, Youtube, Presentation, ExternalLink } from 'lucide-react';
+import { ArrowLeft, BrainCircuit, Puzzle, Youtube, Presentation, ExternalLink, Lightbulb, Users, Bot, Rocket, School, Globe, BookOpenCheck, Brain, GraduationCap, Target } from 'lucide-react';
 import InteractiveBackground from '@/components/shared/InteractiveBackground';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import { Pie, PieChart, ResponsiveContainer } from 'recharts';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+
 
 const InfoSection = ({ title, children, icon: Icon, className = "" }) => (
     <Card className={`shadow-lg h-full border-l-4 border-primary/50 ${className}`}>
@@ -23,14 +26,25 @@ const InfoSection = ({ title, children, icon: Icon, className = "" }) => (
     </Card>
 );
 
+const InfoCard = ({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) => (
+    <div className="flex items-start gap-4">
+        <div className="flex-shrink-0 text-primary">{icon}</div>
+        <div>
+            <h4 className="font-semibold text-foreground">{title}</h4>
+            <p className="text-sm text-muted-foreground">{description}</p>
+        </div>
+    </div>
+);
+
+
 const VideoEmbed = ({ videoId, title }) => (
      <iframe
         src={`https://www.youtube.com/embed/${videoId}`}
         title={title}
+        className="w-full h-[250px] md:h-[315px] rounded-md shadow-md"
         frameBorder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
-        className="w-full h-[250px] md:h-[315px] rounded-md shadow-md"
     ></iframe>
 );
 
@@ -43,6 +57,27 @@ const PresentationEmbed = ({ presentationId, title }) => (
         className="w-full h-[300px] md:h-[450px] rounded-md shadow-md border"
     ></iframe>
 );
+
+const audienceData = [
+  { name: 'Doc. Tecnología', value: 70, fill: 'hsl(var(--chart-1))' },
+  { name: 'Otros Docentes', value: 20, fill: 'hsl(var(--chart-2))' },
+  { name: 'Estudiantes', value: 10, fill: 'hsl(var(--chart-4))' },
+];
+
+const chartConfig = {
+   'Doc. Tecnología': {
+    label: 'Docentes de Tecnología',
+    color: 'hsl(var(--chart-1))',
+  },
+  'Otros Docentes': {
+    label: 'Otros Docentes',
+    color: 'hsl(var(--chart-2))',
+  },
+  'Estudiantes': {
+    label: 'Estudiantes',
+    color: 'hsl(var(--chart-4))',
+  },
+};
 
 
 export default function LearnPage() {
@@ -60,7 +95,10 @@ export default function LearnPage() {
                     </Button>
 
                     <Tabs defaultValue="pc" className="w-full animate-slide-up" style={{ animationDelay: '0.2s' }}>
-                        <TabsList className="grid w-full grid-cols-1 md:grid-cols-3 mb-6 h-auto p-2 bg-primary/10 rounded-lg">
+                        <TabsList className="grid w-full grid-cols-1 md:grid-cols-4 mb-6 h-auto p-2 bg-primary/10 rounded-lg">
+                             <TabsTrigger value="about" className="py-2.5 text-base">
+                                <Lightbulb className="mr-2 h-5 w-5" /> Sobre EduSpark AI
+                            </TabsTrigger>
                             <TabsTrigger value="pc" className="py-2.5 text-base">
                                 <BrainCircuit className="mr-2 h-5 w-5" /> Pensamiento Computacional
                             </TabsTrigger>
@@ -71,6 +109,84 @@ export default function LearnPage() {
                                 <Presentation className="mr-2 h-5 w-5" /> Presentación
                             </TabsTrigger>
                         </TabsList>
+
+                        <TabsContent value="about" className="animate-fade-in">
+                             <InfoSection title="Acerca de EduSpark AI" icon={Lightbulb}>
+                                 <p className="mb-6">Una plataforma diseñada para potenciar la enseñanza del pensamiento computacional a través de la Inteligencia Artificial, en el marco de una iniciativa de investigación de la Universidad de Córdoba, Colombia.</p>
+                                <Tabs defaultValue="objective" className="w-full">
+                                    <TabsList className="grid w-full grid-cols-3 mb-4 bg-primary/20">
+                                        <TabsTrigger value="objective">
+                                            <Target className="h-4 w-4 mr-1"/> Objetivo
+                                        </TabsTrigger>
+                                        <TabsTrigger value="audience">
+                                            <Users className="h-4 w-4 mr-1"/> ¿Para Quién?
+                                        </TabsTrigger>
+                                        <TabsTrigger value="what-it-does">
+                                            <Bot className="h-4 w-4 mr-1"/> ¿Qué Hace?
+                                        </TabsTrigger>
+                                    </TabsList>
+                                    <TabsContent value="objective" className="mt-6">
+                                        <div className="space-y-6">
+                                            <InfoCard
+                                                icon={<Rocket size={24} />}
+                                                title="Innovación Pedagógica"
+                                                description="Asesorar a docentes en el diseño de actividades desconectadas que desarrollen el pensamiento computacional de forma creativa."
+                                            />
+                                            <InfoCard
+                                                icon={<School size={24} />}
+                                                title="Iniciativa de Investigación"
+                                                description="Este proyecto se desarrolla en el marco de la Licenciatura en Informática de la Universidad de Córdoba, Colombia."
+                                            />
+                                            <InfoCard
+                                                icon={<Globe size={24} />}
+                                                title="Acceso Equitativo"
+                                                description="Implementar y validar la herramienta en contextos reales para asegurar su efectividad y mejorarla con retroalimentación."
+                                            />
+                                        </div>
+                                    </TabsContent>
+                                    <TabsContent value="audience" className="mt-6">
+                                        <div className="space-y-4">
+                                            <div className="w-full h-[150px]">
+                                                <ResponsiveContainer width="100%" height="100%">
+                                                    <PieChart>
+                                                        <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+                                                        <Pie data={audienceData} dataKey="value" nameKey="name" innerRadius={30} outerRadius={50} paddingAngle={5} />
+                                                    </PieChart>
+                                                </ResponsiveContainer>
+                                            </div>
+                                            <InfoCard 
+                                                icon={<Users className="h-6 w-6 text-accent"/>}
+                                                title="Docentes de Tecnología e Informática"
+                                                description="Ideal para educadores que buscan innovar en sus clases de pensamiento computacional, incluso en entornos con baja conectividad."
+                                            />
+                                        </div>
+                                    </TabsContent>
+                                    <TabsContent value="what-it-does" className="mt-6">
+                                        <div className="space-y-6 text-center">
+                                            <div className="flex items-center justify-center space-x-2 text-muted-foreground font-semibold">
+                                                <div className="flex flex-col items-center gap-1 p-2 bg-primary/10 rounded-lg">
+                                                    <BookOpenCheck size={24} className="text-primary"/> 
+                                                    <span className="text-xs">Configura</span>
+                                                </div>
+                                                <ArrowLeft size={20} className="text-primary shrink-0 rotate-180"/>
+                                                <div className="flex flex-col items-center gap-1 p-2 bg-primary/10 rounded-lg">
+                                                    <Brain size={24} className="text-primary"/> 
+                                                    <span className="text-xs">Genera</span>
+                                                </div>
+                                                 <ArrowLeft size={20} className="text-primary shrink-0 rotate-180"/>
+                                                <div className="flex flex-col items-center gap-1 p-2 bg-primary/10 rounded-lg">
+                                                    <GraduationCap size={24} className="text-primary"/> 
+                                                    <span className="text-xs">Explora</span>
+                                                </div>
+                                            </div>
+                                            <p className="text-muted-foreground italic">
+                                                Define un tema, selecciona un concepto y un nivel, y deja que la IA genere tres actividades offline únicas y detalladas para tus estudiantes.
+                                            </p>
+                                        </div>
+                                    </TabsContent>
+                                </Tabs>
+                            </InfoSection>
+                        </TabsContent>
 
                         <TabsContent value="pc" className="animate-fade-in">
                             <InfoSection title="Pensamiento Computacional (PC) – Conceptos Clave" icon={BrainCircuit}>
@@ -177,5 +293,3 @@ export default function LearnPage() {
         </ProtectedRoute>
     );
 }
-
-    
