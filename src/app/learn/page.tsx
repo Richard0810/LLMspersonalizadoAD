@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, BrainCircuit, Puzzle, Youtube, Presentation, ExternalLink, Lightbulb, Users, Bot, Rocket, School, Globe, BookOpenCheck, Brain, GraduationCap, Target } from 'lucide-react';
+import { ArrowLeft, BrainCircuit, Puzzle, Youtube, Presentation, ExternalLink, Lightbulb, Users, Bot, Rocket, School, Globe, BookOpenCheck, Brain, GraduationCap, Target, Settings, MessageSquare } from 'lucide-react';
 import InteractiveBackground from '@/components/shared/InteractiveBackground';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import { Pie, PieChart, ResponsiveContainer } from 'recharts';
@@ -95,7 +95,7 @@ export default function LearnPage() {
                         <ArrowLeft className="mr-2 h-4 w-4" /> Atrás
                     </Button>
 
-                    <Tabs defaultValue="pc" className="w-full animate-slide-up" style={{ animationDelay: '0.2s' }}>
+                    <Tabs defaultValue="about" className="w-full animate-slide-up" style={{ animationDelay: '0.2s' }}>
                         <TabsList className="grid w-full grid-cols-1 md:grid-cols-4 mb-6 h-auto p-2 bg-primary/10 rounded-lg">
                              <TabsTrigger value="about" className="py-2.5 text-base">
                                 <Lightbulb className="mr-2 h-5 w-5" /> Sobre EduSpark AI
@@ -146,44 +146,63 @@ export default function LearnPage() {
                                         </div>
                                     </TabsContent>
                                     <TabsContent value="audience" className="mt-6">
-                                        <div className="space-y-4">
-                                            <ChartContainer config={chartConfig} className="mx-auto aspect-square h-[150px] w-full">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                                            <div>
+                                                <InfoCard 
+                                                    icon={<Users className="h-6 w-6 text-accent"/>}
+                                                    title="Docentes de Tecnología e Informática"
+                                                    description="Principalmente, para educadores que buscan innovar en sus clases de pensamiento computacional, incluso en entornos con baja conectividad."
+                                                />
+                                                <InfoCard 
+                                                    icon={<Users className="h-6 w-6 mt-4"/>}
+                                                    title="Otros Docentes y Estudiantes"
+                                                    description="También es útil para cualquier docente interesado en la materia y para estudiantes que deseen explorar estos conceptos."
+                                                />
+                                            </div>
+                                            <ChartContainer config={chartConfig} className="mx-auto aspect-square h-[200px] w-full">
                                                 <ResponsiveContainer width="100%" height="100%">
                                                     <PieChart>
-                                                        <ChartTooltip content={<ChartTooltipContent hideLabel />} />
-                                                        <Pie data={audienceData} dataKey="value" nameKey="name" innerRadius={30} outerRadius={50} paddingAngle={5} />
+                                                        <ChartTooltip content={<ChartTooltipContent nameKey="name" hideLabel />} />
+                                                        <Pie data={audienceData} dataKey="value" nameKey="name" innerRadius={40} outerRadius={60} paddingAngle={5} />
                                                     </PieChart>
                                                 </ResponsiveContainer>
                                             </ChartContainer>
-                                            <InfoCard 
-                                                icon={<Users className="h-6 w-6 text-accent"/>}
-                                                title="Docentes de Tecnología e Informática"
-                                                description="Ideal para educadores que buscan innovar en sus clases de pensamiento computacional, incluso en entornos con baja conectividad."
-                                            />
                                         </div>
                                     </TabsContent>
                                     <TabsContent value="what-it-does" className="mt-6">
-                                        <div className="space-y-6 text-center">
-                                            <div className="flex items-center justify-center space-x-2 text-muted-foreground font-semibold">
-                                                <div className="flex flex-col items-center gap-1 p-2 bg-primary/10 rounded-lg">
-                                                    <BookOpenCheck size={24} className="text-primary"/> 
-                                                    <span className="text-xs">Configura</span>
-                                                </div>
-                                                <ArrowLeft size={20} className="text-primary shrink-0 rotate-180"/>
-                                                <div className="flex flex-col items-center gap-1 p-2 bg-primary/10 rounded-lg">
-                                                    <Brain size={24} className="text-primary"/> 
-                                                    <span className="text-xs">Genera</span>
-                                                </div>
-                                                 <ArrowLeft size={20} className="text-primary shrink-0 rotate-180"/>
-                                                <div className="flex flex-col items-center gap-1 p-2 bg-primary/10 rounded-lg">
-                                                    <GraduationCap size={24} className="text-primary"/> 
-                                                    <span className="text-xs">Explora</span>
-                                                </div>
-                                            </div>
-                                            <p className="text-muted-foreground italic">
-                                                Define un tema, selecciona un concepto y un nivel, y deja que la IA genere tres actividades offline únicas y detalladas para tus estudiantes.
-                                            </p>
-                                        </div>
+                                        <Accordion type="single" collapsible className="w-full" defaultValue="item-1">
+                                            <AccordionItem value="item-1">
+                                                <AccordionTrigger className="text-lg font-semibold text-primary/90 hover:text-primary">
+                                                    <Settings className="mr-2 h-5 w-5"/>Paso 1: La Magia de los Parámetros
+                                                </AccordionTrigger>
+                                                <AccordionContent className="space-y-2">
+                                                    <p>El primer paso es definir cuatro parámetros clave: <strong className='text-foreground'>Tema, Concepto, Área y Grado.</strong></p>
+                                                    <p>Estos no son simples campos de un formulario; son las instrucciones directas que le das a la IA. Este proceso se conoce como <strong className='text-accent'>prompt engineering</strong> guiado. Al ser específico, le dices al modelo exactamente qué tipo de contenido necesitas, asegurando que las actividades generadas sean relevantes y personalizadas para tu clase.</p>
+                                                </AccordionContent>
+                                            </AccordionItem>
+                                            <AccordionItem value="item-2">
+                                                <AccordionTrigger className="text-lg font-semibold text-primary/90 hover:text-primary">
+                                                    <MessageSquare className="mr-2 h-5 w-5"/>Paso 2: Conversa con tu Asistente de IA
+                                                </AccordionTrigger>
+                                                <AccordionContent className="space-y-2">
+                                                    <p>Una vez definidos los parámetros, el chat se convierte en tu centro de mando. Puedes:</p>
+                                                    <ul className='list-disc pl-5 space-y-1'>
+                                                        <li><strong>Hacer preguntas abiertas:</strong> "¿Puedes explicarme la abstracción con un ejemplo de la vida real?"</li>
+                                                        <li><strong>Generar contenido nuevo:</strong> Escribe "generar nuevas actividades" para obtener un set completamente nuevo basado en tus parámetros.</li>
+                                                        <li><strong>Usar comandos rápidos:</strong> Usa "cambiar tema" o "modificar grado" para ajustar los parámetros sobre la marcha sin volver al formulario inicial.</li>
+                                                    </ul>
+                                                </AccordionContent>
+                                            </AccordionItem>
+                                             <AccordionItem value="item-3">
+                                                <AccordionTrigger className="text-lg font-semibold text-primary/90 hover:text-primary">
+                                                    <Bot className="mr-2 h-5 w-5"/>Un LLM Especializado para Educación
+                                                </AccordionTrigger>
+                                                <AccordionContent className="space-y-2">
+                                                    <p>EduSpark AI no usa un modelo de lenguaje genérico. Está conectado a un LLM (Large Language Model) configurado específicamente para actuar como un <strong className='text-foreground'>diseñador instruccional experto</strong> en pedagogía y pensamiento computacional.</p>
+                                                    <p>Esto asegura que las respuestas y actividades no solo sean creativas, sino también pedagógicamente sólidas, detalladas y listas para ser implementadas en un entorno educativo real.</p>
+                                                </AccordionContent>
+                                            </AccordionItem>
+                                        </Accordion>
                                     </TabsContent>
                                 </Tabs>
                             </InfoSection>
@@ -294,3 +313,4 @@ export default function LearnPage() {
         </ProtectedRoute>
     );
 }
+
