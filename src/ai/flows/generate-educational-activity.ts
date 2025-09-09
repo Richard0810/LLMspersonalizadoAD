@@ -30,7 +30,7 @@ const EducationalActivitySchema = z.object({
   teacherPreparation: z.string().describe('Los pasos o materiales que el docente debe preparar antes de la clase, donde cada paso está en una nueva línea.'),
   stepByStepDevelopment: z.string().describe('Guion de clase para el docente, detallando qué decir y hacer. Debe ser una guía numerada con acciones específicas para estudiantes, gestión de tiempos y ejemplos prácticos. Cada paso debe estar en una nueva línea.'),
   visualExamples: z.string().describe('Sugerencias de ejemplos visuales o diagramas que el docente puede dibujar en el tablero o en hojas para facilitar la comprensión (tablas, cuadrículas, mapas, pictogramas).'),
-  reflectionQuestion: z.string().describe('Una explicación detallada que aclare cómo la actividad evidencia el concepto de pensamiento computacional, seguida por preguntas de reflexión para el estudiante, con cada pregunta en una nueva línea y precedida por un guion.'),
+  reflectionQuestion: z.string().describe("Una explicación detallada y clara que demuestre cómo la actividad evidencia el concepto de pensamiento computacional, conectando las acciones específicas del ejercicio con la teoría. A continuación, debe incluir preguntas para guiar la reflexión del estudiante, con cada pregunta en una nueva línea y precedida por un guion."),
   evaluationCriteria: z.string().describe('Los criterios de evaluación o evidencias de aprendizaje que el docente puede usar para valorar el desempeño de los estudiantes, donde cada criterio está en una nueva línea.')
 });
 
@@ -99,4 +99,3 @@ const generateEducationalActivitiesFlow = ai.defineFlow(
     return output!;
   }
 );
-
