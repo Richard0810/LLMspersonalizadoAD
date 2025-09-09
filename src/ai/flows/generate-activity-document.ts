@@ -41,25 +41,28 @@ const GenerateActivityDocumentOutputSchema = z.object({
 const createTextRunsFromMarkdown = (text: string): TextRun[] => {
     if (!text || typeof text !== 'string') return [];
     
-    // Unified regex to handle **bold** and *bold:*
-    const parts = text.split(/(\*\*.*?\*\*|\*.*?\*:)/g).filter(part => part);
+    // Regex to handle **bold**, *bold:* and *Bold:* (case-insensitive for the first letter)
+    const parts = text.split(/(\*\*.*?\*\*|\*[a-zA-Z\s]+?:\*)/g).filter(part => part);
+    
     return parts.map(part => {
-        if (part.startsWith('**') && part.endsWith('**')) {
+        const isBoldMarkdown = (part.startsWith('**') && part.endsWith('**')) || (part.startsWith('*') && part.endsWith(':*'));
+        
+        if (isBoldMarkdown) {
+            let cleanText = '';
+            if (part.startsWith('**')) {
+                cleanText = part.slice(2, -2);
+            } else { // Handles *text:*
+                cleanText = part.slice(1, -2) + ':';
+            }
+            
             return new TextRun({
-                text: part.slice(2, -2),
+                text: cleanText,
                 bold: true,
                 font: 'Arial',
                 size: 22, // 11pt
             });
         }
-        if (part.startsWith('*') && part.endsWith('*:')) {
-            return new TextRun({
-                text: part.slice(1, -1),
-                bold: true,
-                font: 'Arial',
-                size: 22, // 11pt
-            });
-        }
+
         return new TextRun({
             text: part,
             font: 'Arial',
@@ -88,6 +91,7 @@ const createParagraphsFromText = (text: string): Paragraph[] => {
 
 /**
  * Creates a bulleted list from a text string.
+ * Each item is on a new line and may be preceded by a number, hyphen, or nothing.
  * @param text The text to convert to a bulleted list.
  * @returns An array of Paragraph objects formatted as a bulleted list.
  */
