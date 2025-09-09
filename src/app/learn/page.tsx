@@ -12,6 +12,7 @@ import InteractiveBackground from '@/components/shared/InteractiveBackground';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import { Pie, PieChart, ResponsiveContainer } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import type { ChartConfig } from '@/components/ui/chart';
 
 
 const InfoSection = ({ title, children, icon: Icon, className = "" }) => (
@@ -77,7 +78,7 @@ const chartConfig = {
     label: 'Estudiantes',
     color: 'hsl(var(--chart-4))',
   },
-};
+} satisfies ChartConfig;
 
 
 export default function LearnPage() {
@@ -146,14 +147,14 @@ export default function LearnPage() {
                                     </TabsContent>
                                     <TabsContent value="audience" className="mt-6">
                                         <div className="space-y-4">
-                                            <div className="w-full h-[150px]">
+                                            <ChartContainer config={chartConfig} className="mx-auto aspect-square h-[150px] w-full">
                                                 <ResponsiveContainer width="100%" height="100%">
                                                     <PieChart>
                                                         <ChartTooltip content={<ChartTooltipContent hideLabel />} />
                                                         <Pie data={audienceData} dataKey="value" nameKey="name" innerRadius={30} outerRadius={50} paddingAngle={5} />
                                                     </PieChart>
                                                 </ResponsiveContainer>
-                                            </div>
+                                            </ChartContainer>
                                             <InfoCard 
                                                 icon={<Users className="h-6 w-6 text-accent"/>}
                                                 title="Docentes de Tecnología e Informática"
@@ -293,3 +294,5 @@ export default function LearnPage() {
         </ProtectedRoute>
     );
 }
+
+    
