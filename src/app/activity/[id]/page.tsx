@@ -110,8 +110,8 @@ const SectionContent = ({ title, icon, content, generatedContent, className = ""
   };
   
   const getListType = (title: string): 'bullet' | 'numeric' | 'paragraph' => {
-      const bulletSections = ["Materiales Necesarios", "Preparación Previa del Docente"];
-      const numericSections = ["Desarrollo Paso a Paso", "Criterios de Evaluación"];
+      const bulletSections = ["Materiales Necesarios", "Preparación Previa del Docente", "Ejemplos Visuales Sugeridos", "Criterios de Evaluación"];
+      const numericSections = ["Desarrollo Paso a Paso"];
       if (bulletSections.includes(title)) return 'bullet';
       if (numericSections.includes(title)) return 'numeric';
       return 'paragraph';
@@ -395,3 +395,5 @@ export default function ActivityDetailPage() {
     </ProtectedRoute>
   );
 }
+
+    
