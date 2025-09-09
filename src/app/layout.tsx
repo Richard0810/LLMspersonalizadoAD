@@ -31,9 +31,9 @@ export default function RootLayout({
           {children}
           <Toaster />
            <Link href="/learn" passHref>
-            <Button variant="outline" size="icon" className="fixed bottom-4 right-16 z-50 shadow-lg rounded-full h-12 w-12">
-              <GraduationCap className="h-6 w-6 text-primary" />
-              <span className="sr-only">Aprende Más</span>
+            <Button size="lg" className="fixed bottom-4 right-16 z-50 shadow-lg rounded-full h-14 px-5 transition-transform duration-200 ease-in-out hover:scale-105">
+              <GraduationCap className="mr-2 h-6 w-6" />
+              <span className="font-bold">Aprende Más</span>
             </Button>
           </Link>
         </AuthProvider>
