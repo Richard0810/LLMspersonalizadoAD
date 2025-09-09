@@ -34,7 +34,7 @@ const GenerateActivityDocumentOutputSchema = z.object({
 });
 
 /**
- * Parses a string with markdown-style bolding (**text**) into an array of TextRun objects.
+ * Parses a string with markdown-style bolding (**text** or *text:*) into an array of TextRun objects.
  * @param text The input string.
  * @returns An array of TextRun objects with appropriate bolding.
  */
@@ -87,13 +87,37 @@ const createParagraphsFromText = (text: string): Paragraph[] => {
 };
 
 /**
- * Creates a numbered list (array of Paragraphs) from a text string, parsing markdown bolding.
- * It intelligently splits items and handles nested bullet points starting with a hyphen.
+ * Creates a bulleted list from a text string.
+ * @param text The text to convert to a bulleted list.
+ * @returns An array of Paragraph objects formatted as a bulleted list.
+ */
+const createBulletedList = (text: string): Paragraph[] => {
+    if (!text || typeof text !== 'string') return [];
+
+    const lines = text.split('\n').filter(line => line.trim() !== '');
+
+    return lines.map(line => {
+        // Remove any leading numbers or hyphens as we are forcing bullets
+        const itemText = line.trim().replace(/^(\d+\.?\s*|-\s*)/, '');
+        return new Paragraph({
+            children: createTextRunsFromMarkdown(itemText),
+            bullet: {
+                level: 0,
+            },
+            spacing: { after: 120 }
+        });
+    });
+};
+
+
+/**
+ * Creates a numbered list for the step-by-step development section.
+ * It handles nested "Guion" and "Acciones" and treats time markers as non-numbered headings.
  * @param text - The text to be converted into a list.
- * @param numberingRef - The reference ID for the numbering style to use.
+ * @param numberingRef - The reference ID for the numbering style.
  * @returns An array of Paragraph objects formatted as a numbered list.
  */
-const createIntelligentList = (text: string, numberingRef: string): Paragraph[] => {
+const createStepByStepList = (text: string, numberingRef: string): Paragraph[] => {
     if (!text || typeof text !== 'string') return [];
 
     const paragraphs: Paragraph[] = [];
@@ -101,20 +125,23 @@ const createIntelligentList = (text: string, numberingRef: string): Paragraph[] 
 
     lines.forEach(line => {
         const trimmedLine = line.trim();
-        const isSubItem = trimmedLine.startsWith('-');
+        
+        const isTimeHeading = /^\(\d+\s*minutos\)/.test(trimmedLine);
+        const isSubItem = /^\*(Guion d|Acciones d)/.test(trimmedLine);
+        const isNumberedStep = /^\d+\.?\s*/.test(trimmedLine) && !isTimeHeading;
 
-        if (isSubItem) {
-            // It's a sub-item, render as a bullet point with indentation
+        if (isTimeHeading) {
             paragraphs.push(new Paragraph({
-                children: createTextRunsFromMarkdown(trimmedLine.substring(1).trim()),
-                bullet: {
-                    level: 0,
-                },
-                indent: { left: 720 }, // Indent sub-items (720 dxa = 0.5 inch)
-                spacing: { after: 120 }
+                children: [new TextRun({ text: trimmedLine, bold: true, font: "Arial", size: 22 })],
+                spacing: { after: 120, before: 240 },
             }));
-        } else {
-            // It's a main numbered item
+        } else if (isSubItem) {
+            paragraphs.push(new Paragraph({
+                children: createTextRunsFromMarkdown(trimmedLine),
+                indent: { left: 720 }, // Indent sub-items (0.5 inch)
+                spacing: { after: 120 },
+            }));
+        } else if (isNumberedStep) {
             const itemText = trimmedLine.replace(/^\d+\.?\s*/, '');
              paragraphs.push(new Paragraph({
                 children: createTextRunsFromMarkdown(itemText),
@@ -122,6 +149,12 @@ const createIntelligentList = (text: string, numberingRef: string): Paragraph[] 
                     reference: numberingRef,
                     level: 0,
                 },
+                spacing: { after: 240 }, // More space after a main step
+            }));
+        } else {
+             // Fallback for any other line
+            paragraphs.push(new Paragraph({
+                children: createTextRunsFromMarkdown(trimmedLine),
                 spacing: { after: 120 }
             }));
         }
@@ -275,13 +308,13 @@ const generateActivityDocumentFlow = ai.defineFlow(
             ...createParagraphsFromText(activity.estimatedTime),
 
             new Paragraph({ text: "📋 Preparación Previa del Docente", style: "section-title" }),
-            ...createIntelligentList(activity.teacherPreparation, 'numbering-list'),
+            ...createBulletedList(activity.teacherPreparation),
 
             new Paragraph({ text: "✅ Materiales Necesarios", style: "section-title" }),
-            ...createIntelligentList(activity.materials, 'numbering-list'),
+            ...createBulletedList(activity.materials),
 
             new Paragraph({ text: "👣 Desarrollo Paso a Paso", style: "section-title" }),
-            ...createIntelligentList(activity.stepByStepDevelopment, 'numbering-list'),
+            ...createStepByStepList(activity.stepByStepDevelopment, 'numbering-list'),
 
             new Paragraph({ text: "👀 Ejemplos Visuales Sugeridos", style: "section-title" }),
             ...createParagraphsFromText(activity.visualExamples),
@@ -290,7 +323,7 @@ const generateActivityDocumentFlow = ai.defineFlow(
             ...createParagraphsFromText(activity.reflectionQuestion),
 
             new Paragraph({ text: "🧑‍🏫 Criterios de Evaluación", style: "section-title" }),
-            ...createIntelligentList(activity.evaluationCriteria, 'numbering-list'),
+            ...createBulletedList(activity.evaluationCriteria),
           ],
         },
       ],
