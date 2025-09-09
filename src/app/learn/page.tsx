@@ -6,12 +6,13 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft, BrainCircuit, Puzzle, Youtube, Presentation, ExternalLink } from 'lucide-react';
 import InteractiveBackground from '@/components/shared/InteractiveBackground';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
 const InfoSection = ({ title, children, icon: Icon }) => (
-    <Card className="shadow-lg">
+    <Card className="shadow-lg h-full">
         <CardHeader className="flex flex-row items-center gap-3 space-y-0">
             <Icon className="w-8 h-8 text-primary" />
             <CardTitle className="text-2xl font-headline">{title}</CardTitle>
@@ -58,104 +59,122 @@ export default function LearnPage() {
                         <ArrowLeft className="mr-2 h-4 w-4" /> Atrás
                     </Button>
 
-                    <div className="space-y-8">
-                        <InfoSection title="Pensamiento Computacional (PC) – Conceptos Clave" icon={BrainCircuit}>
-                            <div className="text-base text-muted-foreground space-y-4">
-                                <p>El Pensamiento Computacional es un proceso cognitivo de resolución de problemas inspirado en la forma en que los ordenadores procesan la información, pero que trasciende la informática. Consiste en analizar, descomponer y formular soluciones estructuradas para problemas de cualquier ámbito, utilizando principios lógicos, matemáticos y algorítmicos.</p>
-                                <p>No se trata de “pensar como una máquina”, sino de emplear estrategias computacionales para abordar desafíos complejos, de forma que las soluciones puedan ser comprendidas, ejecutadas y reutilizadas tanto por personas como por sistemas tecnológicos.</p>
-                                <p>Este enfoque implica cuatro habilidades fundamentales:</p>
-                            </div>
-                            <Accordion type="single" collapsible className="w-full">
-                                <AccordionItem value="item-1">
-                                    <AccordionTrigger className="text-lg font-semibold">Descomposición</AccordionTrigger>
-                                    <AccordionContent className="text-base text-muted-foreground space-y-2">
-                                        <p>Dividir un problema complejo en partes más pequeñas y manejables.</p>
-                                        <p className="italic"><strong>Ejemplo:</strong> Al armar un rompecabezas, primero separas las piezas por colores o si tienen bordes rectos.</p>
-                                    </AccordionContent>
-                                </AccordionItem>
-                                <AccordionItem value="item-2">
-                                    <AccordionTrigger className="text-lg font-semibold">Reconocimiento de patrones</AccordionTrigger>
-                                    <AccordionContent className="text-base text-muted-foreground space-y-2">
-                                        <p>Identificar similitudes, tendencias o elementos que se repiten en datos o problemas.</p>
-                                        <p className="italic"><strong>Ejemplo:</strong> Buscas piezas con formas o colores similares (como todas las piezas del cielo azul) para unirlas.</p>
-                                    </AccordionContent>
-                                </AccordionItem>
-                                <AccordionItem value="item-3">
-                                    <AccordionTrigger className="text-lg font-semibold">Abstracción</AccordionTrigger>
-                                    <AccordionContent className="text-base text-muted-foreground space-y-2">
-                                        <p>Enfocarse solo en la información esencial del problema y omitir detalles innecesarios.</p>
-                                        <p className="italic"><strong>Ejemplo:</strong> Te concentras en armar el marco del rompecabezas primero, ignorando temporalmente todas las piezas del centro.</p>
-                                    </AccordionContent>
-                                </AccordionItem>
-                                <AccordionItem value="item-4">
-                                    <AccordionTrigger className="text-lg font-semibold">Algoritmos</AccordionTrigger>
-                                    <AccordionContent className="text-base text-muted-foreground space-y-2">
-                                        <p>Desarrollar una secuencia lógica y ordenada de pasos para resolver un problema o realizar una tarea.</p>
-                                        <p className="italic"><strong>Ejemplo:</strong> Creas una serie de pasos: 1. Buscar las esquinas. 2. Armar el borde. 3. Agrupar piezas por color. 4. Armar las secciones de colores.</p>
-                                    </AccordionContent>
-                                </AccordionItem>
-                            </Accordion>
-                            <Card className="mt-6 bg-muted/50">
-                                <CardHeader className="flex flex-row items-center gap-3">
-                                    <Youtube className="w-6 h-6 text-red-600"/>
-                                    <CardTitle className="text-xl font-headline">Video Explicativo</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <VideoEmbed videoId="ti315UlVtS4" title="¿Qué es el Pensamiento Computacional?" />
-                                </CardContent>
-                            </Card>
-                        </InfoSection>
+                    <Tabs defaultValue="pc" className="w-full">
+                        <TabsList className="grid w-full grid-cols-3 mb-4">
+                            <TabsTrigger value="pc">
+                                <BrainCircuit className="mr-2 h-4 w-4" /> Pensamiento Computacional
+                            </TabsTrigger>
+                            <TabsTrigger value="ad">
+                                <Puzzle className="mr-2 h-4 w-4" /> Actividades Desconectadas
+                            </TabsTrigger>
+                            <TabsTrigger value="presentation">
+                                <Presentation className="mr-2 h-4 w-4" /> Presentación
+                            </TabsTrigger>
+                        </TabsList>
 
-                        <InfoSection title="Actividades Desconectadas (AD)" icon={Puzzle}>
-                             <Accordion type="single" collapsible className="w-full">
-                                <AccordionItem value="ad-1">
-                                     <AccordionTrigger className="text-lg font-semibold">Definición y Beneficios</AccordionTrigger>
-                                      <AccordionContent className="text-base text-muted-foreground space-y-3">
-                                        <p><strong>Definición:</strong> Son estrategias didácticas para enseñar Pensamiento Computacional sin computadoras ni dispositivos. Usan juegos, dinámicas grupales y simulaciones para practicar conceptos como algoritmos o patrones.</p>
-                                        <p><strong>Beneficios:</strong> Muy accesibles (no requieren tecnología), fomentan la creatividad, el trabajo en equipo y la resolución de problemas.</p>
-                                      </AccordionContent>
-                                </AccordionItem>
-                                <AccordionItem value="ad-2">
-                                     <AccordionTrigger className="text-lg font-semibold">Ejemplos de Actividades</AccordionTrigger>
-                                     <AccordionContent className="text-base text-muted-foreground space-y-4">
-                                        <div>
-                                            <h4 className="font-bold">Programación de Rutas</h4>
-                                            <p>Los estudiantes usan flechas y símbolos para crear secuencias de instrucciones que guíen a un compañero a través de un laberinto o mapa. → Trabaja el concepto de algoritmo.</p>
-                                        </div>
-                                         <div>
-                                            <h4 className="font-bold">La Cosecha Más Eficiente</h4>
-                                            <p>Los estudiantes, con mapas y fichas que representan cultivos y recolectores, planifican rutas para recolectar la mayor cantidad de productos en el menor tiempo posible. → Trabaja eficiencia algorítmica y optimización.</p>
-                                        </div>
-                                         <div>
-                                            <h4 className="font-bold">El Mercado Vecinal</h4>
-                                            <p>Los estudiantes asumen roles de compradores y vendedores, organizan productos, definen precios y gestionan inventario. → Trabaja toma de decisiones algorítmicas.</p>
-                                        </div>
-                                     </AccordionContent>
-                                </AccordionItem>
-                             </Accordion>
-                              <Card className="mt-6 bg-muted/50">
-                                <CardHeader className="flex flex-row items-center gap-3">
-                                    <Youtube className="w-6 h-6 text-red-600"/>
-                                    <CardTitle className="text-xl font-headline">Video con Ejemplos</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <VideoEmbed videoId="5fU2PT03_Gc" title="Actividades Desconectadas para el aula" />
-                                 </CardContent>
-                            </Card>
-                        </InfoSection>
+                        <TabsContent value="pc">
+                            <InfoSection title="Pensamiento Computacional (PC) – Conceptos Clave" icon={BrainCircuit}>
+                                <div className="text-base text-muted-foreground space-y-4">
+                                    <p>El Pensamiento Computacional es un proceso cognitivo de resolución de problemas inspirado en la forma en que los ordenadores procesan la información, pero que trasciende la informática. Consiste en analizar, descomponer y formular soluciones estructuradas para problemas de cualquier ámbito, utilizando principios lógicos, matemáticos y algorítmicos.</p>
+                                    <p>No se trata de “pensar como una máquina”, sino de emplear estrategias computacionales para abordar desafíos complejos, de forma que las soluciones puedan ser comprendidas, ejecutadas y reutilizadas tanto por personas como por sistemas tecnológicos.</p>
+                                    <p>Este enfoque implica cuatro habilidades fundamentales:</p>
+                                </div>
+                                <Accordion type="single" collapsible className="w-full">
+                                    <AccordionItem value="item-1">
+                                        <AccordionTrigger className="text-lg font-semibold">Descomposición</AccordionTrigger>
+                                        <AccordionContent className="text-base text-muted-foreground space-y-2">
+                                            <p>Dividir un problema complejo en partes más pequeñas y manejables.</p>
+                                            <p className="italic"><strong>Ejemplo:</strong> Al armar un rompecabezas, primero separas las piezas por colores o si tienen bordes rectos.</p>
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                    <AccordionItem value="item-2">
+                                        <AccordionTrigger className="text-lg font-semibold">Reconocimiento de patrones</AccordionTrigger>
+                                        <AccordionContent className="text-base text-muted-foreground space-y-2">
+                                            <p>Identificar similitudes, tendencias o elementos que se repiten en datos o problemas.</p>
+                                            <p className="italic"><strong>Ejemplo:</strong> Buscas piezas con formas o colores similares (como todas las piezas del cielo azul) para unirlas.</p>
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                    <AccordionItem value="item-3">
+                                        <AccordionTrigger className="text-lg font-semibold">Abstracción</AccordionTrigger>
+                                        <AccordionContent className="text-base text-muted-foreground space-y-2">
+                                            <p>Enfocarse solo en la información esencial del problema y omitir detalles innecesarios.</p>
+                                            <p className="italic"><strong>Ejemplo:</strong> Te concentras en armar el marco del rompecabezas primero, ignorando temporalmente todas las piezas del centro.</p>
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                    <AccordionItem value="item-4">
+                                        <AccordionTrigger className="text-lg font-semibold">Algoritmos</AccordionTrigger>
+                                        <AccordionContent className="text-base text-muted-foreground space-y-2">
+                                            <p>Desarrollar una secuencia lógica y ordenada de pasos para resolver un problema o realizar una tarea.</p>
+                                            <p className="italic"><strong>Ejemplo:</strong> Creas una serie de pasos: 1. Buscar las esquinas. 2. Armar el borde. 3. Agrupar piezas por color. 4. Armar las secciones de colores.</p>
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                </Accordion>
+                                <Card className="mt-6 bg-muted/50">
+                                    <CardHeader className="flex flex-row items-center gap-3">
+                                        <Youtube className="w-6 h-6 text-red-600"/>
+                                        <CardTitle className="text-xl font-headline">Video Explicativo</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <VideoEmbed videoId="ti315UlVtS4" title="¿Qué es el Pensamiento Computacional?" />
+                                    </CardContent>
+                                </Card>
+                            </InfoSection>
+                        </TabsContent>
 
-                        <InfoSection title="Presentación: PC y AD en el Contexto Rural" icon={Presentation}>
-                            <p className="text-base text-muted-foreground mb-4">
-                                Explora esta presentación de diapositivas para obtener una visión más profunda de cómo aplicar estos conceptos en entornos rurales, con ejemplos y estrategias adaptadas.
-                            </p>
-                            <PresentationEmbed presentationId={presentationId} title="Presentación sobre PC y AD en el Contexto Rural" />
-                             <Link href={presentationUrl} target="_blank" rel="noopener noreferrer" className="mt-4 inline-block">
-                                <Button size="sm" variant="outline">
-                                    Abrir en nueva pestaña <ExternalLink className="ml-2 h-4 w-4" />
-                                </Button>
-                            </Link>
-                        </InfoSection>
-                    </div>
+                        <TabsContent value="ad">
+                            <InfoSection title="Actividades Desconectadas (AD)" icon={Puzzle}>
+                                <Accordion type="single" collapsible className="w-full">
+                                    <AccordionItem value="ad-1">
+                                        <AccordionTrigger className="text-lg font-semibold">Definición y Beneficios</AccordionTrigger>
+                                        <AccordionContent className="text-base text-muted-foreground space-y-3">
+                                            <p><strong>Definición:</strong> Son estrategias didácticas para enseñar Pensamiento Computacional sin computadoras ni dispositivos. Usan juegos, dinámicas grupales y simulaciones para practicar conceptos como algoritmos o patrones.</p>
+                                            <p><strong>Beneficios:</strong> Muy accesibles (no requieren tecnología), fomentan la creatividad, el trabajo en equipo y la resolución de problemas.</p>
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                    <AccordionItem value="ad-2">
+                                        <AccordionTrigger className="text-lg font-semibold">Ejemplos de Actividades</AccordionTrigger>
+                                        <AccordionContent className="text-base text-muted-foreground space-y-4">
+                                            <div>
+                                                <h4 className="font-bold">Programación de Rutas</h4>
+                                                <p>Los estudiantes usan flechas y símbolos para crear secuencias de instrucciones que guíen a un compañero a través de un laberinto o mapa. → Trabaja el concepto de algoritmo.</p>
+                                            </div>
+                                            <div>
+                                                <h4 className="font-bold">La Cosecha Más Eficiente</h4>
+                                                <p>Los estudiantes, con mapas y fichas que representan cultivos y recolectores, planifican rutas para recolectar la mayor cantidad de productos en el menor tiempo posible. → Trabaja eficiencia algorítmica y optimización.</p>
+                                            </div>
+                                            <div>
+                                                <h4 className="font-bold">El Mercado Vecinal</h4>
+                                                <p>Los estudiantes asumen roles de compradores y vendedores, organizan productos, definen precios y gestionan inventario. → Trabaja toma de decisiones algorítmicas.</p>
+                                            </div>
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                </Accordion>
+                                <Card className="mt-6 bg-muted/50">
+                                    <CardHeader className="flex flex-row items-center gap-3">
+                                        <Youtube className="w-6 h-6 text-red-600"/>
+                                        <CardTitle className="text-xl font-headline">Video con Ejemplos</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <VideoEmbed videoId="5fU2PT03_Gc" title="Actividades Desconectadas para el aula" />
+                                    </CardContent>
+                                </Card>
+                            </InfoSection>
+                        </TabsContent>
+                        
+                        <TabsContent value="presentation">
+                             <InfoSection title="Presentación: PC y AD en el Contexto Rural" icon={Presentation}>
+                                <p className="text-base text-muted-foreground mb-4">
+                                    Explora esta presentación de diapositivas para obtener una visión más profunda de cómo aplicar estos conceptos en entornos rurales, con ejemplos y estrategias adaptadas.
+                                </p>
+                                <PresentationEmbed presentationId={presentationId} title="Presentación sobre PC y AD en el Contexto Rural" />
+                                <Link href={presentationUrl} target="_blank" rel="noopener noreferrer" className="mt-4 inline-block">
+                                    <Button size="sm" variant="outline">
+                                        Abrir en nueva pestaña <ExternalLink className="ml-2 h-4 w-4" />
+                                    </Button>
+                                </Link>
+                            </InfoSection>
+                        </TabsContent>
+                    </Tabs>
                 </main>
             </div>
         </ProtectedRoute>
