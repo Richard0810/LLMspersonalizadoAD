@@ -51,7 +51,7 @@ const createTextRunsFromMarkdown = (text: string): TextRun[] => {
             let cleanText = '';
             if (part.startsWith('**')) {
                 cleanText = part.slice(2, -2);
-            } else { // Handles *text:*
+            } else { // Handles *text:* or *Text:*
                 cleanText = part.slice(1, -2) + ':';
             }
             
@@ -130,7 +130,7 @@ const createStepByStepList = (text: string, numberingRef: string): Paragraph[] =
     lines.forEach(line => {
         const trimmedLine = line.trim();
         
-        const isTimeHeading = /^\(\d+\s*minutos\)/.test(trimmedLine);
+        const isTimeHeading = /^\(\d+\s*minutos?\)/.test(trimmedLine);
         const isSubItem = /^\*(Guion d|Acciones d)/.test(trimmedLine);
         const isNumberedStep = /^\d+\.?\s*/.test(trimmedLine) && !isTimeHeading;
 
