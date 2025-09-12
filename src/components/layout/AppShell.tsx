@@ -44,7 +44,7 @@ export const AppShell: React.FC<AppShellProps> = ({
       <SidebarProvider>
         <Sidebar>
           <SidebarHeader>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col items-center gap-2 text-center p-2">
                <Image
                 src="/logo_unicor.png"
                 alt="Logo Universidad de Córdoba"
@@ -53,6 +53,10 @@ export const AppShell: React.FC<AppShellProps> = ({
                 priority
                 className="w-auto h-12"
               />
+              <div className="group-data-[collapsible=icon]:hidden">
+                <p className="text-xs font-bold text-foreground">Licenciatura en Informática</p>
+                <p className="text-[10px] text-muted-foreground">Facultad de Educación y Ciencias Humanas</p>
+              </div>
             </div>
           </SidebarHeader>
           <SidebarContent>
