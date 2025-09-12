@@ -32,7 +32,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-start min-h-screen bg-background animate-fade-in">
+    <div className="flex flex-col items-center justify-start min-h-screen bg-transparent animate-fade-in">
       <InteractiveBackground />
       
       <header className="w-full bg-card shadow-md z-10 animate-slide-down-fade">
