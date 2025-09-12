@@ -54,10 +54,10 @@ export const AppShell: React.FC<AppShellProps> = ({
               />
               <div className="transition-opacity duration-200 group-data-[collapsible=icon]:opacity-0 flex flex-col items-center">
                  <div className="flex items-center gap-2">
-                    <GraduationCap className="h-5 w-5 text-primary"/>
-                    <p className="text-sm font-bold text-foreground">Licenciatura en Informática</p>
+                    <GraduationCap className="h-4 w-4 text-primary"/>
+                    <p className="text-xs font-bold text-foreground">Licenciatura en Informática</p>
                  </div>
-                <p className="text-xs text-muted-foreground mt-1">Facultad de Educación y Ciencias Humanas</p>
+                <p className="text-[10px] text-muted-foreground mt-1">Facultad de Educación y Ciencias Humanas</p>
               </div>
             </div>
           </SidebarHeader>
