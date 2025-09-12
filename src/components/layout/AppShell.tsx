@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/sidebar';
 import { AppHeader } from './AppHeader';
 import type { LessonParams } from '@/types';
-import { BookOpen, HelpCircle, GraduationCap } from 'lucide-react';
+import { BookOpen, BookOpenCheck, GraduationCap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ProtectedRoute from '../auth/ProtectedRoute';
 
@@ -77,7 +77,7 @@ export const AppShell: React.FC<AppShellProps> = ({
                 <Link href="/learn" legacyBehavior passHref>
                   <SidebarMenuButton asChild isActive={pathname === '/learn'}>
                     <a>
-                      <HelpCircle />
+                      <BookOpenCheck />
                       <span>Recursos</span>
                     </a>
                   </SidebarMenuButton>
