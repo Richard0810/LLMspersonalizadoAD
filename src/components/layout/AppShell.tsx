@@ -14,11 +14,10 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarInset,
 } from '@/components/ui/sidebar';
 import { AppHeader } from './AppHeader';
 import type { LessonParams } from '@/types';
-import { BookOpen, HelpCircle } from 'lucide-react';
+import { BookOpen, HelpCircle, GraduationCap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ProtectedRoute from '../auth/ProtectedRoute';
 
@@ -43,19 +42,22 @@ export const AppShell: React.FC<AppShellProps> = ({
     <ProtectedRoute>
       <SidebarProvider>
         <Sidebar>
-          <SidebarHeader>
-            <div className="flex flex-col items-center gap-2 text-center p-2">
+          <SidebarHeader className="p-2">
+             <div className="bg-muted/60 p-4 rounded-lg flex flex-col items-center gap-3 text-center">
                <Image
                 src="/logo_unicor.png"
                 alt="Logo Universidad de Córdoba"
                 width={150}
                 height={50}
                 priority
-                className="w-auto h-12"
+                className="w-auto h-14"
               />
-              <div className="group-data-[collapsible=icon]:hidden">
-                <p className="text-xs font-bold text-foreground">Licenciatura en Informática</p>
-                <p className="text-[10px] text-muted-foreground">Facultad de Educación y Ciencias Humanas</p>
+              <div className="transition-opacity duration-200 group-data-[collapsible=icon]:opacity-0 flex flex-col items-center">
+                 <div className="flex items-center gap-2">
+                    <GraduationCap className="h-5 w-5 text-primary"/>
+                    <p className="text-sm font-bold text-foreground">Licenciatura en Informática</p>
+                 </div>
+                <p className="text-xs text-muted-foreground mt-1">Facultad de Educación y Ciencias Humanas</p>
               </div>
             </div>
           </SidebarHeader>
@@ -92,14 +94,14 @@ export const AppShell: React.FC<AppShellProps> = ({
                   height={40}
                   className="w-10 h-10"
                 />
-                <div className='group-data-[collapsible=icon]:hidden'>
+                <div className='transition-opacity duration-200 group-data-[collapsible=icon]:opacity-0'>
                     <p className="text-xs font-bold text-foreground">I.E. Alfonso Spath Spath</p>
                     <p className="text-xs text-muted-foreground">Martinez - Cereté, Córdoba</p>
                 </div>
             </div>
           </SidebarFooter>
         </Sidebar>
-        <SidebarInset className='flex flex-col'>
+        <div className='flex flex-1 flex-col'>
            <AppHeader
               page={page}
               lessonParams={lessonParams}
@@ -109,7 +111,7 @@ export const AppShell: React.FC<AppShellProps> = ({
           <main className="flex-1 flex flex-col overflow-auto">
             {children}
           </main>
-        </SidebarInset>
+        </div>
       </SidebarProvider>
     </ProtectedRoute>
   );
