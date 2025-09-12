@@ -8,7 +8,7 @@ import ChatInterface from '@/components/chat/ChatInterface';
 import type { LessonParams } from '@/types';
 import { getLessonParamsFromLocalStorage, clearLessonParamsFromLocalStorage, clearChatHistoryFromLocalStorage } from '@/lib/localStorageUtils';
 import { Loader2 } from 'lucide-react';
-import { PageWrapper } from '@/components/layout/PageWrapper';
+import { AppShell } from '@/components/layout/AppShell';
 
 export default function HomePage() {
   const [lessonParams, setLessonParams] = useState<LessonParams | null>(null);
@@ -47,25 +47,25 @@ export default function HomePage() {
 
   return (
     <ProtectedRoute>
-       {!lessonParams ? (
-          <PageWrapper page="setup">
-            <InitialSetupForm onSetupComplete={handleSetupComplete} />
-          </PageWrapper>
+       <AppShell
+          page={!lessonParams ? 'setup' : 'chat'}
+          lessonParams={lessonParams}
+          onResetSetup={handleResetSetup}
+          onParameterEdit={(field) => handleParameterEdit(field)}
+        >
+        {!lessonParams ? (
+            <div className="flex flex-1 justify-center items-center p-4">
+              <InitialSetupForm onSetupComplete={handleSetupComplete} />
+            </div>
         ) : (
-          <PageWrapper 
-            page="chat"
-            lessonParams={lessonParams}
-            onResetSetup={handleResetSetup}
-            onParameterEdit={(field) => handleParameterEdit(field)}
-          >
             <ChatInterface 
               initialParams={lessonParams} 
               onResetSetup={handleResetSetup}
               // This prop is a bit of a workaround to lift the function up from ChatInterface
               handleParameterEdit={(func) => { handleParameterEdit = func; }} 
             />
-          </PageWrapper>
         )}
+       </AppShell>
     </ProtectedRoute>
   );
 }

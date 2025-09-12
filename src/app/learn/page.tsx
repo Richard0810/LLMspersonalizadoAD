@@ -12,6 +12,7 @@ import InteractiveBackground from '@/components/shared/InteractiveBackground';
 import { Pie, PieChart, ResponsiveContainer } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import type { ChartConfig } from '@/components/ui/chart';
+import { AppShell } from '@/components/layout/AppShell';
 
 
 const InfoSection = ({ title, children, icon: Icon, className = "" }) => (
@@ -86,13 +87,11 @@ export default function LearnPage() {
     const presentationUrl = `https://docs.google.com/presentation/d/${presentationId}/edit?usp=drive_link&ouid=105808271510700269082&rtpof=true&sd=true`;
 
     return (
+      <AppShell>
         <div className="flex flex-col items-center min-h-screen bg-background p-4 md:p-8">
             <InteractiveBackground />
             <main className="w-full max-w-5xl z-10 animate-fade-in">
-                <Button onClick={() => router.back()} variant="outline" className="mb-6 self-start animate-slide-up" style={{ animationDelay: '0.1s' }}>
-                    <ArrowLeft className="mr-2 h-4 w-4" /> Atrás
-                </Button>
-
+                
                 <Tabs defaultValue="about" className="w-full animate-slide-up" style={{ animationDelay: '0.2s' }}>
                     <TabsList className="grid w-full grid-cols-1 md:grid-cols-4 mb-6 h-auto p-2 bg-primary/10 rounded-lg">
                          <TabsTrigger value="about" className="py-2.5 text-base">
@@ -308,5 +307,6 @@ export default function LearnPage() {
                 </Tabs>
             </main>
         </div>
+      </AppShell>
     );
 }

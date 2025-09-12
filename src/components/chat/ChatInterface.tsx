@@ -360,7 +360,3 @@ Generando actividades iniciales...`,
 };
 
 export default ChatInterface;
-
-    
-
-    

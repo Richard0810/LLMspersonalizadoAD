@@ -2,14 +2,9 @@
 'use client';
 
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { Toaster } from '@/components/ui/toaster';
-import { Button } from '@/components/ui/button';
-import { GraduationCap, HelpCircle } from 'lucide-react';
 import './globals.css';
-import { HelpModal } from '@/components/shared/HelpModal';
 
 // Metadata can still be exported from a client component layout
 // export const metadata: Metadata = {
@@ -22,9 +17,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const pathname = usePathname();
-  const showLearnButton = pathname !== '/learn';
-
   return (
     <html lang="es" className="min-h-screen">
       <head>
@@ -40,14 +32,6 @@ export default function RootLayout({
         <AuthProvider>
           {children}
           <Toaster />
-          {showLearnButton && (
-             <Link href="/learn" passHref>
-                <Button size="lg" className="fixed bottom-4 right-4 z-50 shadow-lg rounded-full h-14 px-5 transition-transform duration-200 ease-in-out hover:scale-105">
-                  <GraduationCap className="mr-2 h-6 w-6" />
-                  <span className="font-bold">Aprende Más</span>
-                </Button>
-            </Link>
-          )}
         </AuthProvider>
       </body>
     </html>
