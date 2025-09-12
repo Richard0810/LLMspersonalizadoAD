@@ -54,7 +54,7 @@ export default function HomePage() {
           onParameterEdit={(field) => handleParameterEdit(field)}
         >
         {!lessonParams ? (
-            <div className="flex flex-1 justify-center items-center p-4">
+            <div className="flex flex-1 justify-center items-center p-4 relative">
               <InitialSetupForm onSetupComplete={handleSetupComplete} />
             </div>
         ) : (

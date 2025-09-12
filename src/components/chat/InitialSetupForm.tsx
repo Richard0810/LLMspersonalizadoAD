@@ -11,6 +11,7 @@ import { BookOpenCheck, Brain, GraduationCap, Target, Lightbulb } from 'lucide-r
 import type { LessonParams } from '@/types';
 import { saveLessonParamsToLocalStorage, getLessonParamsFromLocalStorage, clearChatHistoryFromLocalStorage } from '@/lib/localStorageUtils';
 import { subjectAreas, gradeLevels, computationalConcepts } from '@/types'; 
+import InteractiveBackground from '../shared/InteractiveBackground';
 
 interface InitialSetupFormProps {
   onSetupComplete: (params: LessonParams) => void;
@@ -44,7 +45,9 @@ const InitialSetupForm: React.FC<InitialSetupFormProps> = ({ onSetupComplete }) 
   };
 
   return (
-      <Card className="w-full max-w-lg shadow-2xl animate-slide-up">
+    <>
+      <InteractiveBackground />
+      <Card className="w-full max-w-lg shadow-2xl animate-slide-up z-10">
         <CardHeader className="text-center">
           <div className="inline-block mx-auto p-3 bg-primary/10 rounded-full mb-4">
              <Lightbulb className="w-10 h-10 text-primary" />
@@ -111,6 +114,7 @@ const InitialSetupForm: React.FC<InitialSetupFormProps> = ({ onSetupComplete }) 
           </form>
         </CardContent>
       </Card>
+    </>
   );
 };
 
