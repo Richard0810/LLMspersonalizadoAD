@@ -394,12 +394,12 @@ Usa el siguiente CONTENIDO ESTRUCTURADO como la base fundamental.
                 name: `generate-${format}-prompt`,
                 input: { schema: z.object({ topicOrConcept: z.string(), level: z.string().optional(), structuredContent: z.string(), translatedFormatName: z.string() }) },
                 output: { schema: outputSchema },
-                prompt: finalPrompt,
                 model: 'googleai/gemini-2.0-flash',
             }
         );
         
-        const { output } = await prompt(finalPromptParams);
+        const { output } = await prompt(finalPrompt, { prompt, custom: { finalPrompt } });
+
 
         if (output) {
           if (outputTypeLiteral) {
@@ -414,7 +414,5 @@ Usa el siguiente CONTENIDO ESTRUCTURADO como la base fundamental.
     throw new Error(`The combination of category '${category}' and format '${format}' is not implemented or failed to produce output.`);
   }
 );
-
-    
 
     
