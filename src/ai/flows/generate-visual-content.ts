@@ -146,8 +146,15 @@ function buildImagePrompt(params: ImageGenerationParams): string {
     let fullPrompt = params.prompt;
     if (params.artStyle && params.artStyle !== "Ninguno") fullPrompt += `, en el estilo de ${params.artStyle}`;
     if (params.artType && params.artType !== "Ninguno") fullPrompt += `, como un/a ${params.artType}`;
-    if (params.negativePrompt) fullPrompt += `. Evita: ${params.negativePrompt}`;
+    if (params.artistInspired) fullPrompt += `, inspirado por ${params.artistInspired}`;
+    if (params.attributes) fullPrompt += `, con atributos: ${params.attributes}`;
+    if (params.lighting) fullPrompt += `, iluminación: ${params.lighting}`;
+    if (params.composition) fullPrompt += `, composición: ${params.composition}`;
+    if (params.quality) fullPrompt += `, calidad: ${params.quality}`;
     if (params.aspectRatio) fullPrompt += `, relación de aspecto: ${params.aspectRatio}`;
+    if (params.negativePrompt) fullPrompt += `. Evita: ${params.negativePrompt}`;
+    if (params.theme) fullPrompt += `. El tema general está relacionado con: ${params.theme}.`;
+
     return fullPrompt;
 }
 
@@ -160,35 +167,45 @@ const generateVisualContentFlow = ai.defineFlow(
   async (input) => {
     const { category, format, translatedFormatName, params } = input;
 
-    if (category === VisualCategory.IMAGE_GENERATION || (category === VisualCategory.CONCEPT_ILLUSTRATION && (format === VisualFormat.PHOTO_REALISTIC || format === VisualFormat.ILLUSTRATION_CONCEPT))) {
+    // Handle single-step image generation categories
+    if (category === VisualCategory.IMAGE_GENERATION || category === VisualCategory.CONCEPT_ILLUSTRATION) {
         let imgParams: ImageGenerationParams;
+
         if (category === VisualCategory.CONCEPT_ILLUSTRATION) {
             const p = params as ConceptIllustParams;
-            imgParams = { prompt: `Un/a ${p.visualStyle} de "${p.concept}". ${p.specificElements || ''}`, theme: p.theme };
+            const visualStyle = format === VisualFormat.PHOTO_REALISTIC ? 'Fotorrealista' : p.visualStyle;
+            imgParams = { 
+                prompt: `Un/a ${visualStyle} de "${p.concept}". ${p.specificElements || ''}`, 
+                theme: p.theme 
+            };
         } else {
             imgParams = params as ImageGenerationParams;
         }
 
         const fullPrompt = buildImagePrompt(imgParams);
         const { media } = await ai.generate({
-            model: 'googleai/gemini-2.0-flash-exp',
+            model: 'googleai/gemini-pro-vision',
             prompt: fullPrompt,
-            config: {
-                // @ts-ignore
-                responseModalities: ['TEXT', 'IMAGE'],
-            }
+        });
+        
+        if (!media) throw new Error("Image generation failed to return media.");
+
+        const { text: altText } = await ai.generate({
+            prompt: `Genera un texto alternativo (alt text) corto y descriptivo en español para esta imagen. El prompt original era: "${fullPrompt}".`,
+            input: { media: { url: media.url } },
         });
 
         if (media?.url) {
             return {
                 type: 'image',
                 url: media.url,
-                alt: imgParams.prompt.substring(0, 100),
+                alt: altText || imgParams.prompt.substring(0, 100),
             };
         }
         throw new Error("Image generation failed.");
     }
 
+    // Handle multi-step information organization category
     if (category === VisualCategory.INFO_ORGANIZATION) {
         const infoParams = params as InfoOrgParams;
         const { topic, level, details } = infoParams;
@@ -197,24 +214,29 @@ const generateVisualContentFlow = ai.defineFlow(
         if (level === 'basic') lengthInstruction = 'corta';
         if (level === 'advanced') lengthInstruction = 'larga';
 
+        // STEP 1: Generate structured content ("Source of Truth")
         const structuredContentPrompt = `Genera un resumen DETALLADO y JERÁRQUICO para el tema '${topic}'. La longitud debe ser ${lengthInstruction}. Organiza los puntos principales y sub-puntos de forma lógica. Este resumen será la base para construir un diagrama visual. Detalles adicionales: ${details}`;
         
         const { text: structuredContent } = await ai.generate({ prompt: structuredContentPrompt });
-        if(!structuredContent) throw new Error("Could not generate base content.");
+        if(!structuredContent) throw new Error("Could not generate base content for the diagram.");
 
+        // STEP 2: Use the structured content to generate the final JSON/HTML
         let finalPrompt = '';
-        let outputSchema: z.ZodSchema<any>;
+        let outputSchema: z.ZodSchema<any> | undefined = undefined;
         let outputTypeLiteral: GeneratedContentType['type'] | null = null;
 
+        const topicOrConcept = infoParams.topic;
+        const finalPromptParams = { topicOrConcept, level, structuredContent, translatedFormatName };
+        
         switch(format) {
             case VisualFormat.CONCEPT_MAP:
                 finalPrompt = `Tu tarea es generar una ESTRUCTURA DE DATOS JSON para un mapa conceptual interactivo, BASADO EN EL RESUMEN PROPORCIONADO.
-El tema principal del mapa es: "${topic}".
-El nivel de complejidad solicitado es: "${level}".
+El tema principal del mapa es: "{{topicOrConcept}}".
+El nivel de complejidad solicitado es: "{{level}}".
 
 **RESUMEN DEL CONTENIDO (Fuente de la Verdad):**
 ---
-${structuredContent}
+{{{structuredContent}}}
 ---
 
 A partir de este contenido, DEBES generar un objeto JSON que siga el esquema de salida.
@@ -222,27 +244,25 @@ A partir de este contenido, DEBES generar un objeto JSON que siga el esquema de 
 **Reglas de Generación por Nivel (MUY IMPORTANTE):**
 - **Si el nivel es 'basic':** Genera una estructura de datos simple con 5-7 nodos en total (1 principal, 2-3 conceptos, 2-3 conectores).
 - **Si el nivel es 'intermediate':** Genera una estructura más detallada con 8-12 nodos, incluyendo algunas ramas secundarias.
-- **Si el nivel es 'advanced':** Genera una estructura compleja con más de 12 nodos, múltiples niveles de jerarquía y, si es relevante, relaciones cruzadas.
+- **Si el nivel es 'advanced':** Genera más de 12 nodos, múltiples niveles de jerarquía y, si es relevante, relaciones cruzadas.
 
 **Reglas de Estructura JSON (MUY IMPORTANTE):**
-1.  **Contenido:** El campo "label" de cada nodo DEBE derivarse del "RESUMEN DEL CONTENIDO". No inventes información.
-2.  **IDs Únicos:** A cada nodo asígnale un "id" único y descriptivo (ej: "nodo-fotosintesis"). NO USES IDs genéricos como "nodo-1".
-3.  **Posiciones CSS:** Para CADA nodo, genera una posición inicial ("top", "left") en píxeles en el campo "position". Las posiciones deben estar distribuidas lógicamente en un lienzo de 1200x800px para que el mapa sea legible. El nodo principal debe estar cerca de la parte superior central.
-4.  **Tipos de Nodo:** Asigna el "type" correcto: 'principal' para el concepto central, 'concepto' para ideas secundarias, y 'conector' para las palabras de enlace.
-5.  **Conexiones:** En el array "connections", define las relaciones entre tus nodos usando sus IDs únicos en los campos "from" y "to".
-6.  **Idioma:** Todo el texto del campo "label" DEBE estar en ESPAÑOL.
-7.  **Salida Final:** La respuesta debe ser ÚNICAMENTE el objeto JSON válido. No incluyas explicaciones, comentarios o markdown.`;
+1.  **IDs Únicos:** A cada nodo asígnale un "id" único y descriptivo (ej: "nodo-fotosintesis").
+2.  **Posiciones CSS:** Para CADA nodo, genera una posición inicial ("top", "left") en píxeles en un lienzo de 1200x800px.
+3.  **Tipos de Nodo:** Asigna el "type" correcto: 'principal', 'concepto', o 'conector'.
+4.  **Conexiones:** En el array "connections", define las relaciones entre tus nodos usando sus IDs.
+5.  **Salida Final:** La respuesta debe ser ÚNICAMENTE el objeto JSON válido.`;
                 outputSchema = ConceptMapDataContentSchema;
                 outputTypeLiteral = 'concept-map-data';
                 break;
             case VisualFormat.MIND_MAP:
                 finalPrompt = `Tu tarea es generar una ESTRUCTURA DE DATOS JSON para un mapa mental interactivo, BASADO EN EL RESUMEN PROPORCIONADO.
-El tema central del mapa debe ser: "${topic}".
-El nivel de complejidad solicitado es: "${level}".
+El tema central del mapa debe ser: "{{topicOrConcept}}".
+El nivel de complejidad solicitado es: "{{level}}".
 
 **RESUMEN DEL CONTENIDO (Fuente de la Verdad):**
 ---
-${structuredContent}
+{{{structuredContent}}}
 ---
 
 A partir de este contenido, DEBES generar un objeto JSON que siga el esquema de salida.
@@ -253,56 +273,142 @@ A partir de este contenido, DEBES generar un objeto JSON que siga el esquema de 
 - **Si el nivel es 'advanced':** Genera 5-6 ramas principales, cada una con 3-4 puntos secundarios o más detallados.
 
 **Reglas de Estructura JSON (MUY IMPORTANTE):**
-1.  **Contenido:** El campo "title" de cada rama y los strings en "children" DEBEN derivarse del "RESUMEN DEL CONTENIDO". No inventes información.
-2.  **IDs Únicos:** A cada rama asígnale un "id" único y descriptivo (ej: "rama-beneficios").
-3.  **Posiciones CSS:** Para CADA rama, genera una posición inicial ("top", "left") en porcentajes (ej: '20%'). Las posiciones deben estar distribuidas lógicamente alrededor de un nodo central. NO las coloques todas en el mismo sitio.
-4.  **Idioma:** Todo el texto DEBE estar en ESPAÑOL.
-5.  **Salida Final:** La respuesta debe ser ÚNICAMENTE el objeto JSON válido. No incluyas explicaciones, comentarios o markdown.`;
+1.  **Contenido:** El campo "title" de cada rama y los strings en "children" DEBEN derivarse del "RESUMEN DEL CONTENIDO".
+2.  **IDs Únicos:** A cada rama asígnale un "id" único y descriptivo.
+3.  **Posiciones CSS:** Para CADA rama, genera una posición inicial ("top", "left") en porcentajes (ej: '20%'). Las posiciones deben estar distribuidas lógicamente alrededor de un nodo central.
+4.  **Salida Final:** La respuesta debe ser ÚNICAMENTE el objeto JSON válido.`;
                 outputSchema = MindMapDataContentSchema;
                 outputTypeLiteral = 'mind-map-data';
                 break;
             case VisualFormat.FLOW_CHART:
-                finalPrompt = `Basado en el siguiente texto, crea una estructura JSON para un diagrama de flujo. El JSON debe tener 'title', 'nodes' (con id, label, type, position) y 'connections' (con from, to).\n\nTexto: ${structuredContent}`;
+                finalPrompt = `Tu tarea es generar una ESTRUCTURA DE DATOS JSON para un diagrama de flujo interactivo, BASADO EN EL RESUMEN PROPORCIONADO.
+El tema principal del diagrama es: "{{topicOrConcept}}".
+El nivel de complejidad solicitado es: "{{level}}".
+
+**RESUMEN DEL CONTENIDO (Fuente de la Verdad):**
+---
+{{{structuredContent}}}
+---
+
+**Reglas de Generación por Nivel (MUY IMPORTANTE):**
+- **Si el nivel es 'basic':** Genera 4-6 nodos en total (inicio, fin, 2-4 procesos).
+- **Si el nivel es 'intermediate':** Genera 6-10 nodos, incluyendo al menos un nodo de 'decisión'.
+- **Si el nivel es 'advanced':** Genera más de 10 nodos, múltiples decisiones y posibles bucles.
+
+**Reglas de Estructura JSON (MUY IMPORTANTE):**
+1.  **Contenido:** Debe haber siempre un nodo de inicio y uno de fin.
+2.  **Posiciones CSS:** Genera una posición ("top", "left") en píxeles distribuida lógicamente en un lienzo de 1200x800px.
+3.  **Tipos de Nodo:** Asigna el "type" correcto: 'start-end', 'process', o 'decision'.
+4.  **Conexiones:** Define las relaciones secuenciales entre nodos.
+5.  **Salida Final:** La respuesta debe ser ÚNICAMENTE el objeto JSON válido.`;
                 outputSchema = FlowchartDataContentSchema;
                 outputTypeLiteral = 'flowchart-data';
                 break;
             case VisualFormat.VENN_DIAGRAM:
-                 finalPrompt = `Basado en el siguiente texto, crea una estructura JSON para un diagrama de Venn. El JSON debe tener 'title', 'circleA' (label, items), 'circleB' (label, items) y 'intersection' (items).\n\nTexto: ${structuredContent}`;
+                 finalPrompt = `Tu tarea es generar una ESTRUCTURA DE DATOS JSON para un diagrama de Venn, BASADO EN EL RESUMEN PROPORCIONADO.
+El tema principal del diagrama es una comparación: "{{topicOrConcept}}".
+El nivel de complejidad solicitado es: "{{level}}".
+
+**RESUMEN DEL CONTENIDO (Fuente de la Verdad):**
+---
+{{{structuredContent}}}
+---
+
+**Reglas de Generación por Nivel (MUY IMPORTANTE):**
+- **Si el nivel es 'basic':** Genera 2-3 elementos para cada sección (círculo A, círculo B, intersección).
+- **Si el nivel es 'intermediate':** Genera 3-5 elementos para cada sección.
+- **Si el nivel es 'advanced':** Genera 5 o más elementos, buscando diferencias y similitudes más sutiles.
+
+**Reglas de Estructura JSON (MUY IMPORTANTE):**
+1.  **Contenido:** Todos los elementos en los arrays "items" DEBEN derivarse del resumen.
+2.  **Etiquetas Claras:** Asigna una etiqueta clara a "circleA" y "circleB".
+3.  **Salida Final:** La respuesta debe ser ÚNICamente el objeto JSON válido.`;
                  outputSchema = VennDiagramDataContentSchema;
                  outputTypeLiteral = 'venn-diagram-data';
                  break;
             case VisualFormat.COMPARISON_TABLE:
-                finalPrompt = `Basado en el siguiente texto, crea una estructura JSON para una tabla comparativa. El JSON debe tener 'title', 'headers' (array de strings) y 'rows' (array de arrays de strings).\n\nTexto: ${structuredContent}`;
+                finalPrompt = `Tu tarea es generar una ESTRUCTURA DE DATOS JSON para una tabla comparativa, BASADO EN EL RESUMEN PROPORCIONADO.
+El tema principal es: "{{topicOrConcept}}".
+El nivel de complejidad solicitado es: "{{level}}".
+
+**RESUMEN DEL CONTENIDO (Fuente de la Verdad):**
+---
+{{{structuredContent}}}
+---
+
+**Reglas de Generación por Nivel (MUY IMPORTANTE):**
+- **Si el nivel es 'basic':** Genera una tabla simple con 2-3 columnas y 3-5 filas.
+- **Si el nivel es 'intermediate':** Genera una tabla con 3-4 columnas y 5-8 filas.
+- **Si el nivel es 'advanced':** Genera una tabla detallada con 4 o más columnas y más de 8 filas.
+
+**Reglas de Estructura JSON (MUY IMPORTANTE):**
+1.  **Estructura:** El primer elemento de "headers" debe ser el criterio de comparación (ej. "Característica"). El resto son los ítems a comparar. Cada fila debe tener la misma cantidad de elementos que "headers".
+2.  **Salida Final:** La respuesta debe ser ÚNICAMENTE el objeto JSON válido.`;
                 outputSchema = ComparisonTableDataContentSchema;
                 outputTypeLiteral = 'comparison-table-data';
                 break;
             case VisualFormat.TIMELINE:
-                finalPrompt = `Basado en el siguiente texto, crea una estructura JSON para una línea de tiempo. El JSON debe tener 'title' y un array de 'events' (con date, title, description).\n\nTexto: ${structuredContent}`;
+                finalPrompt = `Tu tarea es generar una ESTRUCTURA DE DATOS JSON para una línea de tiempo, BASADO EN EL RESUMEN PROPORCIONADO.
+El tema principal es: "{{topicOrConcept}}".
+El nivel de complejidad solicitado es: "{{level}}".
+
+**RESUMEN DEL CONTENIDO (Fuente de la Verdad):**
+---
+{{{structuredContent}}}
+---
+
+**Reglas de Generación por Nivel (MUY IMPORTANTE):**
+- **Si el nivel es 'basic':** Genera 4-6 eventos clave.
+- **Si el nivel es 'intermediate':** Genera 7-10 eventos.
+- **Si el nivel es 'advanced':** Genera 11 o más eventos, incluyendo detalles sutiles.
+
+**Reglas de Estructura JSON (MUY IMPORTANTE):**
+1.  **Contenido:** Los campos "date", "title" y "description" deben derivarse del resumen y estar en orden cronológico.
+2.  **Salida Final:** La respuesta debe ser ÚNICAMENTE el objeto JSON válido.`;
                 outputSchema = TimelineDataContentSchema;
                 outputTypeLiteral = 'timeline-data';
                 break;
-            default: // Infographic, etc.
-                 finalPrompt = `Crea un código HTML5 auto-contenido y con estilos para una infografía sobre el tema '${topic}', basado en el siguiente texto. El HTML debe ser atractivo visualmente.\n\nTexto: ${structuredContent}`;
-                 outputSchema = GeneratedHtmlSchema.omit({ type: true }); // Omit type for HTML generation too
+            default: // Infographic and other HTML-based formats
+                 finalPrompt = `Tu tarea es generar una representación visual completa en CÓDIGO HTML5 para un/a "{{translatedFormatName}}".
+Usa el siguiente CONTENIDO ESTRUCTURADO como la base fundamental.
+
+**CONTENIDO ESTRUCTURADO (Fuente de la Verdad):**
+---
+{{{structuredContent}}}
+---
+
+**INSTRUCCIONES DE GENERACIÓN:**
+1.  **Basado en Contenido:** El HTML debe representar fielmente la información del resumen. Crea un diseño atractivo con secciones, iconos sugeridos (ej. [ICONO: libro]) y una paleta de colores coherente.
+2.  **Solo Código:** Responde ÚNICAMENTE con el código HTML5. No incluyas explicaciones.
+3.  **Auto-contenido:** Incluye TODOS los estilos CSS en una etiqueta <style> en el <head>.
+4.  **Adaptable:** El diseño debe ser responsive.`;
+                 outputSchema = GeneratedHtmlSchema.omit({ type: true }); // Omit type for plain HTML generation
                  outputTypeLiteral = 'html';
                  break;
         }
 
-        const { output } = await ai.generate({
-          prompt: finalPrompt,
-          output: { schema: outputSchema }
-        });
+        const prompt = ai.definePrompt(
+            {
+                name: `generate-${format}-prompt`,
+                input: { schema: z.object({ topicOrConcept: z.string(), level: z.string().optional(), structuredContent: z.string(), translatedFormatName: z.string() }) },
+                output: { schema: outputSchema },
+                prompt: finalPrompt,
+            }
+        );
+        
+        const { output } = await prompt(finalPromptParams);
 
         if (output) {
           if (outputTypeLiteral) {
             // Re-add the 'type' field before returning
             return { ...output, type: outputTypeLiteral } as GenerateVisualContentFlowOutput;
           }
-          return output as GenerateVisualContentFlowOutput;
+          // For cases like HTML where schema is directly the output
+          return { type: 'html', ...output } as GenerateVisualContentFlowOutput;
         }
     }
     
-    throw new Error(`The combination of category '${category}' and format '${format}' is not implemented.`);
+    throw new Error(`The combination of category '${category}' and format '${format}' is not implemented or failed to produce output.`);
   }
 );
 
