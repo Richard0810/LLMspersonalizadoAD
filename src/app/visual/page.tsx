@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { Loader2, AlertCircle, Eye, ArrowLeft } from 'lucide-react';
+import { Loader2, AlertCircle, ArrowLeft, Palette } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { generateVisualContentAction } from './actions';
 import OutputDisplay from '@/components/visual/OutputDisplay';
@@ -156,10 +156,10 @@ export default function VisualGeneratorPage() {
             )}
             <header className={selectedCategory ? "text-left" : "text-center w-full"}>
               <div className="inline-block mx-auto p-3 bg-primary/10 rounded-full mb-4">
-                  <Eye className="h-10 w-10 text-primary" />
+                  <Palette className="h-10 w-10 text-primary" />
               </div>
               <h1 className="text-4xl sm:text-5xl font-bold text-primary font-headline animate-background-shine bg-[length:200%_auto] bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-                Generador de Formatos Visuales
+                Estudio de Creación Visual
               </h1>
               <p className="text-muted-foreground mt-2 text-lg max-w-2xl mx-auto">
                 {selectedCategory ? `Estás creando en la categoría: ${VISUAL_CATEGORIES_LIST.find(c=>c.id === selectedCategory)?.name}` : 'Elige una categoría para empezar a crear visualizaciones de alto impacto para tus clases.'}
