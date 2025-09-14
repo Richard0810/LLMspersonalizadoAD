@@ -151,7 +151,7 @@ export default function VisualGeneratorPage() {
         <div className="flex items-center mb-10">
             {selectedCategory && (
                 <Button onClick={handleResetSelection} variant="outline" className="mr-6">
-                  <ArrowLeft className="mr-2 h-4 w-4" /> Volver a Categorías
+                  <ArrowLeft className="mr-2 h-4 w-4" /> Atrás
                 </Button>
             )}
             <header className={selectedCategory ? "text-left" : "text-center w-full"}>
