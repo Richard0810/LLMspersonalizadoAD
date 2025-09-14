@@ -17,6 +17,11 @@ const formSchema = z.object({
   prompt: z.string().min(1, 'El prompt es obligatorio.'),
   artStyle: z.string().optional(),
   artType: z.string().optional(),
+  artistInspired: z.string().optional(),
+  attributes: z.string().optional(),
+  lighting: z.string().optional(),
+  composition: z.string().optional(),
+  quality: z.string().optional(),
   negativePrompt: z.string().optional(),
   aspectRatio: z.string().optional(),
 });
@@ -38,6 +43,11 @@ export function ImageGenerationForm({ onSubmit, isLoading, translatedFormatName 
       theme: '',
       artStyle: 'Ninguno',
       artType: 'Ninguno',
+      artistInspired: '',
+      attributes: '',
+      lighting: '',
+      composition: '',
+      quality: 'Alta resolución',
       negativePrompt: '',
       aspectRatio: '16:9',
     },
@@ -102,6 +112,58 @@ export function ImageGenerationForm({ onSubmit, isLoading, translatedFormatName 
               </FormItem>
             )}
           />
+           <FormField
+            control={form.control}
+            name="artistInspired"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Inspirado en Artista/Periodo (Opcional)</FormLabel>
+                <FormControl>
+                  <Input placeholder="Ej: Van Gogh, Dalí, Art Deco" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="attributes"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Atributos del Sujeto (Opcional)</FormLabel>
+                <FormControl>
+                  <Input placeholder="Ej: armadura metálica, ojos brillantes" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="lighting"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Iluminación y Atmósfera (Opcional)</FormLabel>
+                <FormControl>
+                  <Input placeholder="Ej: luz del atardecer, neblina" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="composition"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Composición y Perspectiva (Opcional)</FormLabel>
+                <FormControl>
+                  <Input placeholder="Ej: vista aérea, plano cercano" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
 
         <FormField
@@ -109,7 +171,7 @@ export function ImageGenerationForm({ onSubmit, isLoading, translatedFormatName 
           name="negativePrompt"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Prompt Negativo</FormLabel>
+              <FormLabel>Prompt Negativo (Opcional)</FormLabel>
               <FormControl>
                 <Input placeholder="Ej: desenfocado, de baja calidad, texto, marcas de agua" {...field} />
               </FormControl>
@@ -119,26 +181,48 @@ export function ImageGenerationForm({ onSubmit, isLoading, translatedFormatName 
           )}
         />
         
-        <FormField
-            control={form.control}
-            name="aspectRatio"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Relación de Aspecto</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger><SelectValue placeholder="Selecciona relación de aspecto" /></SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="16:9">16:9 (Horizontal)</SelectItem>
-                    <SelectItem value="1:1">1:1 (Cuadrado)</SelectItem>
-                    <SelectItem value="9:16">9:16 (Vertical)</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <FormField
+                control={form.control}
+                name="aspectRatio"
+                render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Relación de Aspecto</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                        <SelectTrigger><SelectValue placeholder="Selecciona relación de aspecto" /></SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                        <SelectItem value="16:9">16:9 (Horizontal)</SelectItem>
+                        <SelectItem value="1:1">1:1 (Cuadrado)</SelectItem>
+                        <SelectItem value="9:16">9:16 (Vertical)</SelectItem>
+                    </SelectContent>
+                    </Select>
+                    <FormMessage />
+                </FormItem>
+                )}
+            />
+            <FormField
+                control={form.control}
+                name="quality"
+                render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Calidad</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                        <SelectTrigger><SelectValue placeholder="Selecciona una calidad" /></SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                        <SelectItem value="Estándar">Estándar</SelectItem>
+                        <SelectItem value="Alta resolución">Alta resolución</SelectItem>
+                        <SelectItem value="Fotorrealista">Fotorrealista</SelectItem>
+                    </SelectContent>
+                    </Select>
+                    <FormMessage />
+                </FormItem>
+                )}
+            />
+        </div>
 
         <Button type="submit" disabled={isLoading} className="w-full">
           {isLoading ? 'Generando...' : `Generar ${translatedFormatName}`}

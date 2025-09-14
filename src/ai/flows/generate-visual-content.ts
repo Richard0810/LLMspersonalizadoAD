@@ -196,7 +196,7 @@ const generateVisualContentFlow = ai.defineFlow(
 
         const { text: altText } = await ai.generate({
             model: 'googleai/gemini-2.0-flash',
-            prompt: `Genera un texto alternativo (alt text) para esta imagen.`,
+            prompt: `Genera un texto alternativo (alt text) corto y descriptivo en español para esta imagen.`,
             input: { media: { url: media.url } },
         });
 
@@ -233,12 +233,12 @@ const generateVisualContentFlow = ai.defineFlow(
         switch(format) {
             case VisualFormat.CONCEPT_MAP:
                 finalPrompt = `Tu tarea es generar una ESTRUCTURA DE DATOS JSON para un mapa conceptual interactivo, BASADO EN EL RESUMEN PROPORCIONADO.
-El tema principal del mapa es: "{{topicOrConcept}}".
-El nivel de complejidad solicitado es: "{{level}}".
+El tema principal del mapa es: "${topicOrConcept}".
+El nivel de complejidad solicitado es: "${level}".
 
 **RESUMEN DEL CONTENIDO (Fuente de la Verdad):**
 ---
-{{{structuredContent}}}
+${structuredContent}
 ---
 
 A partir de este contenido, DEBES generar un objeto JSON que siga el esquema de salida.
@@ -259,12 +259,12 @@ A partir de este contenido, DEBES generar un objeto JSON que siga el esquema de 
                 break;
             case VisualFormat.MIND_MAP:
                 finalPrompt = `Tu tarea es generar una ESTRUCTURA DE DATOS JSON para un mapa mental interactivo, BASADO EN EL RESUMEN PROPORCIONADO.
-El tema central del mapa debe ser: "{{topicOrConcept}}".
-El nivel de complejidad solicitado es: "{{level}}".
+El tema central del mapa debe ser: "${topicOrConcept}".
+El nivel de complejidad solicitado es: "${level}".
 
 **RESUMEN DEL CONTENIDO (Fuente de la Verdad):**
 ---
-{{{structuredContent}}}
+${structuredContent}
 ---
 
 A partir de este contenido, DEBES generar un objeto JSON que siga el esquema de salida.
@@ -284,12 +284,12 @@ A partir de este contenido, DEBES generar un objeto JSON que siga el esquema de 
                 break;
             case VisualFormat.FLOW_CHART:
                 finalPrompt = `Tu tarea es generar una ESTRUCTURA DE DATOS JSON para un diagrama de flujo interactivo, BASADO EN EL RESUMEN PROPORCIONADO.
-El tema principal del diagrama es: "{{topicOrConcept}}".
-El nivel de complejidad solicitado es: "{{level}}".
+El tema principal del diagrama es: "${topicOrConcept}".
+El nivel de complejidad solicitado es: "${level}".
 
 **RESUMEN DEL CONTENIDO (Fuente de la Verdad):**
 ---
-{{{structuredContent}}}
+${structuredContent}
 ---
 
 **Reglas de Generación por Nivel (MUY IMPORTANTE):**
@@ -308,12 +308,12 @@ El nivel de complejidad solicitado es: "{{level}}".
                 break;
             case VisualFormat.VENN_DIAGRAM:
                  finalPrompt = `Tu tarea es generar una ESTRUCTURA DE DATOS JSON para un diagrama de Venn, BASADO EN EL RESUMEN PROPORCIONADO.
-El tema principal del diagrama es una comparación: "{{topicOrConcept}}".
-El nivel de complejidad solicitado es: "{{level}}".
+El tema principal del diagrama es una comparación: "${topicOrConcept}".
+El nivel de complejidad solicitado es: "${level}".
 
 **RESUMEN DEL CONTENIDO (Fuente de la Verdad):**
 ---
-{{{structuredContent}}}
+${structuredContent}
 ---
 
 **Reglas de Generación por Nivel (MUY IMPORTANTE):**
@@ -330,12 +330,12 @@ El nivel de complejidad solicitado es: "{{level}}".
                  break;
             case VisualFormat.COMPARISON_TABLE:
                 finalPrompt = `Tu tarea es generar una ESTRUCTURA DE DATOS JSON para una tabla comparativa, BASADO EN EL RESUMEN PROPORCIONADO.
-El tema principal es: "{{topicOrConcept}}".
-El nivel de complejidad solicitado es: "{{level}}".
+El tema principal es: "${topicOrConcept}".
+El nivel de complejidad solicitado es: "${level}".
 
 **RESUMEN DEL CONTENIDO (Fuente de la Verdad):**
 ---
-{{{structuredContent}}}
+${structuredContent}
 ---
 
 **Reglas de Generación por Nivel (MUY IMPORTANTE):**
@@ -351,12 +351,12 @@ El nivel de complejidad solicitado es: "{{level}}".
                 break;
             case VisualFormat.TIMELINE:
                 finalPrompt = `Tu tarea es generar una ESTRUCTURA DE DATOS JSON para una línea de tiempo, BASADO EN EL RESUMEN PROPORCIONADO.
-El tema principal es: "{{topicOrConcept}}".
-El nivel de complejidad solicitado es: "{{level}}".
+El tema principal es: "${topicOrConcept}".
+El nivel de complejidad solicitado es: "${level}".
 
 **RESUMEN DEL CONTENIDO (Fuente de la Verdad):**
 ---
-{{{structuredContent}}}
+${structuredContent}
 ---
 
 **Reglas de Generación por Nivel (MUY IMPORTANTE):**
@@ -371,12 +371,12 @@ El nivel de complejidad solicitado es: "{{level}}".
                 outputTypeLiteral = 'timeline-data';
                 break;
             default: // Infographic and other HTML-based formats
-                 finalPrompt = `Tu tarea es generar una representación visual completa en CÓDIGO HTML5 para un/a "{{translatedFormatName}}".
+                 finalPrompt = `Tu tarea es generar una representación visual completa en CÓDIGO HTML5 para un/a "${translatedFormatName}".
 Usa el siguiente CONTENIDO ESTRUCTURADO como la base fundamental.
 
 **CONTENIDO ESTRUCTURADO (Fuente de la Verdad):**
 ---
-{{{structuredContent}}}
+${structuredContent}
 ---
 
 **INSTRUCCIONES DE GENERACIÓN:**
