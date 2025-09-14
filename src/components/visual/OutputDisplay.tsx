@@ -10,6 +10,8 @@ import { Download, Maximize } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Calendar } from 'lucide-react';
+import html2pdf from 'html2pdf.js';
+
 
 interface OutputDisplayProps {
   content: GeneratedContentType | null;
@@ -604,59 +606,25 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ content, format }) => {
   };
 
   const handleHtmlDownloadAsPdf = (htmlContent: GeneratedHtmlType) => {
-    // 1. Create an invisible iframe
-    const iframe = document.createElement('iframe');
-    iframe.style.position = 'absolute';
-    iframe.style.left = '-9999px'; // Position it off-screen
-    iframe.style.top = '-9999px';
-    iframe.style.width = '1px';
-    iframe.style.height = '1px';
-    iframe.style.border = '0';
+    const element = document.createElement('div');
+    element.innerHTML = htmlContent.content;
 
-    // Add the iframe to the document body
-    document.body.appendChild(iframe);
-    
-    // Function to clean up and remove the iframe
-    const cleanupIframe = () => { 
-      if (iframe.parentNode === document.body) {
-        document.body.removeChild(iframe); 
-      }
+    // Opciones para html2pdf
+    const opt = {
+      margin:       0.5,
+      filename:     `${htmlContent.title || 'infografia'}.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true },
+      jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
 
-    // 2. Wait for the iframe to load
-    iframe.onload = () => {
-      try {
-        // 3. Open the browser's print dialog
-        if (iframe.contentWindow) {
-          iframe.contentWindow.focus(); // Focus the iframe
-          iframe.contentWindow.print(); // This is the magic!
-        } else { 
-          console.error("Iframe contentWindow not available."); 
-        }
-      } catch (e) { 
-        console.error("Error during print:", e);
-      } finally { 
-        // 4. Clean up the iframe after a second
-        setTimeout(cleanupIframe, 1000); 
-      } 
-    };
+    // Generar el PDF
+    html2pdf().from(element).set(opt).save();
 
-    // Handle errors if the iframe fails to load
-    iframe.onerror = (e) => { 
-      console.error("Error loading iframe:", e); 
-      cleanupIframe(); 
-    };
-    
-    // 5. Write the infographic HTML into the iframe
-    const doc = iframe.contentDocument || iframe.contentWindow?.document;
-    if (doc) {
-      doc.open();
-      doc.write(htmlContent.content); // Inject the AI-generated HTML here
-      doc.close();
-    } else { 
-      console.error("Could not get iframe doc."); 
-      cleanupIframe(); 
-    }
+    toast({
+      title: "Descargando PDF",
+      description: "La descarga de tu infografía comenzará en breve.",
+    });
   };
 
 
@@ -767,5 +735,3 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ content, format }) => {
 };
 
 export default OutputDisplay;
-
-    
