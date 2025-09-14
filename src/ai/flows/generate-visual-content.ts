@@ -1,107 +1,234 @@
 
 'use server';
 /**
- * @fileOverview A flow to generate visual content for an educational activity.
- * It analyzes text sections (materials, instructions, reflection) and generates
- * relevant images for each part.
- *
- * - generateVisualContent - The main function to trigger the visual content generation.
- * - GenerateVisualContentInput - The input type for the flow.
- * - GenerateVisualContentOutput - The return type for the flow.
+ * @fileOverview Genkit flow for generating various visual content types.
+ * - generateVisualContent: Main exported function to call the flow.
  */
 
 import { ai } from '@/ai/genkit';
-import { googleAI } from '@genkit-ai/googleai';
 import { z } from 'genkit';
+import {
+  GenerateVisualContentFlowInput,
+  GenerateVisualContentFlowOutput,
+  ImageGenerationParams,
+  InfoOrgParams,
+  ConceptIllustParams,
+  VisualCategory,
+  VisualFormat
+} from '@/types';
 
-const GenerateVisualContentInputSchema = z.object({
-  materials: z.string().describe('The materials section of the activity.'),
-  instructions: z.string().describe('The instructions section of the activity.'),
-  reflection: z.string().describe('The reflection section of the activity.'),
+// Internal Zod schemas for validation within the flow.
+// These should match the types in src/types/index.ts
+
+const ImageGenerationParamsSchema = z.object({
+  theme: z.string().optional(),
+  prompt: z.string().min(1),
+  artStyle: z.string().optional(),
+  artType: z.string().optional(),
+  artistInspired: z.string().optional(),
+  attributes: z.string().optional(),
+  lighting: z.string().optional(),
+  composition: z.string().optional(),
+  quality: z.string().optional(),
+  negativePrompt: z.string().optional(),
+  aspectRatio: z.string().optional(),
+  numImages: z.number().optional(),
 });
-export type GenerateVisualContentInput = z.infer<typeof GenerateVisualContentInputSchema>;
 
-const ImageGenerationSchema = z.object({
-    shouldGenerate: z.boolean().describe("Whether an image is relevant and should be generated for this text snippet."),
-    imagePrompt: z.string().optional().describe("A detailed, descriptive prompt for a text-to-image model. Example: 'A simple black and white word search puzzle about planets'. Be specific."),
+const InfoOrgParamsSchema = z.object({
+  theme: z.string().optional(),
+  topic: z.string().min(1),
+  level: z.enum(['basic', 'intermediate', 'advanced']).optional(),
+  details: z.string().optional(),
+  outputStructure: z.string().optional(),
 });
 
-const VisualStepSchema = z.object({
-  step: z.string().describe('The original text for this step.'),
-  image: z.string().optional().describe('The generated image as a Base64 data URI.'),
+const ConceptIllustParamsSchema = z.object({
+  theme: z.string().optional(),
+  concept: z.string().min(1),
+  visualStyle: z.string(),
+  specificElements: z.string().optional(),
 });
 
-const GenerateVisualContentOutputSchema = z.object({
-  materials: z.array(VisualStepSchema),
-  instructions: z.array(VisualStepSchema),
-  reflection: z.array(VisualStepSchema),
+const FlowInputSchema = z.object({
+  category: z.nativeEnum(VisualCategory),
+  format: z.nativeEnum(VisualFormat),
+  translatedFormatName: z.string(),
+  params: z.union([
+    ImageGenerationParamsSchema,
+    InfoOrgParamsSchema,
+    ConceptIllustParamsSchema,
+  ]),
+  isPreview: z.boolean().optional(),
 });
-export type GenerateVisualContentOutput = z.infer<typeof GenerateVisualContentOutputSchema>;
 
-// Helper function to process a text section (e.g., instructions)
-async function processSection(text: string): Promise<z.infer<typeof VisualStepSchema>[]> {
-    if (!text.trim()) {
-        return [];
-    }
+const GeneratedImageSchema = z.object({
+  type: z.literal('image'),
+  url: z.string(),
+  alt: z.string(),
+});
 
-    // Split text into processable chunks (e.g., by line breaks for numbered lists or paragraphs)
-    const chunks = text.split('\n').filter(chunk => chunk.trim() !== '');
+// Define other output schemas similarly...
+const GeneratedHtmlSchema = z.object({
+    type: z.literal('html'),
+    content: z.string(),
+    title: z.string().optional(),
+});
 
-    const processedChunks = await Promise.all(
-        chunks.map(async (chunk) => {
-            const llmResponse = await ai.generate({
-                model: googleAI('gemini-2.0-flash'),
-                prompt: `Analyze the following text from an educational activity. Decide if a simple, clear, and helpful visual aid (like a simple drawing, diagram, or graphic) would enhance it for a teacher or student. If so, create a specific DALL-E 3 style prompt to generate it. If not, indicate that no image is needed. The visual should be simple, almost like a line drawing or a basic graphic.
+const GeneratedConceptMapDataSchema = z.object({
+    type: z.literal('concept-map-data'),
+    title: z.string(),
+    nodes: z.array(z.object({ id: z.string(), label: z.string(), type: z.enum(['principal', 'concepto', 'conector']), position: z.object({ top: z.number(), left: z.number() }) })),
+    connections: z.array(z.object({ from: z.string(), to: z.string() })),
+});
 
-Text to analyze: "${chunk}"`,
-                output: { schema: ImageGenerationSchema },
-                config: { temperature: 0.2 },
-            });
+const GeneratedMindMapDataSchema = z.object({
+    type: z.literal('mind-map-data'),
+    title: z.string(),
+    branches: z.array(z.object({ id: z.string(), title: z.string(), children: z.array(z.string()), position: z.object({ top: z.string(), left: z.string() }) })),
+});
 
-            const decision = llmResponse.output;
-            if (!decision) {
-                return { step: chunk };
-            }
+const GeneratedFlowchartDataSchema = z.object({
+    type: z.literal('flowchart-data'),
+    title: z.string(),
+    nodes: z.array(z.object({ id: z.string(), label: z.string(), type: z.enum(['start-end', 'process', 'decision']), position: z.object({ top: z.number(), left: z.number() }) })),
+    connections: z.array(z.object({ from: z.string(), to: z.string() })),
+});
 
-            if (decision.shouldGenerate && decision.imagePrompt) {
-                const {media} = await ai.generate({
-                    model: googleAI('imagen-4.0-fast-generate-001'),
-                    prompt: decision.imagePrompt,
-                });
-                return {
-                    step: chunk,
-                    image: media?.url,
-                };
-            }
+const GeneratedVennDiagramDataSchema = z.object({
+    type: z.literal('venn-diagram-data'),
+    title: z.string(),
+    circleA: z.object({ label: z.string(), items: z.array(z.string()) }),
+    circleB: z.object({ label: z.string(), items: z.array(z.string()) }),
+    intersection: z.object({ label: z.string().optional(), items: z.array(z.string()) }),
+});
 
-            return { step: chunk };
-        })
-    );
+const GeneratedComparisonTableDataSchema = z.object({
+    type: z.literal('comparison-table-data'),
+    title: z.string(),
+    headers: z.array(z.string()),
+    rows: z.array(z.array(z.string())),
+});
 
-    return processedChunks.filter(Boolean) as z.infer<typeof VisualStepSchema>[];
+const GeneratedTimelineDataSchema = z.object({
+    type: z.literal('timeline-data'),
+    title: z.string(),
+    events: z.array(z.object({ date: z.string(), title: z.string(), description: z.string() })),
+});
+
+
+const FlowOutputSchema = z.discriminatedUnion("type", [
+  GeneratedImageSchema,
+  GeneratedHtmlSchema,
+  GeneratedConceptMapDataSchema,
+  GeneratedMindMapDataSchema,
+  GeneratedFlowchartDataSchema,
+  GeneratedVennDiagramDataSchema,
+  GeneratedComparisonTableDataSchema,
+  GeneratedTimelineDataSchema,
+  // Add other schemas here as they are defined
+]);
+
+export async function generateVisualContent(input: GenerateVisualContentFlowInput): Promise<GenerateVisualContentFlowOutput> {
+  const validatedInput = FlowInputSchema.parse(input);
+  return generateVisualContentFlow(validatedInput);
+}
+
+function buildImagePrompt(params: ImageGenerationParams): string {
+    let fullPrompt = params.prompt;
+    if (params.artStyle && params.artStyle !== "Ninguno") fullPrompt += `, en el estilo de ${params.artStyle}`;
+    if (params.artType && params.artType !== "Ninguno") fullPrompt += `, como un/a ${params.artType}`;
+    if (params.negativePrompt) fullPrompt += `. Evita: ${params.negativePrompt}`;
+    if (params.aspectRatio) fullPrompt += `, relación de aspecto: ${params.aspectRatio}`;
+    return fullPrompt;
 }
 
 const generateVisualContentFlow = ai.defineFlow(
   {
     name: 'generateVisualContentFlow',
-    inputSchema: GenerateVisualContentInputSchema,
-    outputSchema: GenerateVisualContentOutputSchema,
+    inputSchema: FlowInputSchema,
+    outputSchema: FlowOutputSchema,
   },
   async (input) => {
-    const [materials, instructions, reflection] = await Promise.all([
-      processSection(input.materials),
-      processSection(input.instructions),
-      processSection(input.reflection),
-    ]);
+    const { category, format, translatedFormatName, params } = input;
 
-    return {
-      materials,
-      instructions,
-      reflection,
-    };
+    if (category === VisualCategory.IMAGE_GENERATION || (category === VisualCategory.CONCEPT_ILLUSTRATION && (format === VisualFormat.PHOTO_REALISTIC || format === VisualFormat.ILLUSTRATION_CONCEPT))) {
+        let imgParams: ImageGenerationParams;
+        if (category === VisualCategory.CONCEPT_ILLUSTRATION) {
+            const p = params as ConceptIllustParams;
+            imgParams = { prompt: `Un/a ${p.visualStyle} de "${p.concept}". ${p.specificElements || ''}`, theme: p.theme };
+        } else {
+            imgParams = params as ImageGenerationParams;
+        }
+
+        const fullPrompt = buildImagePrompt(imgParams);
+        const { media } = await ai.generate({
+            model: 'googleai/imagen-4.0-fast-generate-001',
+            prompt: fullPrompt,
+        });
+
+        if (media?.url) {
+            return {
+                type: 'image',
+                url: media.url,
+                alt: imgParams.prompt.substring(0, 100),
+            };
+        }
+        throw new Error("Image generation failed.");
+    }
+
+    if (category === VisualCategory.INFO_ORGANIZATION) {
+        const { topic, level, details } = params as InfoOrgParams;
+        
+        // This is a simplified version. A real implementation would have detailed prompts per format.
+        const structuredContentPrompt = `Genera un resumen DETALLADO y JERÁRQUICO para el tema '${topic}'. Organiza los puntos principales y sub-puntos de forma lógica. El nivel de detalle debe ser ${level}. Detalles adicionales: ${details}`;
+        const { text: structuredContent } = await ai.generate({ prompt: structuredContentPrompt });
+        if(!structuredContent) throw new Error("Could not generate base content.");
+
+        let finalPrompt = '';
+        let outputSchema;
+
+        switch(format) {
+            case VisualFormat.CONCEPT_MAP:
+                finalPrompt = `Basado en el siguiente texto, crea una estructura JSON para un mapa conceptual. El JSON debe tener 'title', 'nodes' (con id, label, type, position) y 'connections' (con from, to).\n\nTexto: ${structuredContent}`;
+                outputSchema = GeneratedConceptMapDataSchema;
+                break;
+            case VisualFormat.MIND_MAP:
+                finalPrompt = `Basado en el siguiente texto, crea una estructura JSON para un mapa mental. El JSON debe tener 'title' y 'branches' (con id, title, children, position).\n\nTexto: ${structuredContent}`;
+                outputSchema = GeneratedMindMapDataSchema;
+                break;
+            case VisualFormat.FLOW_CHART:
+                finalPrompt = `Basado en el siguiente texto, crea una estructura JSON para un diagrama de flujo. El JSON debe tener 'title', 'nodes' (con id, label, type, position) y 'connections' (con from, to).\n\nTexto: ${structuredContent}`;
+                outputSchema = GeneratedFlowchartDataSchema;
+                break;
+            case VisualFormat.VENN_DIAGRAM:
+                 finalPrompt = `Basado en el siguiente texto, crea una estructura JSON para un diagrama de Venn. El JSON debe tener 'title', 'circleA' (label, items), 'circleB' (label, items) y 'intersection' (items).\n\nTexto: ${structuredContent}`;
+                 outputSchema = GeneratedVennDiagramDataSchema;
+                 break;
+            case VisualFormat.COMPARISON_TABLE:
+                finalPrompt = `Basado en el siguiente texto, crea una estructura JSON para una tabla comparativa. El JSON debe tener 'title', 'headers' (array de strings) y 'rows' (array de arrays de strings).\n\nTexto: ${structuredContent}`;
+                outputSchema = GeneratedComparisonTableDataSchema;
+                break;
+            case VisualFormat.TIMELINE:
+                finalPrompt = `Basado en el siguiente texto, crea una estructura JSON para una línea de tiempo. El JSON debe tener 'title' y un array de 'events' (con date, title, description).\n\nTexto: ${structuredContent}`;
+                outputSchema = GeneratedTimelineDataSchema;
+                break;
+            default: // Infographic, etc.
+                 finalPrompt = `Crea un código HTML5 auto-contenido y con estilos para una infografía sobre el tema '${topic}', basado en el siguiente texto. El HTML debe ser atractivo visualmente.\n\nTexto: ${structuredContent}`;
+                 outputSchema = GeneratedHtmlSchema;
+                 break;
+        }
+
+        const { output } = await ai.generate({
+          prompt: finalPrompt,
+          output: { schema: outputSchema }
+        });
+
+        if (output) {
+          return output as GenerateVisualContentFlowOutput;
+        }
+    }
+    
+    throw new Error(`The combination of category '${category}' and format '${format}' is not implemented.`);
   }
 );
-
-export async function generateVisualContent(input: GenerateVisualContentInput): Promise<GenerateVisualContentOutput> {
-  return generateVisualContentFlow(input);
-}

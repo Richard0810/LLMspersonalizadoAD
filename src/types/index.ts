@@ -77,3 +77,169 @@ export interface VisualContent {
   instructions: InstructionStep[];
   reflection: InstructionStep[];
 }
+
+
+// Visual Generator Types
+
+export enum VisualCategory {
+  IMAGE_GENERATION = "image_generation",
+  INFO_ORGANIZATION = "info_organization",
+  CONCEPT_ILLUSTRATION = "concept_illustration"
+}
+
+export enum VisualFormat {
+  // Image Generation
+  TEXT_TO_IMAGE = "text_to_image",
+
+  // Info Organization
+  CONCEPT_MAP = "concept_map",
+  MIND_MAP = "mind_map",
+  FLOW_CHART = "flow_chart",
+  VENN_DIAGRAM = "venn_diagram",
+  COMPARISON_TABLE = "comparison_table",
+  TIMELINE = "timeline",
+  INFOGRAPHIC = "infographic",
+
+  // Concept Illustration
+  PHOTO_REALISTIC = "photo_realistic",
+  ILLUSTRATION_CONCEPT = "illustration_concept",
+}
+
+// Input parameter types
+export interface ImageGenerationParams {
+  theme?: string;
+  prompt: string;
+  artStyle?: string;
+  artType?: string;
+  artistInspired?: string;
+  attributes?: string;
+  lighting?: string;
+  composition?: string;
+  quality?: string;
+  negativePrompt?: string;
+  aspectRatio?: string;
+  numImages?: number;
+}
+
+export interface InfoOrgParams {
+  theme?: string;
+  topic: string;
+  level?: 'basic' | 'intermediate' | 'advanced';
+  details?: string;
+  outputStructure?: string;
+}
+
+export interface ConceptIllustParams {
+  theme?: string;
+  concept: string;
+  visualStyle: string; // e.g., 'fotorrealista', 'ilustración estilizada'
+  specificElements?: string;
+}
+
+export interface GenerateVisualContentFlowInput {
+  category: VisualCategory;
+  format: VisualFormat;
+  translatedFormatName: string;
+  params: ImageGenerationParams | InfoOrgParams | ConceptIllustParams;
+  isPreview?: boolean;
+}
+
+// Output types from the flow
+export interface GeneratedImageType {
+  type: 'image';
+  url: string; // data URI
+  alt: string;
+}
+
+export interface GeneratedTextType {
+  type: 'text';
+  content: string;
+  title?: string;
+}
+
+export interface GeneratedHtmlType {
+  type: 'html';
+  content: string;
+  title?: string;
+}
+
+export interface GeneratedConceptMapDataType {
+  type: 'concept-map-data';
+  title: string;
+  nodes: Array<{
+    id: string;
+    label: string;
+    type: 'principal' | 'concepto' | 'conector';
+    position: { top: number; left: number };
+  }>;
+  connections: Array<{ from: string; to: string }>;
+}
+
+export interface GeneratedMindMapDataType {
+  type: 'mind-map-data';
+  title: string;
+  branches: Array<{
+    id: string;
+    title: string;
+    children: string[];
+    position: { top: string; left: string };
+  }>;
+}
+
+export interface GeneratedFlowchartDataType {
+  type: 'flowchart-data';
+  title: string;
+  nodes: Array<{
+    id: string;
+    label: string;
+    type: 'start-end' | 'process' | 'decision';
+    position: { top: number; left: number };
+  }>;
+  connections: Array<{ from: string; to: string }>;
+}
+
+export interface GeneratedVennDiagramDataType {
+  type: 'venn-diagram-data';
+  title: string;
+  circleA: { label: string; items: string[] };
+  circleB: { label: string; items: string[] };
+  intersection: { label?: string; items: string[] };
+}
+
+export interface GeneratedComparisonTableDataType {
+  type: 'comparison-table-data';
+  title: string;
+  headers: string[];
+  rows: string[][];
+}
+
+export interface GeneratedTimelineDataType {
+  type: 'timeline-data';
+  title: string;
+  events: Array<{
+    date: string;
+    title: string;
+    description: string;
+  }>;
+}
+
+export interface GeneratedJsonType {
+  type: 'json';
+  data: Record<string, any> | Array<Record<string, any>>;
+  title?: string;
+  description?: string;
+}
+
+export type GeneratedContentType =
+  | GeneratedImageType
+  | GeneratedTextType
+  | GeneratedHtmlType
+  | GeneratedConceptMapDataType
+  | GeneratedMindMapDataType
+  | GeneratedFlowchartDataType
+  | GeneratedVennDiagramDataType
+  | GeneratedComparisonTableDataType
+  | GeneratedTimelineDataType
+  | GeneratedJsonType;
+
+export type GenerateVisualContentFlowOutput = GeneratedContentType;

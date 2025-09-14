@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import React from 'react';
@@ -17,7 +18,7 @@ import {
 } from '@/components/ui/sidebar';
 import { AppHeader } from './AppHeader';
 import type { LessonParams } from '@/types';
-import { BookOpen, BookOpenCheck, GraduationCap, Image as ImageIcon } from 'lucide-react';
+import { BookOpen, BookOpenCheck, GraduationCap, Image as ImageIcon, Eye } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ProtectedRoute from '../auth/ProtectedRoute';
 
@@ -43,7 +44,7 @@ export const AppShell: React.FC<AppShellProps> = ({
       <SidebarProvider>
         <Sidebar>
           <SidebarHeader className="p-2">
-             <div className="bg-muted/60 p-4 rounded-lg flex flex-col items-center gap-3 text-center">
+            <div className="bg-muted/60 p-4 rounded-lg flex flex-col items-center gap-3 text-center">
                <Image
                 src="/logo_unicor.png"
                 alt="Logo Universidad de Córdoba"
@@ -77,7 +78,7 @@ export const AppShell: React.FC<AppShellProps> = ({
                 <Link href="/visual" legacyBehavior passHref>
                   <SidebarMenuButton asChild isActive={pathname === '/visual'}>
                     <a>
-                      <ImageIcon />
+                      <Eye />
                       <span>Contenido Visual</span>
                     </a>
                   </SidebarMenuButton>
