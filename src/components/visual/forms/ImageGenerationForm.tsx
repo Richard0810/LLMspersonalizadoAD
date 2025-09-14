@@ -9,12 +9,12 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import type { ImageGenerationParams, VisualFormat } from '@/types';
+import type { ImageGenerationParams } from '@/types';
 import { ART_STYLES, ART_TYPES } from '@/lib/visual-constants';
 
 const formSchema = z.object({
   theme: z.string().optional(),
-  prompt: z.string().min(1, 'El prompt es obligatorio.'),
+  prompt: z.string().min(3, 'El prompt debe tener al menos 3 caracteres.'),
   artStyle: z.string().optional(),
   artType: z.string().optional(),
   artistInspired: z.string().optional(),
@@ -31,7 +31,6 @@ type FormValues = z.infer<typeof formSchema>;
 interface Props {
   onSubmit: (params: ImageGenerationParams) => Promise<void>;
   isLoading: boolean;
-  format: VisualFormat;
   translatedFormatName: string;
 }
 
@@ -231,3 +230,5 @@ export function ImageGenerationForm({ onSubmit, isLoading, translatedFormatName 
     </Form>
   );
 }
+
+    

@@ -227,14 +227,11 @@ const generateVisualContentFlow = ai.defineFlow(
         let finalPrompt = '';
         let outputSchema: z.ZodSchema<any> | undefined = undefined;
         let outputTypeLiteral: GeneratedContentType['type'] | null = null;
-
-        const topicOrConcept = infoParams.topic;
-        const finalPromptParams = { topicOrConcept, level, structuredContent, translatedFormatName };
         
         switch(format) {
             case VisualFormat.CONCEPT_MAP:
                 finalPrompt = `Tu tarea es generar una ESTRUCTURA DE DATOS JSON para un mapa conceptual interactivo, BASADO EN EL RESUMEN PROPORCIONADO.
-El tema principal del mapa es: "${topicOrConcept}".
+El tema principal del mapa es: "${topic}".
 El nivel de complejidad solicitado es: "${level}".
 
 **RESUMEN DEL CONTENIDO (Fuente de la Verdad):**
@@ -260,7 +257,7 @@ A partir de este contenido, DEBES generar un objeto JSON que siga el esquema de 
                 break;
             case VisualFormat.MIND_MAP:
                 finalPrompt = `Tu tarea es generar una ESTRUCTURA DE DATOS JSON para un mapa mental interactivo, BASADO EN EL RESUMEN PROPORCIONADO.
-El tema central del mapa debe ser: "${topicOrConcept}".
+El tema central del mapa debe ser: "${topic}".
 El nivel de complejidad solicitado es: "${level}".
 
 **RESUMEN DEL CONTENIDO (Fuente de la Verdad):**
@@ -285,7 +282,7 @@ A partir de este contenido, DEBES generar un objeto JSON que siga el esquema de 
                 break;
             case VisualFormat.FLOW_CHART:
                 finalPrompt = `Tu tarea es generar una ESTRUCTURA DE DATOS JSON para un diagrama de flujo interactivo, BASADO EN EL RESUMEN PROPORCIONADO.
-El tema principal del diagrama es: "${topicOrConcept}".
+El tema principal del diagrama es: "${topic}".
 El nivel de complejidad solicitado es: "${level}".
 
 **RESUMEN DEL CONTENIDO (Fuente de la Verdad):**
@@ -309,7 +306,7 @@ ${structuredContent}
                 break;
             case VisualFormat.VENN_DIAGRAM:
                  finalPrompt = `Tu tarea es generar una ESTRUCTURA DE DATOS JSON para un diagrama de Venn, BASADO EN EL RESUMEN PROPORCIONADO.
-El tema principal del diagrama es una comparación: "${topicOrConcept}".
+El tema principal del diagrama es una comparación: "${topic}".
 El nivel de complejidad solicitado es: "${level}".
 
 **RESUMEN DEL CONTENIDO (Fuente de la Verdad):**
@@ -331,7 +328,7 @@ ${structuredContent}
                  break;
             case VisualFormat.COMPARISON_TABLE:
                 finalPrompt = `Tu tarea es generar una ESTRUCTURA DE DATOS JSON para una tabla comparativa, BASADO EN EL RESUMEN PROPORCIONADO.
-El tema principal es: "${topicOrConcept}".
+El tema principal es: "${topic}".
 El nivel de complejidad solicitado es: "${level}".
 
 **RESUMEN DEL CONTENIDO (Fuente de la Verdad):**
@@ -352,7 +349,7 @@ ${structuredContent}
                 break;
             case VisualFormat.TIMELINE:
                 finalPrompt = `Tu tarea es generar una ESTRUCTURA DE DATOS JSON para una línea de tiempo, BASADO EN EL RESUMEN PROPORCIONADO.
-El tema principal es: "${topicOrConcept}".
+El tema principal es: "${topic}".
 El nivel de complejidad solicitado es: "${level}".
 
 **RESUMEN DEL CONTENIDO (Fuente de la Verdad):**
@@ -385,27 +382,30 @@ ${structuredContent}
 2.  **Solo Código:** Responde ÚNICAMENTE con el código HTML5. No incluyas explicaciones.
 3.  **Auto-contenido:** Incluye TODOS los estilos CSS en una etiqueta <style> en el <head>.
 4.  **Adaptable:** El diseño debe ser responsive.`;
-                 outputSchema = GeneratedHtmlSchema.omit({ type: true }); // Omit type for plain HTML generation
+                 outputSchema = z.object({
+                    content: z.string(),
+                    title: z.string().optional(),
+                });
                  outputTypeLiteral = 'html';
                  break;
         }
 
-        const prompt = ai.definePrompt(
-            {
-                name: `generate-${format}-prompt`,
-                input: { schema: z.object({ topicOrConcept: z.string(), level: z.string().optional(), structuredContent: z.string(), translatedFormatName: z.string() }) },
-                output: { schema: outputSchema },
-                model: 'googleai/gemini-2.0-flash',
+        const { output } = await ai.generate({
+            model: 'googleai/gemini-2.0-flash',
+            prompt: finalPrompt,
+            output: {
+                schema: outputSchema
             }
-        );
-        
-        const { output } = await prompt(finalPrompt, { prompt, custom: { finalPrompt } });
-
+        });
 
         if (output) {
           if (outputTypeLiteral) {
+            // For JSON outputs, Genkit will parse it automatically if a schema is provided
             // Re-add the 'type' field before returning
-            return { ...output, type: outputTypeLiteral } as GenerateVisualContentFlowOutput;
+             if (format === VisualFormat.INFOGRAPHIC) {
+                return { ...output, type: outputTypeLiteral } as GenerateVisualContentFlowOutput;
+            }
+            return { ...(output as object), type: outputTypeLiteral } as GenerateVisualContentFlowOutput;
           }
           // For cases like HTML where schema is directly the output
           return { type: 'html', ...output } as GenerateVisualContentFlowOutput;
@@ -415,3 +415,5 @@ ${structuredContent}
     throw new Error(`The combination of category '${category}' and format '${format}' is not implemented or failed to produce output.`);
   }
 );
+
+    

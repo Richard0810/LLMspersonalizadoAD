@@ -122,7 +122,6 @@ export default function VisualGeneratorPage() {
           <ImageGenerationForm
             onSubmit={handleSubmit as (params: ImageGenerationParams) => Promise<void>}
             isLoading={isLoading}
-            format={selectedFormat}
             translatedFormatName={translatedFormatName}
           />
         );
@@ -246,3 +245,5 @@ export default function VisualGeneratorPage() {
     </AppShell>
   );
 }
+
+    
