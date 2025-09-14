@@ -59,20 +59,6 @@ export function InfoOrganizationForm({ onSubmit, isLoading, translatedFormatName
         
         <FormField
           control={form.control}
-          name="details"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Detalles y Contexto Adicional</FormLabel>
-              <FormControl>
-                <Textarea placeholder="Ej: Enfocarse en la evaporación, condensación y precipitación. Mencionar el rol del sol." {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
           name="level"
           render={({ field }) => (
             <FormItem>
@@ -87,6 +73,20 @@ export function InfoOrganizationForm({ onSubmit, isLoading, translatedFormatName
                   <SelectItem value="advanced">Avanzado</SelectItem>
                 </SelectContent>
               </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="details"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Detalles y Contexto Adicional (Opcional)</FormLabel>
+              <FormControl>
+                <Textarea placeholder="Ej: Enfocarse en la evaporación, condensación y precipitación. Mencionar el rol del sol." {...field} />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
