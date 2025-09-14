@@ -57,6 +57,14 @@ export default function VisualGeneratorPage() {
     setGeneratedContent(null);
     setError(null);
   };
+  
+  const handleResetSelection = () => {
+    setSelectedCategory(null);
+    setSelectedFormat(null);
+    setGeneratedContent(null);
+    setError(null);
+  };
+
 
   const handleSubmit = useCallback(async (params: any) => {
     if (!selectedFormat || !selectedCategory) {
@@ -140,60 +148,71 @@ export default function VisualGeneratorPage() {
   return (
     <AppShell>
       <div className="container mx-auto py-8">
-        <header className="mb-10 text-center">
-          <Eye className="h-16 w-16 text-primary mx-auto mb-4" />
-          <h1 className="text-4xl sm:text-5xl font-bold text-primary">
-            Generador de Formatos Visuales
-          </h1>
-          <p className="text-muted-foreground mt-2 text-lg">
-            Crea visualizaciones de alto impacto para tus clases.
-          </p>
-        </header>
+        <div className="flex items-center mb-10">
+            {selectedCategory && (
+                <Button onClick={handleResetSelection} variant="outline" className="mr-6">
+                  <ArrowLeft className="mr-2 h-4 w-4" /> Volver
+                </Button>
+            )}
+            <header className={selectedCategory ? "text-left" : "text-center w-full"}>
+              <Eye className="h-16 w-16 text-primary mx-auto mb-4" />
+              <h1 className="text-4xl sm:text-5xl font-bold text-primary">
+                Generador de Formatos Visuales
+              </h1>
+              <p className="text-muted-foreground mt-2 text-lg">
+                Crea visualizaciones de alto impacto para tus clases.
+              </p>
+            </header>
+        </div>
 
-        <Button onClick={() => router.back()} variant="outline" className="mb-6 self-start">
-          <ArrowLeft className="mr-2 h-4 w-4" /> Atrás
-        </Button>
 
-        <Card className="w-full max-w-4xl mx-auto shadow-xl mb-8">
-          <CardHeader>
-            <CardTitle>Configuración de la Visualización</CardTitle>
-            <CardDescription>Elige qué tipo de contenido visual quieres que la IA genere.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <Label htmlFor="category-select">1. Elige una Categoría</Label>
-                <Select value={selectedCategory || ''} onValueChange={handleCategoryChange}>
-                  <SelectTrigger id="category-select" className="w-full mt-1">
-                    <SelectValue placeholder="Selecciona una categoría" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {VISUAL_CATEGORIES_LIST.map(cat => (
-                      <SelectItem key={cat.id} value={cat.id}>{cat.icon} {cat.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {selectedCategory && (
-                <div>
-                  <Label htmlFor="format-select">2. Elige un Formato</Label>
-                  <Select value={selectedFormat || ''} onValueChange={handleFormatChange} disabled={!selectedCategory}>
-                    <SelectTrigger id="format-select" className="w-full mt-1">
-                      <SelectValue placeholder="Selecciona un formato" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {VISUAL_FORMATS_BY_CATEGORY[selectedCategory]?.map(fmt => (
-                        <SelectItem key={fmt.id} value={fmt.id}>{fmt.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
+        {!selectedCategory && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            {VISUAL_CATEGORIES_LIST.map((cat) => (
+                <Card 
+                    key={cat.id} 
+                    onClick={() => handleCategoryChange(cat.id)}
+                    className="cursor-pointer hover:shadow-lg hover:border-primary transition-all"
+                >
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-3 text-xl">
+                        <span className="text-2xl">{cat.icon}</span>
+                        {cat.name}
+                    </CardTitle>
+                </CardHeader>
+                </Card>
+            ))}
             </div>
-            {selectedFormat && <div className="pt-4 border-t">{renderForm()}</div>}
-          </CardContent>
-        </Card>
+        )}
+        
+        {selectedCategory && (
+            <Card className="w-full max-w-4xl mx-auto shadow-xl mb-8">
+                <CardHeader>
+                    <CardTitle>Configuración de la Visualización</CardTitle>
+                    <CardDescription>
+                        {VISUAL_CATEGORIES_LIST.find(c => c.id === selectedCategory)?.name}: Elige un formato para continuar.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <div className="grid grid-cols-1 gap-6">
+                    <div>
+                      <Label htmlFor="format-select">Formato</Label>
+                      <Select value={selectedFormat || ''} onValueChange={handleFormatChange} disabled={!selectedCategory}>
+                        <SelectTrigger id="format-select" className="w-full mt-1">
+                          <SelectValue placeholder="Selecciona un formato" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {VISUAL_FORMATS_BY_CATEGORY[selectedCategory]?.map(fmt => (
+                            <SelectItem key={fmt.id} value={fmt.id}>{fmt.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    </div>
+                    {selectedFormat && <div className="pt-4 border-t">{renderForm()}</div>}
+                </CardContent>
+            </Card>
+        )}
         
         {isLoading && (
           <Card className="w-full max-w-3xl mx-auto shadow-xl mt-8">
