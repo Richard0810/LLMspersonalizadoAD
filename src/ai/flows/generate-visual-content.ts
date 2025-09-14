@@ -14,7 +14,8 @@ import {
   InfoOrgParams,
   ConceptIllustParams,
   VisualCategory,
-  VisualFormat
+  VisualFormat,
+  GeneratedContentType
 } from '@/types';
 
 // Internal Zod schemas for validation within the flow.
@@ -81,10 +82,20 @@ const ConceptMapDataContentSchema = z.object({
     nodes: z.array(z.object({ id: z.string(), label: z.string(), type: z.enum(['principal', 'concepto', 'conector']), position: z.object({ top: z.number(), left: z.number() }) })),
     connections: z.array(z.object({ from: z.string(), to: z.string() })),
 });
+
 const MindMapDataContentSchema = z.object({
     title: z.string(),
-    branches: z.array(z.object({ id: z.string(), title: z.string(), children: z.array(z.string()), position: z.object({ top: z.string(), left: z.string() }) })),
+    branches: z.array(z.object({
+        id: z.string(),
+        title: z.string(),
+        children: z.array(z.string()),
+        position: z.object({
+            top: z.string(),
+            left: z.string()
+        })
+    })),
 });
+
 const FlowchartDataContentSchema = z.object({
     title: z.string(),
     nodes: z.array(z.object({ id: z.string(), label: z.string(), type: z.enum(['start-end', 'process', 'decision']), position: z.object({ top: z.number(), left: z.number() }) })),
@@ -179,10 +190,15 @@ const generateVisualContentFlow = ai.defineFlow(
     }
 
     if (category === VisualCategory.INFO_ORGANIZATION) {
-        const { topic, level, details } = params as InfoOrgParams;
+        const infoParams = params as InfoOrgParams;
+        const { topic, level, details } = infoParams;
         
-        // This is a simplified version. A real implementation would have detailed prompts per format.
-        const structuredContentPrompt = `Genera un resumen DETALLADO y JERÁRQUICO para el tema '${topic}'. Organiza los puntos principales y sub-puntos de forma lógica. El nivel de detalle debe ser ${level}. Detalles adicionales: ${details}`;
+        let lengthInstruction: 'corta' | 'media' | 'larga' = 'media';
+        if (level === 'basic') lengthInstruction = 'corta';
+        if (level === 'advanced') lengthInstruction = 'larga';
+
+        const structuredContentPrompt = `Genera un resumen DETALLADO y JERÁRQUICO para el tema '${topic}'. La longitud debe ser ${lengthInstruction}. Organiza los puntos principales y sub-puntos de forma lógica. Este resumen será la base para construir un diagrama visual. Detalles adicionales: ${details}`;
+        
         const { text: structuredContent } = await ai.generate({ prompt: structuredContentPrompt });
         if(!structuredContent) throw new Error("Could not generate base content.");
 
@@ -197,7 +213,28 @@ const generateVisualContentFlow = ai.defineFlow(
                 outputTypeLiteral = 'concept-map-data';
                 break;
             case VisualFormat.MIND_MAP:
-                finalPrompt = `Basado en el siguiente texto, crea una estructura JSON para un mapa mental. El JSON debe tener 'title' y 'branches' (con id, title, children, position).\n\nTexto: ${structuredContent}`;
+                finalPrompt = `Tu tarea es generar una ESTRUCTURA DE DATOS JSON para un mapa mental interactivo, BASADO EN EL RESUMEN PROPORCIONADO.
+El tema central del mapa debe ser: "${topic}".
+El nivel de complejidad solicitado es: "${level}".
+
+**RESUMEN DEL CONTENIDO (Fuente de la Verdad):**
+---
+${structuredContent}
+---
+
+A partir de este contenido, DEBES generar un objeto JSON que siga el esquema de salida.
+
+**Reglas de Generación por Nivel (MUY IMPORTANTE):**
+- **Si el nivel es 'basic':** Genera 3-4 ramas principales, cada una con 1-2 puntos secundarios.
+- **Si el nivel es 'intermediate':** Genera 4-5 ramas principales, cada una con 2-3 puntos secundarios.
+- **Si el nivel es 'advanced':** Genera 5-6 ramas principales, cada una con 3-4 puntos secundarios o más detallados.
+
+**Reglas de Estructura JSON (MUY IMPORTANTE):**
+1.  **Contenido:** El campo "title" de cada rama y los strings en "children" DEBEN derivarse del "RESUMEN DEL CONTENIDO". No inventes información.
+2.  **IDs Únicos:** A cada rama asígnale un "id" único y descriptivo (ej: "rama-beneficios").
+3.  **Posiciones CSS:** Para CADA rama, genera una posición inicial ("top", "left") en porcentajes (ej: '20%'). Las posiciones deben estar distribuidas lógicamente alrededor de un nodo central. NO las coloques todas en el mismo sitio.
+4.  **Idioma:** Todo el texto DEBE estar en ESPAÑOL.
+5.  **Salida Final:** La respuesta debe ser ÚNICAMENTE el objeto JSON válido. No incluyas explicaciones, comentarios o markdown.`;
                 outputSchema = MindMapDataContentSchema;
                 outputTypeLiteral = 'mind-map-data';
                 break;
@@ -236,7 +273,7 @@ const generateVisualContentFlow = ai.defineFlow(
         if (output) {
           if (outputTypeLiteral) {
             // Re-add the 'type' field before returning
-            return { ...output, type: outputTypeLiteral };
+            return { ...output, type: outputTypeLiteral } as GenerateVisualContentFlowOutput;
           }
           return output as GenerateVisualContentFlowOutput;
         }

@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useRef, useEffect, useCallback, forwardRef } from 'react';
+import React, { useRef, useEffect, useCallback, forwardRef, useState } from 'react';
 import { VisualFormat } from '@/types';
 import type { GeneratedContentType, GeneratedImageType, GeneratedHtmlType, GeneratedJsonType, GeneratedConceptMapDataType, GeneratedMindMapDataType, GeneratedFlowchartDataType, GeneratedVennDiagramDataType, GeneratedComparisonTableDataType, GeneratedTimelineDataType } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -166,7 +166,7 @@ const RenderMindMap = forwardRef<HTMLDivElement, { data: GeneratedMindMapDataTyp
         if (!canvas || !ctx || !mapContainer) return;
         
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.strokeStyle = '#333';
+        ctx.strokeStyle = '#94a3b8'; // slate-400
         ctx.lineWidth = 2;
         
         const centralNode = nodeRefs.current['central'];
@@ -275,15 +275,15 @@ const RenderMindMap = forwardRef<HTMLDivElement, { data: GeneratedMindMapDataTyp
     return (
         <div 
             ref={ref}
-            className="relative border rounded bg-white shadow overflow-hidden text-center"
+            className="relative border rounded bg-slate-50 shadow-inner overflow-hidden text-center"
             style={{ width: '100%', height: '800px', maxWidth: '1200px', margin: 'auto' }}
         >
             <canvas ref={canvasRef} className="absolute top-0 left-0 pointer-events-none z-[1]"></canvas>
             <div 
                 id="central" 
                 ref={el => nodeRefs.current['central'] = el}
-                className="node-draggable absolute bg-blue-600 text-white p-5 rounded-lg shadow-lg cursor-move z-[10] text-xl font-bold"
-                style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}
+                className="node-draggable absolute bg-primary text-primary-foreground p-4 rounded-xl shadow-lg cursor-move z-[10] text-lg font-bold flex items-center justify-center"
+                style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)', minWidth: '150px', minHeight: '60px' }}
             >
                 {data.title}
             </div>
@@ -292,12 +292,17 @@ const RenderMindMap = forwardRef<HTMLDivElement, { data: GeneratedMindMapDataTyp
                     key={branch.id}
                     id={branch.id}
                     ref={el => nodeRefs.current[branch.id] = el}
-                    className="node-draggable absolute bg-yellow-400 text-black p-3 rounded-lg shadow-md cursor-move z-[10] w-40 text-center"
+                    className="node-draggable absolute bg-card text-card-foreground p-3 rounded-lg shadow-md cursor-move z-[10] w-48 text-left border border-border"
                     style={{ top: branch.position.top, left: branch.position.left }}
                 >
-                    <strong className="text-base">{branch.title}</strong>
-                    <ul className="list-none p-0 mt-2 text-sm text-left">
-                        {branch.children.map((child, i) => <li key={i} className="mt-1"> • {child}</li>)}
+                    <strong className="text-base text-accent font-semibold">{branch.title}</strong>
+                    <ul className="list-none p-0 mt-2 text-sm text-muted-foreground space-y-1">
+                        {branch.children.map((child, i) => (
+                           <li key={i} className="flex items-start">
+                             <span className="text-primary mr-2 mt-1">&#8226;</span>
+                             <span>{child}</span>
+                           </li>
+                        ))}
                     </ul>
                 </div>
             ))}
@@ -723,3 +728,5 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ content, format }) => {
 };
 
 export default OutputDisplay;
+
+    
