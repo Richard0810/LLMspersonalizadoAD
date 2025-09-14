@@ -144,6 +144,7 @@ export async function generateVisualContent(input: GenerateVisualContentFlowInpu
 
 function buildImagePrompt(params: ImageGenerationParams): string {
     let fullPrompt = params.prompt;
+
     if (params.artStyle && params.artStyle !== "Ninguno") fullPrompt += `, en el estilo de ${params.artStyle}`;
     if (params.artType && params.artType !== "Ninguno") fullPrompt += `, como un/a ${params.artType}`;
     if (params.artistInspired) fullPrompt += `, inspirado por ${params.artistInspired}`;
@@ -414,5 +415,3 @@ ${structuredContent}
     throw new Error(`The combination of category '${category}' and format '${format}' is not implemented or failed to produce output.`);
   }
 );
-
-    
