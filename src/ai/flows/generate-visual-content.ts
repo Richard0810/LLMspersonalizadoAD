@@ -186,6 +186,9 @@ const generateVisualContentFlow = ai.defineFlow(
         const { media } = await ai.generate({
             model: 'googleai/gemini-2.0-flash-exp',
             prompt: fullPrompt,
+            config: {
+                responseModalities: ['IMAGE'],
+            },
         });
         
         if (!media) throw new Error("Image generation failed to return media.");
