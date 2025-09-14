@@ -10,7 +10,6 @@ import { Download, Maximize } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Calendar } from 'lucide-react';
-import html2pdf from 'html2pdf.js';
 
 
 interface OutputDisplayProps {
@@ -606,10 +605,12 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ content, format }) => {
   };
 
   const handleHtmlDownloadAsPdf = (htmlContent: GeneratedHtmlType) => {
+    // Dynamic import for client-side library
+    const html2pdf = require('html2pdf.js');
+
     const element = document.createElement('div');
     element.innerHTML = htmlContent.content;
 
-    // Opciones para html2pdf
     const opt = {
       margin:       0.5,
       filename:     `${htmlContent.title || 'infografia'}.pdf`,
@@ -618,7 +619,6 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ content, format }) => {
       jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
 
-    // Generar el PDF
     html2pdf().from(element).set(opt).save();
 
     toast({
