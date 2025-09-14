@@ -184,13 +184,14 @@ const generateVisualContentFlow = ai.defineFlow(
 
         const fullPrompt = buildImagePrompt(imgParams);
         const { media } = await ai.generate({
-            model: 'googleai/gemini-pro-vision',
+            model: 'googleai/gemini-2.0-flash-exp',
             prompt: fullPrompt,
         });
         
         if (!media) throw new Error("Image generation failed to return media.");
 
         const { text: altText } = await ai.generate({
+            model: 'gemini',
             prompt: `Genera un texto alternativo (alt text) corto y descriptivo en español para esta imagen. El prompt original era: "${fullPrompt}".`,
             input: { media: { url: media.url } },
         });
@@ -217,7 +218,7 @@ const generateVisualContentFlow = ai.defineFlow(
         // STEP 1: Generate structured content ("Source of Truth")
         const structuredContentPrompt = `Genera un resumen DETALLADO y JERÁRQUICO para el tema '${topic}'. La longitud debe ser ${lengthInstruction}. Organiza los puntos principales y sub-puntos de forma lógica. Este resumen será la base para construir un diagrama visual. Detalles adicionales: ${details}`;
         
-        const { text: structuredContent } = await ai.generate({ prompt: structuredContentPrompt });
+        const { text: structuredContent } = await ai.generate({ model: 'gemini', prompt: structuredContentPrompt });
         if(!structuredContent) throw new Error("Could not generate base content for the diagram.");
 
         // STEP 2: Use the structured content to generate the final JSON/HTML
@@ -393,6 +394,7 @@ Usa el siguiente CONTENIDO ESTRUCTURADO como la base fundamental.
                 input: { schema: z.object({ topicOrConcept: z.string(), level: z.string().optional(), structuredContent: z.string(), translatedFormatName: z.string() }) },
                 output: { schema: outputSchema },
                 prompt: finalPrompt,
+                model: 'gemini',
             }
         );
         
