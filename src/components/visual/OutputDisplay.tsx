@@ -594,7 +594,7 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ content, format }) => {
     link.href = imageContent.url; 
     let filename = "imagen_generada_eduspark";
     if (imageContent.alt) {
-      const sanitizedAlt = imageContent.alt.substring(0, 40).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^\w\s.-]/g, "").trim().replace(/\s+/g, "_");
+      const sanitizedAlt = imageContent.alt.substring(0, 100).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^\w\s.-]/g, "").trim().replace(/\s+/g, "_");
       if (sanitizedAlt) filename = sanitizedAlt;
     }
     link.download = `${filename}.png`; 
@@ -604,28 +604,67 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ content, format }) => {
   };
 
   const handleHtmlDownloadAsPdf = (htmlContent: GeneratedHtmlType) => {
+    // 1. Create an invisible iframe
     const iframe = document.createElement('iframe');
     iframe.style.position = 'absolute';
-    iframe.style.left = '-9999px';
-    document.body.appendChild(iframe);
+    iframe.style.left = '-9999px'; // Position it off-screen
+    iframe.style.top = '-9999px';
+    iframe.style.width = '1px';
+    iframe.style.height = '1px';
+    iframe.style.border = '0';
 
-    iframe.onload = () => {
-        const iframeDoc = iframe.contentWindow?.document;
-        if (iframeDoc) {
-            iframeDoc.open();
-            iframeDoc.write(htmlContent.content);
-            iframeDoc.close();
-            iframe.contentWindow?.print();
-        }
-        document.body.removeChild(iframe);
+    // Add the iframe to the document body
+    document.body.appendChild(iframe);
+    
+    // Function to clean up and remove the iframe
+    const cleanupIframe = () => { 
+      if (iframe.parentNode === document.body) {
+        document.body.removeChild(iframe); 
+      }
     };
+
+    // 2. Wait for the iframe to load
+    iframe.onload = () => {
+      try {
+        // 3. Open the browser's print dialog
+        if (iframe.contentWindow) {
+          iframe.contentWindow.focus(); // Focus the iframe
+          iframe.contentWindow.print(); // This is the magic!
+        } else { 
+          console.error("Iframe contentWindow not available."); 
+        }
+      } catch (e) { 
+        console.error("Error during print:", e);
+      } finally { 
+        // 4. Clean up the iframe after a second
+        setTimeout(cleanupIframe, 1000); 
+      } 
+    };
+
+    // Handle errors if the iframe fails to load
+    iframe.onerror = (e) => { 
+      console.error("Error loading iframe:", e); 
+      cleanupIframe(); 
+    };
+    
+    // 5. Write the infographic HTML into the iframe
+    const doc = iframe.contentDocument || iframe.contentWindow?.document;
+    if (doc) {
+      doc.open();
+      doc.write(htmlContent.content); // Inject the AI-generated HTML here
+      doc.close();
+    } else { 
+      console.error("Could not get iframe doc."); 
+      cleanupIframe(); 
+    }
   };
+
 
   const handleFullscreen = () => {
     const elementToFullscreen = displayContainerRef.current;
     if (elementToFullscreen && 'requestFullscreen' in elementToFullscreen) {
         (elementToFullscreen as HTMLElement).requestFullscreen().catch(err => {
-        console.error(`Error al intentar activar el modo de pantalla completa: ${err.message} (${err.name})`);
+        console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
         toast({
           title: "Error de Pantalla Completa",
           description: "No se pudo activar la pantalla completa. Es posible que tu navegador no lo soporte.",
@@ -708,12 +747,12 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ content, format }) => {
       {renderContent()}
       <div className="flex justify-center items-center gap-4 mt-4">
         {content.type === 'image' && (
-             <Button onClick={() => handleImageDownload(content)} variant="outline">
+             <Button onClick={() => handleImageDownload(content as GeneratedImageType)} variant="outline">
               <Download className="mr-2 h-4 w-4" /> Descargar Imagen
             </Button>
         )}
         {content.type === 'html' && (
-             <Button onClick={() => handleHtmlDownloadAsPdf(content)} variant="outline">
+             <Button onClick={() => handleHtmlDownloadAsPdf(content as GeneratedHtmlType)} variant="outline">
               <Download className="mr-2 h-4 w-4" /> Descargar como PDF
             </Button>
         )}

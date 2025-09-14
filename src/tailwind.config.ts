@@ -73,6 +73,8 @@ export default {
           border: 'hsl(var(--sidebar-border))',
           ring: 'hsl(var(--sidebar-ring))',
         },
+        'emerald-50': '#ecfdf5', // Added for gradient
+        'cyan-50': '#ecfeff', // Added for gradient
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -130,3 +132,5 @@ export default {
   },
   plugins: [require('tailwindcss-animate')],
 } satisfies Config;
+
+    
