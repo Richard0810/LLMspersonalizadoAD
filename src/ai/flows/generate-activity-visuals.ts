@@ -21,12 +21,14 @@ const GenerateActivityVisualsOutputSchema = z.object({
   materials: z.array(VisualItemSchema).describe('Visual aids for the necessary materials.'),
   instructions: z.array(VisualItemSchema).describe('Visual aids for the step-by-step instructions.'),
   reflection: z.array(VisualItemSchema).describe('Visual aids for the reflection questions.'),
+  visualExamples: z.array(VisualItemSchema).describe('Visual aids for the suggested visual examples.'),
 });
 
 const GenerateActivityVisualsInputSchema = z.object({
   materials: z.string(),
   instructions: z.string(),
   reflection: z.string(),
+  visualExamples: z.string(),
 });
 
 // This internal schema is what the AI will be prompted to produce.
@@ -40,6 +42,7 @@ const InternalOutputSchema = z.object({
   materials: z.array(InternalVisualItemSchema),
   instructions: z.array(InternalVisualItemSchema),
   reflection: z.array(InternalVisualItemSchema),
+  visualExamples: z.array(InternalVisualItemSchema),
 });
 
 
@@ -55,9 +58,9 @@ const analysisPrompt = ai.definePrompt({
     output: { schema: InternalOutputSchema },
     prompt: `You are an expert instructional designer and art director. Your task is to analyze an educational activity and decide which parts would benefit most from a visual aid.
 
-You will receive three sections of an activity: materials, instructions, and reflection.
+You will receive four sections of an activity: materials, instructions, reflection, and visualExamples.
 For EACH item in EACH section, you must make a decision:
-1.  Is an image useful here? Images should only be for concrete, visualizable objects or actions. Do not generate images for abstract concepts or simple instructions like "ask the students".
+1.  Is an image useful here? Images should only be for concrete, visualizable objects or actions. Do not generate images for abstract concepts or simple instructions like "ask the students". For the 'visualExamples' section, always try to generate an image.
 2.  If yes, create a SIMPLE, CLEAR, and CONCISE prompt for an image generation model. The prompt should describe a clean, minimalistic, educational-style illustration. Think of simple icons or drawings a teacher would make on a whiteboard.
 3.  If no image is needed, the 'imagePrompt' field MUST be null.
 
@@ -72,6 +75,9 @@ Analyze the following activity content:
 ---
 **Reflection:**
 {{{reflection}}}
+---
+**Suggested Visuals:**
+{{{visualExamples}}}
 ---
 
 Based on your analysis, provide the output in the required JSON format. For each line item in the original text, create a corresponding JSON object with the original text and either an 'imagePrompt' or null.
@@ -119,13 +125,14 @@ const generateActivityVisualsFlow = ai.defineFlow(
       );
     };
 
-    const [materials, instructions, reflection] = await Promise.all([
+    const [materials, instructions, reflection, visualExamples] = await Promise.all([
       processSection(analysis.materials),
       processSection(analysis.instructions),
       processSection(analysis.reflection),
+      processSection(analysis.visualExamples),
     ]);
     
     // Step 3: Return the final structured object with image URLs.
-    return { materials, instructions, reflection };
+    return { materials, instructions, reflection, visualExamples };
   }
 );

@@ -187,6 +187,7 @@ export default function ActivityDetailPage() {
         materials: activity.materials,
         instructions: activity.stepByStepDevelopment,
         reflection: activity.reflectionQuestion,
+        visualExamples: activity.visualExamples,
       });
       
       setGeneratedContent(visualResult);
@@ -367,6 +368,7 @@ export default function ActivityDetailPage() {
               title="Ejemplos Visuales Sugeridos"
               icon={<Eye className="h-6 w-6" />}
               content={activity.visualExamples}
+              generatedContent={generatedContent?.visualExamples}
             />
             <SectionContent
               title="Reflexión y Conexión"

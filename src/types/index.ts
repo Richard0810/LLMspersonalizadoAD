@@ -78,12 +78,14 @@ export interface GeneratedActivityVisuals {
   materials: VisualItem[];
   instructions: VisualItem[];
   reflection: VisualItem[];
+  visualExamples: VisualItem[];
 }
 
 export interface GenerateActivityVisualsInput {
   materials: string;
   instructions: string;
   reflection: string;
+  visualExamples: string;
 }
 
 
