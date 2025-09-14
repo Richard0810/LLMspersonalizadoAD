@@ -75,46 +75,44 @@ const GeneratedHtmlSchema = z.object({
     title: z.string().optional(),
 });
 
-const GeneratedConceptMapDataSchema = z.object({
-    type: z.literal('concept-map-data'),
+// Schemas for AI output (without the 'type' literal)
+const ConceptMapDataContentSchema = z.object({
     title: z.string(),
     nodes: z.array(z.object({ id: z.string(), label: z.string(), type: z.enum(['principal', 'concepto', 'conector']), position: z.object({ top: z.number(), left: z.number() }) })),
     connections: z.array(z.object({ from: z.string(), to: z.string() })),
 });
-
-const GeneratedMindMapDataSchema = z.object({
-    type: z.literal('mind-map-data'),
+const MindMapDataContentSchema = z.object({
     title: z.string(),
     branches: z.array(z.object({ id: z.string(), title: z.string(), children: z.array(z.string()), position: z.object({ top: z.string(), left: z.string() }) })),
 });
-
-const GeneratedFlowchartDataSchema = z.object({
-    type: z.literal('flowchart-data'),
+const FlowchartDataContentSchema = z.object({
     title: z.string(),
     nodes: z.array(z.object({ id: z.string(), label: z.string(), type: z.enum(['start-end', 'process', 'decision']), position: z.object({ top: z.number(), left: z.number() }) })),
     connections: z.array(z.object({ from: z.string(), to: z.string() })),
 });
-
-const GeneratedVennDiagramDataSchema = z.object({
-    type: z.literal('venn-diagram-data'),
+const VennDiagramDataContentSchema = z.object({
     title: z.string(),
     circleA: z.object({ label: z.string(), items: z.array(z.string()) }),
     circleB: z.object({ label: z.string(), items: z.array(z.string()) }),
     intersection: z.object({ label: z.string().optional(), items: z.array(z.string()) }),
 });
-
-const GeneratedComparisonTableDataSchema = z.object({
-    type: z.literal('comparison-table-data'),
+const ComparisonTableDataContentSchema = z.object({
     title: z.string(),
     headers: z.array(z.string()),
     rows: z.array(z.array(z.string())),
 });
-
-const GeneratedTimelineDataSchema = z.object({
-    type: z.literal('timeline-data'),
+const TimelineDataContentSchema = z.object({
     title: z.string(),
     events: z.array(z.object({ date: z.string(), title: z.string(), description: z.string() })),
 });
+
+// Full schemas for final output (with the 'type' literal)
+const GeneratedConceptMapDataSchema = ConceptMapDataContentSchema.extend({ type: z.literal('concept-map-data') });
+const GeneratedMindMapDataSchema = MindMapDataContentSchema.extend({ type: z.literal('mind-map-data') });
+const GeneratedFlowchartDataSchema = FlowchartDataContentSchema.extend({ type: z.literal('flowchart-data') });
+const GeneratedVennDiagramDataSchema = VennDiagramDataContentSchema.extend({ type: z.literal('venn-diagram-data') });
+const GeneratedComparisonTableDataSchema = ComparisonTableDataContentSchema.extend({ type: z.literal('comparison-table-data') });
+const GeneratedTimelineDataSchema = TimelineDataContentSchema.extend({ type: z.literal('timeline-data') });
 
 
 const FlowOutputSchema = z.discriminatedUnion("type", [
@@ -126,7 +124,6 @@ const FlowOutputSchema = z.discriminatedUnion("type", [
   GeneratedVennDiagramDataSchema,
   GeneratedComparisonTableDataSchema,
   GeneratedTimelineDataSchema,
-  // Add other schemas here as they are defined
 ]);
 
 export async function generateVisualContent(input: GenerateVisualContentFlowInput): Promise<GenerateVisualContentFlowOutput> {
@@ -166,6 +163,7 @@ const generateVisualContentFlow = ai.defineFlow(
             model: 'googleai/gemini-2.0-flash-exp',
             prompt: fullPrompt,
             config: {
+                // @ts-ignore
                 responseModalities: ['TEXT', 'IMAGE'],
             }
         });
@@ -189,36 +187,44 @@ const generateVisualContentFlow = ai.defineFlow(
         if(!structuredContent) throw new Error("Could not generate base content.");
 
         let finalPrompt = '';
-        let outputSchema;
+        let outputSchema: z.ZodSchema<any>;
+        let outputTypeLiteral: GeneratedContentType['type'] | null = null;
 
         switch(format) {
             case VisualFormat.CONCEPT_MAP:
                 finalPrompt = `Basado en el siguiente texto, crea una estructura JSON para un mapa conceptual. El JSON debe tener 'title', 'nodes' (con id, label, type, position) y 'connections' (con from, to).\n\nTexto: ${structuredContent}`;
-                outputSchema = GeneratedConceptMapDataSchema;
+                outputSchema = ConceptMapDataContentSchema;
+                outputTypeLiteral = 'concept-map-data';
                 break;
             case VisualFormat.MIND_MAP:
                 finalPrompt = `Basado en el siguiente texto, crea una estructura JSON para un mapa mental. El JSON debe tener 'title' y 'branches' (con id, title, children, position).\n\nTexto: ${structuredContent}`;
-                outputSchema = GeneratedMindMapDataSchema;
+                outputSchema = MindMapDataContentSchema;
+                outputTypeLiteral = 'mind-map-data';
                 break;
             case VisualFormat.FLOW_CHART:
                 finalPrompt = `Basado en el siguiente texto, crea una estructura JSON para un diagrama de flujo. El JSON debe tener 'title', 'nodes' (con id, label, type, position) y 'connections' (con from, to).\n\nTexto: ${structuredContent}`;
-                outputSchema = GeneratedFlowchartDataSchema;
+                outputSchema = FlowchartDataContentSchema;
+                outputTypeLiteral = 'flowchart-data';
                 break;
             case VisualFormat.VENN_DIAGRAM:
                  finalPrompt = `Basado en el siguiente texto, crea una estructura JSON para un diagrama de Venn. El JSON debe tener 'title', 'circleA' (label, items), 'circleB' (label, items) y 'intersection' (items).\n\nTexto: ${structuredContent}`;
-                 outputSchema = GeneratedVennDiagramDataSchema;
+                 outputSchema = VennDiagramDataContentSchema;
+                 outputTypeLiteral = 'venn-diagram-data';
                  break;
             case VisualFormat.COMPARISON_TABLE:
                 finalPrompt = `Basado en el siguiente texto, crea una estructura JSON para una tabla comparativa. El JSON debe tener 'title', 'headers' (array de strings) y 'rows' (array de arrays de strings).\n\nTexto: ${structuredContent}`;
-                outputSchema = GeneratedComparisonTableDataSchema;
+                outputSchema = ComparisonTableDataContentSchema;
+                outputTypeLiteral = 'comparison-table-data';
                 break;
             case VisualFormat.TIMELINE:
                 finalPrompt = `Basado en el siguiente texto, crea una estructura JSON para una línea de tiempo. El JSON debe tener 'title' y un array de 'events' (con date, title, description).\n\nTexto: ${structuredContent}`;
-                outputSchema = GeneratedTimelineDataSchema;
+                outputSchema = TimelineDataContentSchema;
+                outputTypeLiteral = 'timeline-data';
                 break;
             default: // Infographic, etc.
                  finalPrompt = `Crea un código HTML5 auto-contenido y con estilos para una infografía sobre el tema '${topic}', basado en el siguiente texto. El HTML debe ser atractivo visualmente.\n\nTexto: ${structuredContent}`;
-                 outputSchema = GeneratedHtmlSchema;
+                 outputSchema = GeneratedHtmlSchema.omit({ type: true }); // Omit type for HTML generation too
+                 outputTypeLiteral = 'html';
                  break;
         }
 
@@ -228,6 +234,10 @@ const generateVisualContentFlow = ai.defineFlow(
         });
 
         if (output) {
+          if (outputTypeLiteral) {
+            // Re-add the 'type' field before returning
+            return { ...output, type: outputTypeLiteral };
+          }
           return output as GenerateVisualContentFlowOutput;
         }
     }
@@ -235,3 +245,5 @@ const generateVisualContentFlow = ai.defineFlow(
     throw new Error(`The combination of category '${category}' and format '${format}' is not implemented.`);
   }
 );
+
+    
