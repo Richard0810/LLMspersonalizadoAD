@@ -195,7 +195,6 @@ const generateVisualContentFlow = ai.defineFlow(
         
         if (!media || !media.url) throw new Error("Image generation failed to return media.");
 
-        // Use the original prompt as alt text, ensuring it's not cut off
         const altText = imgParams.prompt;
 
         return {
@@ -444,3 +443,5 @@ Genera el código HTML completo y profesional AHORA.`;
     throw new Error(`The combination of category '${category}' and format '${format}' is not implemented or failed to produce output.`);
   }
 );
+
+    
