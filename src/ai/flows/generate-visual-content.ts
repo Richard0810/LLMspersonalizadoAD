@@ -183,6 +183,7 @@ const generateVisualContentFlow = ai.defineFlow(
         }
 
         const fullPrompt = buildImagePrompt(imgParams);
+        
         const { media } = await ai.generate({
             model: 'googleai/gemini-2.0-flash-exp',
             prompt: fullPrompt,
@@ -191,7 +192,7 @@ const generateVisualContentFlow = ai.defineFlow(
             },
         });
         
-        if (!media) throw new Error("Image generation failed to return media.");
+        if (!media || !media.url) throw new Error("Image generation failed to return media.");
 
         const { text: altText } = await ai.generate({
             model: 'gemini',
@@ -199,14 +200,11 @@ const generateVisualContentFlow = ai.defineFlow(
             input: { media: { url: media.url } },
         });
 
-        if (media?.url) {
-            return {
-                type: 'image',
-                url: media.url,
-                alt: altText || imgParams.prompt.substring(0, 100),
-            };
-        }
-        throw new Error("Image generation failed.");
+        return {
+            type: 'image',
+            url: media.url,
+            alt: altText || imgParams.prompt.substring(0, 100),
+        };
     }
 
     // Handle multi-step information organization category
@@ -326,7 +324,7 @@ El nivel de complejidad solicitado es: "{{level}}".
 **Reglas de Estructura JSON (MUY IMPORTANTE):**
 1.  **Contenido:** Todos los elementos en los arrays "items" DEBEN derivarse del resumen.
 2.  **Etiquetas Claras:** Asigna una etiqueta clara a "circleA" y "circleB".
-3.  **Salida Final:** La respuesta debe ser ÚNICamente el objeto JSON válido.`;
+3.  **Salida Final:** La respuesta debe ser ÚNICAMENTE el objeto JSON válido.`;
                  outputSchema = VennDiagramDataContentSchema;
                  outputTypeLiteral = 'venn-diagram-data';
                  break;
@@ -416,5 +414,3 @@ Usa el siguiente CONTENIDO ESTRUCTURADO como la base fundamental.
     throw new Error(`The combination of category '${category}' and format '${format}' is not implemented or failed to produce output.`);
   }
 );
-
-    
