@@ -147,46 +147,49 @@ export default function VisualGeneratorPage() {
 
   return (
     <AppShell>
-      <div className="container mx-auto py-8">
+      <div className="container mx-auto py-8 animate-fade-in">
         <div className="flex items-center mb-10">
             {selectedCategory && (
                 <Button onClick={handleResetSelection} variant="outline" className="mr-6">
-                  <ArrowLeft className="mr-2 h-4 w-4" /> Volver
+                  <ArrowLeft className="mr-2 h-4 w-4" /> Volver a Categorías
                 </Button>
             )}
             <header className={selectedCategory ? "text-left" : "text-center w-full"}>
-              <Eye className="h-16 w-16 text-primary mx-auto mb-4" />
-              <h1 className="text-4xl sm:text-5xl font-bold text-primary">
+              <div className="inline-block mx-auto p-3 bg-primary/10 rounded-full mb-4">
+                  <Eye className="h-10 w-10 text-primary" />
+              </div>
+              <h1 className="text-4xl sm:text-5xl font-bold text-primary font-headline animate-background-shine bg-[length:200%_auto] bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
                 Generador de Formatos Visuales
               </h1>
-              <p className="text-muted-foreground mt-2 text-lg">
-                Crea visualizaciones de alto impacto para tus clases.
+              <p className="text-muted-foreground mt-2 text-lg max-w-2xl mx-auto">
+                {selectedCategory ? `Estás creando en la categoría: ${VISUAL_CATEGORIES_LIST.find(c=>c.id === selectedCategory)?.name}` : 'Elige una categoría para empezar a crear visualizaciones de alto impacto para tus clases.'}
               </p>
             </header>
         </div>
 
 
         {!selectedCategory && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto animate-slide-up" style={{animationDelay: '200ms'}}>
             {VISUAL_CATEGORIES_LIST.map((cat) => (
                 <Card 
                     key={cat.id} 
                     onClick={() => handleCategoryChange(cat.id)}
-                    className="cursor-pointer hover:shadow-lg hover:border-primary transition-all"
+                    className="cursor-pointer hover:shadow-2xl hover:border-primary transition-all duration-300 transform hover:-translate-y-2 flex flex-col text-center items-center"
                 >
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-3 text-xl">
-                        <span className="text-2xl">{cat.icon}</span>
-                        {cat.name}
-                    </CardTitle>
-                </CardHeader>
+                  <CardHeader className="items-center">
+                      <div className="p-4 bg-primary/10 rounded-full text-4xl mb-3">{cat.icon}</div>
+                      <CardTitle className="text-xl font-headline">{cat.name}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                      <CardDescription>{ALL_VISUAL_FORMATS_LIST.find(f=>f.category === cat.id)?.description}</CardDescription>
+                  </CardContent>
                 </Card>
             ))}
             </div>
         )}
         
         {selectedCategory && (
-            <Card className="w-full max-w-4xl mx-auto shadow-xl mb-8">
+            <Card className="w-full max-w-4xl mx-auto shadow-xl mb-8 animate-fade-in">
                 <CardHeader>
                     <CardTitle>Configuración de la Visualización</CardTitle>
                     <CardDescription>
@@ -215,7 +218,7 @@ export default function VisualGeneratorPage() {
         )}
         
         {isLoading && (
-          <Card className="w-full max-w-3xl mx-auto shadow-xl mt-8">
+          <Card className="w-full max-w-3xl mx-auto shadow-xl mt-8 animate-fade-in">
             <CardContent className="pt-6 text-center">
               <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
               <p className="text-lg text-muted-foreground">Generando contenido. Esto puede tardar un momento...</p>
@@ -224,7 +227,7 @@ export default function VisualGeneratorPage() {
         )}
 
         {error && (
-          <Alert variant="destructive" className="mt-8 max-w-3xl mx-auto">
+          <Alert variant="destructive" className="mt-8 max-w-3xl mx-auto animate-fade-in">
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Error de Generación</AlertTitle>
             <AlertDescription>{error}</AlertDescription>
@@ -232,7 +235,7 @@ export default function VisualGeneratorPage() {
         )}
 
         {generatedContent && !isLoading && selectedFormat && (
-          <Card className="w-full max-w-3xl mx-auto shadow-xl mt-10">
+          <Card className="w-full max-w-3xl mx-auto shadow-xl mt-10 animate-fade-in">
             <CardHeader><CardTitle className="text-2xl">Resultado Generado</CardTitle></CardHeader>
             <CardContent>
               <OutputDisplay content={generatedContent} format={selectedFormat} />
