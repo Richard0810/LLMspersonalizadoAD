@@ -208,7 +208,30 @@ const generateVisualContentFlow = ai.defineFlow(
 
         switch(format) {
             case VisualFormat.CONCEPT_MAP:
-                finalPrompt = `Basado en el siguiente texto, crea una estructura JSON para un mapa conceptual. El JSON debe tener 'title', 'nodes' (con id, label, type, position) y 'connections' (con from, to).\n\nTexto: ${structuredContent}`;
+                finalPrompt = `Tu tarea es generar una ESTRUCTURA DE DATOS JSON para un mapa conceptual interactivo, BASADO EN EL RESUMEN PROPORCIONADO.
+El tema principal del mapa es: "${topic}".
+El nivel de complejidad solicitado es: "${level}".
+
+**RESUMEN DEL CONTENIDO (Fuente de la Verdad):**
+---
+${structuredContent}
+---
+
+A partir de este contenido, DEBES generar un objeto JSON que siga el esquema de salida.
+
+**Reglas de Generación por Nivel (MUY IMPORTANTE):**
+- **Si el nivel es 'basic':** Genera una estructura de datos simple con 5-7 nodos en total (1 principal, 2-3 conceptos, 2-3 conectores).
+- **Si el nivel es 'intermediate':** Genera una estructura más detallada con 8-12 nodos, incluyendo algunas ramas secundarias.
+- **Si el nivel es 'advanced':** Genera una estructura compleja con más de 12 nodos, múltiples niveles de jerarquía y, si es relevante, relaciones cruzadas.
+
+**Reglas de Estructura JSON (MUY IMPORTANTE):**
+1.  **Contenido:** El campo "label" de cada nodo DEBE derivarse del "RESUMEN DEL CONTENIDO". No inventes información.
+2.  **IDs Únicos:** A cada nodo asígnale un "id" único y descriptivo (ej: "nodo-fotosintesis"). NO USES IDs genéricos como "nodo-1".
+3.  **Posiciones CSS:** Para CADA nodo, genera una posición inicial ("top", "left") en píxeles en el campo "position". Las posiciones deben estar distribuidas lógicamente en un lienzo de 1200x800px para que el mapa sea legible. El nodo principal debe estar cerca de la parte superior central.
+4.  **Tipos de Nodo:** Asigna el "type" correcto: 'principal' para el concepto central, 'concepto' para ideas secundarias, y 'conector' para las palabras de enlace.
+5.  **Conexiones:** En el array "connections", define las relaciones entre tus nodos usando sus IDs únicos en los campos "from" y "to".
+6.  **Idioma:** Todo el texto del campo "label" DEBE estar en ESPAÑOL.
+7.  **Salida Final:** La respuesta debe ser ÚNICAMENTE el objeto JSON válido. No incluyas explicaciones, comentarios o markdown.`;
                 outputSchema = ConceptMapDataContentSchema;
                 outputTypeLiteral = 'concept-map-data';
                 break;
