@@ -195,7 +195,6 @@ const generateVisualContentFlow = ai.defineFlow(
         
         if (!media || !media.url) throw new Error("Image generation failed to return media.");
 
-        // Use the original, complete prompt as the alt text.
         const altText = imgParams.prompt;
 
         return {
@@ -387,18 +386,25 @@ ${structuredContent}
     *   Usa una paleta de colores moderna y atractiva. Inspírate en paletas con púrpuras, azules, y rosas.
     *   **Fondo Principal:** Usa un gradiente lineal sutil para el fondo del \`<body>\`, por ejemplo, de un azul claro a un púrpura claro.
     *   **Colores de Acento:** Usa colores vibrantes (ej: fucsia, amarillo, turquesa) para títulos, iconos y elementos destacados.
-5.  **Iconografía:**
-    *   Para cada sección o punto clave, inserta un marcador de posición de icono en el HTML con el formato \`[ICONO: palabra_clave]\`. Por ejemplo, para una sección sobre "definir objetivos", podrías usar \`[ICONO: diana]\` o \`[ICONO: foco]\`. La IA debe elegir palabras clave relevantes.
+5.  **Iconografía con SVG Incrustado (MUY IMPORTANTE):**
+    *   Para cada sección o punto clave, DEBES generar e incrustar un **código SVG completo** para un icono simple y relevante. NO uses marcadores de posición como '[ICONO: palabra]'.
+    *   **Estilo del SVG:** Los SVG deben ser de estilo "outline" (líneas), con un \`stroke="currentColor"\` para que hereden el color del texto, un \`stroke-width="2"\`, \`stroke-linecap="round"\`, \`stroke-linejoin="round"\`, y \`fill="none"\`. El tamaño debe ser de 24x24 píxeles dentro de un div.
 6.  **Estructura y Layout (Flexbox/Grid):**
     *   Usa un contenedor principal con un \`max-width\` para centrar el contenido.
     *   Organiza el contenido en "tarjetas" o "secciones" distintas usando \`divs\`. Cada tarjeta debe tener \`background-color: white;\`, \`border-radius\`, y una sombra sutil (\`box-shadow\`) para crear un efecto de profundidad.
     *   Usa CSS Flexbox o Grid para crear un diseño adaptable (responsive) que se vea bien tanto en móviles como en escritorio.
 7.  **Basado en Contenido:** El texto de la infografía (títulos, párrafos) DEBE basarse fielmente en el "CONTENIDO ESTRUCTURADO" proporcionado.
 
-Ejemplo de cómo podrías estructurar una sección:
+Ejemplo de cómo podrías estructurar una sección CON SVG:
 \`\`\`html
 <div class="info-card">
-  <div class="icon-placeholder">[ICONO: bombilla]</div>
+  <div class="icon-container">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"></circle>
+      <circle cx="12" cy="12" r="6"></circle>
+      <circle cx="12" cy="12" r="2"></circle>
+    </svg>
+  </div>
   <h3>Título de la Sección</h3>
   <p>Contenido de la sección basado en el resumen...</p>
 </div>
