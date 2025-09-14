@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/sidebar';
 import { AppHeader } from './AppHeader';
 import type { LessonParams } from '@/types';
-import { BookOpen, BookOpenCheck, GraduationCap } from 'lucide-react';
+import { BookOpen, BookOpenCheck, GraduationCap, Image as ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ProtectedRoute from '../auth/ProtectedRoute';
 
@@ -69,6 +69,16 @@ export const AppShell: React.FC<AppShellProps> = ({
                     <a>
                       <BookOpen />
                       <span>Generar Actividades</span>
+                    </a>
+                  </SidebarMenuButton>
+                </Link>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <Link href="/visual" legacyBehavior passHref>
+                  <SidebarMenuButton asChild isActive={pathname === '/visual'}>
+                    <a>
+                      <ImageIcon />
+                      <span>Contenido Visual</span>
                     </a>
                   </SidebarMenuButton>
                 </Link>
