@@ -10,7 +10,7 @@ export const ai = genkit({
   })],
   models: {
     'gemini': 'googleai/gemini-2.0-flash',
-    'imagen': 'googleai/imagen-4.0-fast-generate-001',
+    'imagen': 'googleai/gemini-2.0-flash-exp',
   },
   model: 'googleai/gemini-2.0-flash',
 });
