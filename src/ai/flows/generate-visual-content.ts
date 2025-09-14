@@ -195,6 +195,7 @@ const generateVisualContentFlow = ai.defineFlow(
         
         if (!media || !media.url) throw new Error("Image generation failed to return media.");
 
+        // Use the original, complete prompt as the alt text.
         const altText = imgParams.prompt;
 
         return {
@@ -365,19 +366,44 @@ ${structuredContent}
                 outputTypeLiteral = 'timeline-data';
                 break;
             default: // Infographic and other HTML-based formats
-                 finalPrompt = `Tu tarea es generar una representación visual completa en CÓDIGO HTML5 para un/a "${translatedFormatName}".
-Usa el siguiente CONTENIDO ESTRUCTURADO como la base fundamental.
+                 finalPrompt = `Tu tarea es actuar como un diseñador gráfico y de UI experto y generar una infografía visualmente impactante en CÓDIGO HTML5.
+El tema es: "${topic}".
+El nivel de detalle es: "${level}".
 
 **CONTENIDO ESTRUCTURADO (Fuente de la Verdad):**
 ---
 ${structuredContent}
 ---
 
-**INSTRUCCIONES DE GENERACIÓN:**
-1.  **Basado en Contenido:** El HTML debe representar fielmente la información del resumen. Crea un diseño atractivo con secciones, iconos sugeridos (ej. [ICONO: libro]) y una paleta de colores coherente.
-2.  **Solo Código:** Responde ÚNICAMENTE con el código HTML5. No incluyas explicaciones.
-3.  **Auto-contenido:** Incluye TODOS los estilos CSS en una etiqueta <style> en el <head>.
-4.  **Adaptable:** El diseño debe ser responsive.`;
+**INSTRUCCIONES DE DISEÑO (MUY IMPORTANTE):**
+1.  **Solo Código HTML:** Tu respuesta debe ser ÚNICA y EXCLUSIVAMENTE el código HTML completo. No incluyas explicaciones, comentarios, ni la palabra "html". La salida debe empezar con \`<!DOCTYPE html>\` y terminar con \`</html>\`.
+2.  **Estilos CSS Auto-contenidos:** TODO el CSS debe estar dentro de una única etiqueta \`<style>\` en el \`<head>\`. No uses enlaces a hojas de estilo externas. Hazlo moderno, limpio y profesional.
+3.  **Tipografía Profesional:**
+    *   Importa las fuentes 'Inter' y 'Space Grotesk' de Google Fonts en el CSS.
+    *   Usa 'Space Grotesk' para los títulos (h1, h2, h3) con un peso de 700.
+    *   Usa 'Inter' para el cuerpo del texto (p, li) con un peso de 400 y 600 para negritas.
+    *   Establece una jerarquía visual clara con tamaños de fuente (ej: h1: 2.5rem, h2: 1.8rem, p: 1rem).
+4.  **Paleta de Colores Vibrante y Gradientes:**
+    *   Usa una paleta de colores moderna y atractiva. Inspírate en paletas con púrpuras, azules, y rosas.
+    *   **Fondo Principal:** Usa un gradiente lineal sutil para el fondo del \`<body>\`, por ejemplo, de un azul claro a un púrpura claro.
+    *   **Colores de Acento:** Usa colores vibrantes (ej: fucsia, amarillo, turquesa) para títulos, iconos y elementos destacados.
+5.  **Iconografía:**
+    *   Para cada sección o punto clave, inserta un marcador de posición de icono en el HTML con el formato \`[ICONO: palabra_clave]\`. Por ejemplo, para una sección sobre "definir objetivos", podrías usar \`[ICONO: diana]\` o \`[ICONO: foco]\`. La IA debe elegir palabras clave relevantes.
+6.  **Estructura y Layout (Flexbox/Grid):**
+    *   Usa un contenedor principal con un \`max-width\` para centrar el contenido.
+    *   Organiza el contenido en "tarjetas" o "secciones" distintas usando \`divs\`. Cada tarjeta debe tener \`background-color: white;\`, \`border-radius\`, y una sombra sutil (\`box-shadow\`) para crear un efecto de profundidad.
+    *   Usa CSS Flexbox o Grid para crear un diseño adaptable (responsive) que se vea bien tanto en móviles como en escritorio.
+7.  **Basado en Contenido:** El texto de la infografía (títulos, párrafos) DEBE basarse fielmente en el "CONTENIDO ESTRUCTURADO" proporcionado.
+
+Ejemplo de cómo podrías estructurar una sección:
+\`\`\`html
+<div class="info-card">
+  <div class="icon-placeholder">[ICONO: bombilla]</div>
+  <h3>Título de la Sección</h3>
+  <p>Contenido de la sección basado en el resumen...</p>
+</div>
+\`\`\`
+Genera el código HTML completo y profesional AHORA.`;
                  outputSchema = z.object({
                     content: z.string(),
                     title: z.string().optional(),
@@ -411,7 +437,3 @@ ${structuredContent}
     throw new Error(`The combination of category '${category}' and format '${format}' is not implemented or failed to produce output.`);
   }
 );
-
-    
-
-    
