@@ -2,15 +2,17 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { AppShell } from '@/components/layout/AppShell';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { Loader2, AlertCircle, Eye } from 'lucide-react';
+import { Loader2, AlertCircle, Eye, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { generateVisualContentAction } from './actions';
 import OutputDisplay from '@/components/visual/OutputDisplay';
+import { Button } from '@/components/ui/button';
 
 import type {
   VisualCategory,
@@ -37,6 +39,7 @@ export default function VisualGeneratorPage() {
   const [generatedContent, setGeneratedContent] = useState<GeneratedContentType | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   const { toast } = useToast();
 
@@ -146,6 +149,10 @@ export default function VisualGeneratorPage() {
             Crea visualizaciones de alto impacto para tus clases.
           </p>
         </header>
+
+        <Button onClick={() => router.back()} variant="outline" className="mb-6 self-start">
+          <ArrowLeft className="mr-2 h-4 w-4" /> Atrás
+        </Button>
 
         <Card className="w-full max-w-4xl mx-auto shadow-xl mb-8">
           <CardHeader>
