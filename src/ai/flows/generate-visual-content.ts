@@ -195,6 +195,7 @@ const generateVisualContentFlow = ai.defineFlow(
         
         if (!media || !media.url) throw new Error("Image generation failed to return media.");
 
+        // Use the original prompt as alt text, ensuring it's not cut off
         const altText = imgParams.prompt;
 
         return {
@@ -209,12 +210,12 @@ const generateVisualContentFlow = ai.defineFlow(
         const infoParams = params as InfoOrgParams;
         const { topic, level, details } = infoParams;
         
-        let lengthInstruction: 'corta' | 'media' | 'larga' = 'media';
-        if (level === 'basic') lengthInstruction = 'corta';
-        if (level === 'advanced') lengthInstruction = 'larga';
+        let lengthInstruction: 'muy breve (3 a 4 puntos clave)' | 'breve (5 a 6 puntos clave)' | 'detallado pero conciso (7 a 8 ideas principales)' = 'breve (5 a 6 puntos clave)';
+        if (level === 'basic') lengthInstruction = 'muy breve (3 a 4 puntos clave)';
+        if (level === 'advanced') lengthInstruction = 'detallado pero conciso (7 a 8 ideas principales)';
 
         // STEP 1: Generate structured content ("Source of Truth")
-        const structuredContentPrompt = `Genera un resumen DETALLADO y JERÁRQUICO para el tema '${topic}'. La longitud debe ser ${lengthInstruction}. Organiza los puntos principales y sub-puntos de forma lógica. Este resumen será la base para construir un diagrama visual. Detalles adicionales: ${details}`;
+        const structuredContentPrompt = `Genera un resumen CONCISO Y DIRECTO para el tema '${topic}'. La longitud debe ser ${lengthInstruction}. Organiza los puntos principales y sub-puntos de forma lógica. El resumen DEBE estar completamente en español. Este resumen será la base para construir un diagrama visual. Detalles adicionales: ${details}`;
         
         const { text: structuredContent } = await ai.generate({ model: 'googleai/gemini-2.0-flash', prompt: structuredContentPrompt });
         if(!structuredContent) throw new Error("Could not generate base content for the diagram.");
@@ -365,11 +366,11 @@ ${structuredContent}
                 outputTypeLiteral = 'timeline-data';
                 break;
             default: // Infographic and other HTML-based formats
-                 finalPrompt = `Tu tarea es actuar como un diseñador gráfico y de UI experto y generar una infografía visualmente impactante en CÓDIGO HTML5.
+                 finalPrompt = `Tu tarea es actuar como un diseñador gráfico y de UI experto y generar una infografía visualmente impactante en CÓDIGO HTML5. Todo el texto visible para el usuario DEBE estar en español.
 El tema es: "${topic}".
 El nivel de detalle es: "${level}".
 
-**CONTENIDO ESTRUCTURADO (Fuente de la Verdad):**
+**CONTENIDO ESTRUCTURADO EN ESPAÑOL (Fuente de la Verdad):**
 ---
 ${structuredContent}
 ---
@@ -393,7 +394,7 @@ ${structuredContent}
     *   Usa un contenedor principal con un \`max-width\` para centrar el contenido.
     *   Organiza el contenido en "tarjetas" o "secciones" distintas usando \`divs\`. Cada tarjeta debe tener \`background-color: white;\`, \`border-radius\`, y una sombra sutil (\`box-shadow\`) para crear un efecto de profundidad.
     *   Usa CSS Flexbox o Grid para crear un diseño adaptable (responsive) que se vea bien tanto en móviles como en escritorio.
-7.  **Basado en Contenido:** El texto de la infografía (títulos, párrafos) DEBE basarse fielmente en el "CONTENIDO ESTRUCTURADO" proporcionado.
+7.  **Basado en Contenido:** El texto de la infografía (títulos, párrafos) DEBE basarse fielmente en el "CONTENIDO ESTRUCTURADO" proporcionado y debe estar en español.
 
 Ejemplo de cómo podrías estructurar una sección CON SVG:
 \`\`\`html
