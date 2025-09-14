@@ -195,16 +195,13 @@ const generateVisualContentFlow = ai.defineFlow(
         
         if (!media || !media.url) throw new Error("Image generation failed to return media.");
 
-        const { text: altText } = await ai.generate({
-            model: 'googleai/gemini-2.0-flash',
-            prompt: `Genera un texto alternativo (alt text) corto y descriptivo en español para esta imagen.`,
-            input: { media: { url: media.url } },
-        });
+        // Use the user's prompt directly as the alt text.
+        const altText = imgParams.prompt;
 
         return {
             type: 'image',
             url: media.url,
-            alt: altText || imgParams.prompt.substring(0, 100),
+            alt: altText,
         };
     }
 
