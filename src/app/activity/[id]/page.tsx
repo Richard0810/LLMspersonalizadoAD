@@ -8,11 +8,11 @@ import InteractiveBackground from '@/components/shared/InteractiveBackground';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Download, ListChecks, BookOpen, Target, ThumbsUp, Sparkles, Loader2, Clock, ClipboardCheck, Brain, Eye, UserCheck, FileDown } from 'lucide-react';
-import type { Activity, VisualContent } from '@/types';
+import type { Activity, GeneratedActivityVisuals } from '@/types';
 import { getActivityByIdFromLocalStorage } from '@/lib/localStorageUtils';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
-import { generateVisualContent } from '@/ai/flows/generate-visual-content';
+import { generateActivityVisuals } from '@/ai/flows/generate-activity-visuals';
 import { generateActivityDocument } from '@/ai/flows/generate-activity-document';
 import Image from 'next/image';
 import WordIcon from '@/components/icons/WordIcon';
@@ -124,19 +124,19 @@ const SectionContent = ({ title, icon, content, generatedContent, className = ""
       <h3 className="text-xl font-semibold flex items-center gap-2 text-accent font-headline mb-2">
         {icon} {title}
       </h3>
-      {generatedContent ? (
+      {generatedContent && generatedContent.length > 0 ? (
         <div className="space-y-4">
           {generatedContent.map((item, index) => (
-            <div key={index} className="p-3 bg-muted/50 rounded-lg">
+            <div key={index} className="p-4 bg-muted/50 rounded-lg border border-primary/20">
               <p
-                className="text-muted-foreground whitespace-pre-line mb-2"
-                dangerouslySetInnerHTML={{ __html: formatWithBold(item.step) }}
+                className="text-muted-foreground whitespace-pre-line mb-3"
+                dangerouslySetInnerHTML={{ __html: formatWithBold(item.text) }}
               />
-              {item.image && (
-                <div className="mt-2 text-center">
+              {item.imageUrl && (
+                <div className="mt-2 text-center border-t border-dashed pt-3">
                   <Image 
-                    src={item.image} 
-                    alt={`Ilustración para: ${item.step.substring(0, 50)}`} 
+                    src={item.imageUrl} 
+                    alt={`Ilustración para: ${item.text.substring(0, 50)}`} 
                     width={400} 
                     height={400} 
                     className="rounded-md shadow-md mx-auto"
@@ -162,7 +162,7 @@ export default function ActivityDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isGeneratingContent, setIsGeneratingContent] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
-  const [generatedContent, setGeneratedContent] = useState<VisualContent | null>(null);
+  const [generatedContent, setGeneratedContent] = useState<GeneratedActivityVisuals | null>(null);
 
   useEffect(() => {
     if (params.id) {
@@ -179,11 +179,11 @@ export default function ActivityDetailPage() {
 
     toast({
       title: "Generación en Proceso",
-      description: "La IA está creando el contenido visual. Esto puede tardar un momento...",
+      description: "La IA está analizando la actividad y creando contenido visual. Esto puede tardar unos minutos...",
     });
 
     try {
-      const visualResult = await generateVisualContent({
+      const visualResult = await generateActivityVisuals({
         materials: activity.materials,
         instructions: activity.stepByStepDevelopment,
         reflection: activity.reflectionQuestion,
@@ -191,12 +191,13 @@ export default function ActivityDetailPage() {
       
       setGeneratedContent(visualResult);
       toast({
-        title: "¡Contenido Generado!",
-        description: "El contenido visual está listo.",
+        title: "¡Contenido Visual Generado!",
+        description: "Los recursos visuales para tu actividad están listos.",
+        className: 'bg-green-100 border-green-400 text-green-800'
       });
 
     } catch (error) {
-      console.error("Error generando contenido:", error);
+      console.error("Error generando contenido visual de la actividad:", error);
       toast({
         title: "Error de Generación",
         description: `No se pudo generar el contenido. ${error instanceof Error ? error.message : 'Error desconocido.'}`,
@@ -395,5 +396,3 @@ export default function ActivityDetailPage() {
     </ProtectedRoute>
   );
 }
-
-    

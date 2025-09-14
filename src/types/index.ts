@@ -67,15 +67,23 @@ export const computationalConcepts = [
   "Todos los conceptos"
 ];
 
-export interface InstructionStep {
-  step: string;
-  image?: string; // Base64 encoded image data URI
+
+// Activity Visuals Types
+export interface VisualItem {
+  text: string;
+  imageUrl: string | null; // URL de la imagen generada (Base64)
 }
 
-export interface VisualContent {
-  materials: InstructionStep[];
-  instructions: InstructionStep[];
-  reflection: InstructionStep[];
+export interface GeneratedActivityVisuals {
+  materials: VisualItem[];
+  instructions: VisualItem[];
+  reflection: VisualItem[];
+}
+
+export interface GenerateActivityVisualsInput {
+  materials: string;
+  instructions: string;
+  reflection: string;
 }
 
 
