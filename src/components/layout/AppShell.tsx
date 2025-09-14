@@ -79,7 +79,7 @@ export const AppShell: React.FC<AppShellProps> = ({
                   <SidebarMenuButton asChild isActive={pathname === '/visual'}>
                     <a>
                       <Palette />
-                      <span>Contenido Visual</span>
+                      <span>Generación Visual</span>
                     </a>
                   </SidebarMenuButton>
                 </Link>
