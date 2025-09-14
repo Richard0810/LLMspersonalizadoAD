@@ -196,7 +196,7 @@ const generateVisualContentFlow = ai.defineFlow(
 
         const { text: altText } = await ai.generate({
             model: 'googleai/gemini-2.0-flash',
-            prompt: `Genera un texto alternativo (alt text) corto y descriptivo en español para esta imagen. El prompt original era: "${fullPrompt}".`,
+            prompt: `Genera un texto alternativo (alt text) para esta imagen.`,
             input: { media: { url: media.url } },
         });
 
@@ -414,5 +414,7 @@ Usa el siguiente CONTENIDO ESTRUCTURADO como la base fundamental.
     throw new Error(`The combination of category '${category}' and format '${format}' is not implemented or failed to produce output.`);
   }
 );
+
+    
 
     
