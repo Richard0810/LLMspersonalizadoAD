@@ -195,7 +195,6 @@ const generateVisualContentFlow = ai.defineFlow(
         
         if (!media || !media.url) throw new Error("Image generation failed to return media.");
 
-        // Use the user's prompt directly as the alt text.
         const altText = imgParams.prompt;
 
         return {
@@ -412,5 +411,7 @@ ${structuredContent}
     throw new Error(`The combination of category '${category}' and format '${format}' is not implemented or failed to produce output.`);
   }
 );
+
+    
 
     
