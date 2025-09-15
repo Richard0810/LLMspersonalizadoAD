@@ -3,7 +3,7 @@
 
 import React, { useRef, useEffect, useCallback, forwardRef, useState } from 'react';
 import { VisualFormat } from '@/types';
-import type { GeneratedContentType, GeneratedImageType, GeneratedHtmlType, GeneratedJsonType, GeneratedConceptMapDataType, GeneratedMindMapDataType, GeneratedFlowchartDataType, GeneratedVennDiagramDataType, GeneratedComparisonTableDataType, GeneratedTimelineDataType } from '@/types';
+import type { GeneratedContentType, GeneratedImageType, GeneratedHtmlType, GeneratedConceptMapDataType, GeneratedMindMapDataType, GeneratedFlowchartDataType, GeneratedVennDiagramDataType, GeneratedComparisonTableDataType, GeneratedTimelineDataType } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Download, Maximize } from 'lucide-react';
@@ -657,24 +657,6 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ content, format }) => {
             {content.alt && <p className="text-sm text-muted-foreground text-center mt-2">{content.alt}</p>}
           </div>
         );
-      case 'text':
-        return (
-          <div className="p-4 bg-muted/50 rounded-md border">
-            {content.title && <h3 className="text-lg font-semibold text-primary mb-2">{content.title}</h3>}
-            <pre className="whitespace-pre-wrap text-sm font-sans">{content.content}</pre>
-          </div>
-        );
-      case 'json':
-        const jsonData = content as GeneratedJsonType;
-        return (
-          <div className="p-4 bg-muted/50 rounded-md border">
-            {jsonData.title && <h3 className="text-lg font-semibold text-primary mb-2">{jsonData.title}</h3>}
-            {jsonData.description && <p className="text-sm text-muted-foreground mb-2">{jsonData.description}</p>}
-            <pre className="whitespace-pre-wrap text-sm bg-background p-3 rounded-md overflow-x-auto border">
-              {JSON.stringify(jsonData.data, null, 2)}
-            </pre>
-          </div>
-        );
       case 'html':
         return (
             <div className="w-full aspect-video max-h-[70vh]">
@@ -698,7 +680,7 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ content, format }) => {
       case 'comparison-table-data':
         return <RenderComparisonTable ref={displayContainerRef} data={content} />;
       case 'timeline-data':
-        return <RenderTimeline ref={displayContainerRef} data={content} />;
+        return <RenderTimeline ref={displayContainer-Ref} data={content} />;
       default:
         return <Alert variant="destructive"><AlertTitle>Error</AlertTitle><AlertDescription>Tipo de contenido desconocido.</AlertDescription></Alert>;
     }

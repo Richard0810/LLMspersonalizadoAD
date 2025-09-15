@@ -186,21 +186,22 @@ const generateVisualContentFlow = ai.defineFlow(
         const fullPrompt = buildImagePrompt(imgParams);
         
         const { media } = await ai.generate({
-            model: 'googleai/gemini-2.0-flash-exp',
+            model: 'googleai/gemini-2.0-flash-exp', // Correct model from bitacora
             prompt: fullPrompt,
             config: {
-                responseModalities: ['TEXT', 'IMAGE'],
+                responseModalities: ['TEXT', 'IMAGE'], // Mandatory config from bitacora
             },
         });
         
         if (!media || !media.url) throw new Error("Image generation failed to return media.");
 
         const { text: altText } = await ai.generate({
-            model: 'googleai/gemini-2.0-flash',
+            model: 'googleai/gemini-2.0-flash', // Correct text model from bitacora
             prompt: `Genera un texto alternativo (alt text) conciso y descriptivo para la siguiente imagen. El prompt original para la imagen fue: "${imgParams.prompt}". El texto debe estar en español y no exceder los 125 caracteres.`,
             input: { media: { url: media.url } },
         });
 
+        // FIX: Explicitly type the result object to satisfy TypeScript
         const result: GeneratedImageType = {
             type: 'image',
             url: media.url,
@@ -446,5 +447,3 @@ Genera el código HTML completo y profesional AHORA.`;
     throw new Error(`The combination of category '${category}' and format '${format}' is not implemented or failed to produce output.`);
   }
 );
-
-    
