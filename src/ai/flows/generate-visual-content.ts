@@ -195,7 +195,11 @@ const generateVisualContentFlow = ai.defineFlow(
         
         if (!media || !media.url) throw new Error("Image generation failed to return media.");
 
-        const altText = imgParams.prompt;
+        const { text: altText } = await ai.generate({
+            model: 'googleai/gemini-2.0-flash',
+            prompt: `Genera un texto alternativo (alt text) conciso y descriptivo para la siguiente imagen. El prompt original para la imagen fue: "${imgParams.prompt}". El texto debe estar en español y no exceder los 125 caracteres.`,
+            input: { media: { url: media.url } },
+        });
 
         return {
             type: 'image',
@@ -435,13 +439,9 @@ Genera el código HTML completo y profesional AHORA.`;
             }
             return { ...(output as object), type: outputTypeLiteral } as GenerateVisualContentFlowOutput;
           }
-          // For cases like HTML where schema is directly the output
-          return { type: 'html', ...output } as GenerateVisualContentFlowOutput;
         }
     }
     
     throw new Error(`The combination of category '${category}' and format '${format}' is not implemented or failed to produce output.`);
   }
 );
-
-    

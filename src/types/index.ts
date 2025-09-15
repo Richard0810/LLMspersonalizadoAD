@@ -225,13 +225,6 @@ export interface GeneratedTimelineDataType {
   }>;
 }
 
-export interface GeneratedJsonType {
-  type: 'json';
-  data: Record<string, any> | Array<Record<string, any>>;
-  title?: string;
-  description?: string;
-}
-
 export type GeneratedContentType =
   | GeneratedImageType
   | GeneratedHtmlType
@@ -240,7 +233,6 @@ export type GeneratedContentType =
   | GeneratedFlowchartDataType
   | GeneratedVennDiagramDataType
   | GeneratedComparisonTableDataType
-  | GeneratedTimelineDataType
-  | GeneratedJsonType;
+  | GeneratedTimelineDataType;
 
 export type GenerateVisualContentFlowOutput = GeneratedContentType;
