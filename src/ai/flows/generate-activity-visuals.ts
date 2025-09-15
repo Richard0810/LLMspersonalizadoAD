@@ -7,7 +7,7 @@
  * - generateActivityVisuals - The main exported function to trigger the flow.
  */
 
-import { ai, imagen } from '@/ai/genkit';
+import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import type { GenerateActivityVisualsInput, GeneratedActivityVisuals, VisualItem } from '@/types';
 
@@ -82,8 +82,11 @@ const generateImage = async (prompt: string): Promise<string | null> => {
     if (!prompt) return null;
     try {
         const { media } = await ai.generate({
-            model: imagen,
+            model: 'googleai/gemini-2.0-flash-exp',
             prompt: `Educational illustration, simple, clean, minimalist, whiteboard drawing style: ${prompt}`,
+            config: {
+                responseModalities: ['TEXT', 'IMAGE'],
+            },
         });
         return media?.url || null;
     } catch (error) {
@@ -126,3 +129,5 @@ const generateActivityVisualsFlow = ai.defineFlow(
     return { materials, instructions, reflection };
   }
 );
+
+    

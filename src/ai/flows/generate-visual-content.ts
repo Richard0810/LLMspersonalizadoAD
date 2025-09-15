@@ -5,7 +5,7 @@
  * - generateVisualContent: Main exported function to call the flow.
  */
 
-import { ai, imagen } from '@/ai/genkit';
+import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import {
   GenerateVisualContentFlowInput,
@@ -15,7 +15,8 @@ import {
   ConceptIllustParams,
   VisualCategory,
   VisualFormat,
-  GeneratedContentType
+  GeneratedContentType,
+  GeneratedImageType
 } from '@/types';
 
 // Internal Zod schemas for validation within the flow.
@@ -69,7 +70,6 @@ const GeneratedImageSchema = z.object({
   alt: z.string(),
 });
 
-// Define other output schemas similarly...
 const GeneratedHtmlSchema = z.object({
     type: z.literal('html'),
     content: z.string(),
@@ -186,19 +186,22 @@ const generateVisualContentFlow = ai.defineFlow(
         const fullPrompt = buildImagePrompt(imgParams);
         
         const { media } = await ai.generate({
-            model: imagen,
+            model: 'googleai/gemini-2.0-flash-exp',
             prompt: fullPrompt,
+            config: {
+                responseModalities: ['TEXT', 'IMAGE'],
+            },
         });
         
         if (!media || !media.url) throw new Error("Image generation failed to return media.");
 
         const { text: altText } = await ai.generate({
-            model: 'googleai/gemini-1.5-flash-latest',
+            model: 'googleai/gemini-2.0-flash',
             prompt: `Genera un texto alternativo (alt text) conciso y descriptivo para la siguiente imagen. El prompt original para la imagen fue: "${imgParams.prompt}". El texto debe estar en español y no exceder los 125 caracteres.`,
             input: { media: { url: media.url } },
         });
 
-        const result: GenerateVisualContentFlowOutput = {
+        const result: GeneratedImageType = {
             type: 'image',
             url: media.url,
             alt: altText,
@@ -218,7 +221,7 @@ const generateVisualContentFlow = ai.defineFlow(
         // STEP 1: Generate structured content ("Source of Truth")
         const structuredContentPrompt = `Genera un resumen CONCISO Y DIRECTO para el tema '${topic}'. La longitud debe ser ${lengthInstruction}. Organiza los puntos principales y sub-puntos de forma lógica. El resumen DEBE estar completamente en español. Este resumen será la base para construir un diagrama visual. Detalles adicionales: ${details}`;
         
-        const { text: structuredContent } = await ai.generate({ model: 'googleai/gemini-1.5-flash-latest', prompt: structuredContentPrompt });
+        const { text: structuredContent } = await ai.generate({ model: 'googleai/gemini-2.0-flash', prompt: structuredContentPrompt });
         if(!structuredContent) throw new Error("Could not generate base content for the diagram.");
 
         // STEP 2: Use the structured content to generate the final JSON/HTML
@@ -421,7 +424,7 @@ Genera el código HTML completo y profesional AHORA.`;
         }
 
         const { output } = await ai.generate({
-            model: 'googleai/gemini-1.5-flash-latest',
+            model: 'googleai/gemini-2.0-flash',
             prompt: finalPrompt,
             output: {
                 schema: outputSchema
@@ -444,4 +447,4 @@ Genera el código HTML completo y profesional AHORA.`;
   }
 );
 
-  
+    
