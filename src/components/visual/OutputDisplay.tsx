@@ -604,9 +604,9 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ content, format }) => {
     document.body.removeChild(link);
   };
 
-  const handleHtmlDownloadAsPdf = (htmlContent: GeneratedHtmlType) => {
+  const handleHtmlDownloadAsPdf = async (htmlContent: GeneratedHtmlType) => {
     // Dynamic import for client-side library
-    const html2pdf = require('html2pdf.js');
+    const { default: html2pdf } = await import('html2pdf.js');
 
     const element = document.createElement('div');
     element.innerHTML = htmlContent.content;
