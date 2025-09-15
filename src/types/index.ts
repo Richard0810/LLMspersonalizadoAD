@@ -159,12 +159,6 @@ export interface GeneratedImageType {
   alt: string;
 }
 
-export interface GeneratedTextType {
-  type: 'text';
-  content: string;
-  title?: string;
-}
-
 export interface GeneratedHtmlType {
   type: 'html';
   content: string;
@@ -240,7 +234,6 @@ export interface GeneratedJsonType {
 
 export type GeneratedContentType =
   | GeneratedImageType
-  | GeneratedTextType
   | GeneratedHtmlType
   | GeneratedConceptMapDataType
   | GeneratedMindMapDataType
