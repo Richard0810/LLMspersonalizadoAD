@@ -186,11 +186,9 @@ const generateVisualContentFlow = ai.defineFlow(
         const fullPrompt = buildImagePrompt(imgParams);
         
         const { media } = await ai.generate({
-            model: 'googleai/gemini-2.0-flash-exp', // Correct model from bitacora
+            model: 'googleai/gemini-2.0-flash-exp',
             prompt: fullPrompt,
-            config: {
-                responseModalities: ['TEXT', 'IMAGE'], // Mandatory config from bitacora
-            },
+            responseModalities: ['TEXT', 'IMAGE'],
         });
         
         if (!media || !media.url) throw new Error("Image generation failed to return media.");

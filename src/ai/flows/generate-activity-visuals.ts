@@ -82,11 +82,9 @@ const generateImage = async (prompt: string): Promise<string | null> => {
     if (!prompt) return null;
     try {
         const { media } = await ai.generate({
-            model: 'googleai/gemini-2.0-flash-exp', // Correct model from bitacora
+            model: 'googleai/gemini-2.0-flash-exp',
             prompt: `Educational illustration, simple, clean, minimalist, whiteboard drawing style: ${prompt}`,
-            config: {
-                responseModalities: ['TEXT', 'IMAGE'], // Mandatory config from bitacora
-            },
+            responseModalities: ['TEXT', 'IMAGE'],
         });
         return media?.url || null;
     } catch (error) {
