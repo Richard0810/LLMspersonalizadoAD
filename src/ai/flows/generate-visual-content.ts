@@ -15,8 +15,6 @@ import {
   ConceptIllustParams,
   VisualCategory,
   VisualFormat,
-  GeneratedImageType,
-  GeneratedHtmlType,
   GeneratedConceptMapDataType,
   GeneratedMindMapDataType,
   GeneratedFlowchartDataType,
@@ -246,9 +244,8 @@ const generateVisualContentFlow = ai.defineFlow(
         const { media } = await ai.generate({
             model: 'googleai/gemini-2.0-flash-exp',
             prompt: fullPrompt,
-            config: {
-                responseModalities: ['TEXT', 'IMAGE'],
-            },
+            responseModalities: ['TEXT', 'IMAGE'],
+            config: {},
         });
         
         if (!media || !media.url) {
