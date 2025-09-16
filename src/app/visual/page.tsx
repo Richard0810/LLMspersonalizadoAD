@@ -93,17 +93,18 @@ export default function VisualGeneratorPage() {
     const result = await generateVisualContentAction(flowInput);
     setIsLoading(false);
 
-    if (result.success && result.data) {
+    if (result && result.success && result.data) {
       setGeneratedContent(result.data);
       toast({
         title: "¡Contenido Visual Generado!",
         description: `Tu ${translatedFormatName} está listo.`
       });
     } else {
-      setError(result.error || "Ocurrió un error desconocido.");
+      const errorMessage = result?.error || "Ocurrió un error desconocido durante la generación.";
+      setError(errorMessage);
       toast({
         title: "Error de Generación",
-        description: result.error || "No se pudo generar el contenido.",
+        description: errorMessage,
         variant: "destructive"
       });
     }
