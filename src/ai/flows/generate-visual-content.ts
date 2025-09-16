@@ -245,7 +245,6 @@ const generateVisualContentFlow = ai.defineFlow(
             model: 'googleai/gemini-2.0-flash-exp',
             prompt: fullPrompt,
             responseModalities: ['TEXT', 'IMAGE'],
-            config: {},
         });
         
         if (!media || !media.url) {
@@ -260,7 +259,6 @@ const generateVisualContentFlow = ai.defineFlow(
             ]
         });
 
-        // FIX: Use the correct type from the union
         const result: GenerateVisualContentFlowOutput = {
             type: 'image',
             url: media.url,
