@@ -7,7 +7,7 @@
  * - generateActivityVisuals - The main exported function to trigger the flow.
  */
 
-import { ai, imagen } from '@/ai/genkit';
+import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import type { GenerateActivityVisualsInput, GeneratedActivityVisuals, VisualItem } from '@/types';
 
@@ -87,9 +87,13 @@ Based on your analysis, provide the output in the required JSON format. For each
 const generateImage = async (prompt: string): Promise<string | null> => {
     if (!prompt) return null;
     try {
+        const fullPrompt = `Educational illustration, simple, clean, minimalist, whiteboard drawing style: ${prompt}`;
         const { media } = await ai.generate({
-            model: imagen,
-            prompt: `Educational illustration, simple, clean, minimalist, whiteboard drawing style: ${prompt}`,
+            model: 'googleai/gemini-2.0-flash-exp',
+            prompt: fullPrompt,
+            config: {
+                responseModalities: ['TEXT', 'IMAGE'],
+            },
         });
         return media?.url || null;
     } catch (error) {
@@ -133,3 +137,4 @@ const generateActivityVisualsFlow = ai.defineFlow(
     return { materials, instructions, reflection, visualExamples };
   }
 );
+

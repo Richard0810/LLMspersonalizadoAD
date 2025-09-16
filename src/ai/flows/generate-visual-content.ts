@@ -244,7 +244,9 @@ const generateVisualContentFlow = ai.defineFlow(
         const { media } = await ai.generate({
             model: 'googleai/gemini-2.0-flash-exp',
             prompt: fullPrompt,
-            responseModalities: ['TEXT', 'IMAGE'],
+            config: {
+                responseModalities: ['TEXT', 'IMAGE'],
+            },
         });
         
         if (!media || !media.url) {
