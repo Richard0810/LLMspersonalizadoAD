@@ -680,7 +680,7 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ content, format }) => {
       case 'comparison-table-data':
         return <RenderComparisonTable ref={displayContainerRef} data={content} />;
       case 'timeline-data':
-        return <RenderTimeline ref={displayContainer-Ref} data={content} />;
+        return <RenderTimeline ref={displayContainerRef} data={content} />;
       default:
         return <Alert variant="destructive"><AlertTitle>Error</AlertTitle><AlertDescription>Tipo de contenido desconocido.</AlertDescription></Alert>;
     }
