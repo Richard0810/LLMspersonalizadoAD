@@ -4,7 +4,7 @@
  * - generateVisualContent: Main exported function to call the flow.
  */
 
-import { ai } from '@/ai/genkit';
+import { ai, imagen } from '@/ai/genkit';
 import { z } from 'genkit';
 import {
   GenerateVisualContentFlowInput,
@@ -14,7 +14,8 @@ import {
   ConceptIllustParams,
   VisualCategory,
   VisualFormat,
-  GeneratedContentType
+  GeneratedContentType,
+  GeneratedImageType
 } from '@/types';
 
 // Internal Zod schemas for validation within the flow.
@@ -237,11 +238,8 @@ const generateVisualContentFlow = ai.defineFlow(
         const fullPrompt = buildImagePrompt(imgParams);
         
         const { media } = await ai.generate({
-            model: 'googleai/gemini-2.0-flash-exp',
+            model: imagen,
             prompt: fullPrompt,
-            config: {
-                responseModalities: ['TEXT', 'IMAGE'],
-            },
         });
         
         if (!media || !media.url) {
@@ -254,7 +252,6 @@ const generateVisualContentFlow = ai.defineFlow(
             input: { media: { url: media.url } },
         });
 
-        // FIX: Use the correct type from the union
         const result: GenerateVisualContentFlowOutput = {
             type: 'image',
             url: media.url,

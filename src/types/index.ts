@@ -161,12 +161,6 @@ export interface GeneratedImageType {
   alt: string;
 }
 
-export interface GeneratedTextType {
-  type: 'text';
-  content: string;
-  title?: string;
-}
-
 export interface GeneratedHtmlType {
   type: 'html';
   content: string;
@@ -233,23 +227,14 @@ export interface GeneratedTimelineDataType {
   }>;
 }
 
-export interface GeneratedJsonType {
-  type: 'json';
-  data: Record<string, any> | Array<Record<string, any>>;
-  title?: string;
-  description?: string;
-}
-
 export type GeneratedContentType =
   | GeneratedImageType
-  | GeneratedTextType
   | GeneratedHtmlType
   | GeneratedConceptMapDataType
   | GeneratedMindMapDataType
   | GeneratedFlowchartDataType
   | GeneratedVennDiagramDataType
   | GeneratedComparisonTableDataType
-  | GeneratedTimelineDataType
-  | GeneratedJsonType;
+  | GeneratedTimelineDataType;
 
 export type GenerateVisualContentFlowOutput = GeneratedContentType;
