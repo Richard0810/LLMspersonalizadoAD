@@ -1,10 +1,11 @@
+
 'use server';
 /**
  * @fileOverview Genkit flow for generating various visual content types.
  * - generateVisualContent: Main exported function to call the flow.
  */
 
-import { ai, imagen } from '@/ai/genkit';
+import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import {
   GenerateVisualContentFlowInput,
@@ -14,8 +15,14 @@ import {
   ConceptIllustParams,
   VisualCategory,
   VisualFormat,
-  GeneratedContentType,
-  GeneratedImageType
+  GeneratedImageType,
+  GeneratedHtmlType,
+  GeneratedConceptMapDataType,
+  GeneratedMindMapDataType,
+  GeneratedFlowchartDataType,
+  GeneratedVennDiagramDataType,
+  GeneratedComparisonTableDataType,
+  GeneratedTimelineDataType
 } from '@/types';
 
 // Internal Zod schemas for validation within the flow.
@@ -185,7 +192,6 @@ function buildImagePrompt(params: ImageGenerationParams): string {
     if (params.lighting) fullPrompt += `, iluminación: ${params.lighting}`;
     if (params.composition) fullPrompt += `, composición: ${params.composition}`;
     if (params.quality) fullPrompt += `, calidad: ${params.quality}`;
-    if (params.aspectRatio) fullPrompt += `, relación de aspecto: ${params.aspectRatio}`;
     if (params.negativePrompt) fullPrompt += `. Evita: ${params.negativePrompt}`;
     if (params.theme) fullPrompt += `. El tema general está relacionado con: ${params.theme}.`;
 
@@ -238,8 +244,11 @@ const generateVisualContentFlow = ai.defineFlow(
         const fullPrompt = buildImagePrompt(imgParams);
         
         const { media } = await ai.generate({
-            model: imagen,
+            model: 'googleai/gemini-2.0-flash-exp',
             prompt: fullPrompt,
+            config: {
+                responseModalities: ['TEXT', 'IMAGE'],
+            },
         });
         
         if (!media || !media.url) {
@@ -248,10 +257,13 @@ const generateVisualContentFlow = ai.defineFlow(
 
         const { text: altText } = await ai.generate({
             model: 'googleai/gemini-2.0-flash',
-            prompt: `Genera un texto alternativo (alt text) conciso y descriptivo para la siguiente imagen. El prompt original para la imagen fue: "${imgParams.prompt}". El texto debe estar en español y no exceder los 125 caracteres.`,
-            input: { media: { url: media.url } },
+            prompt: [
+              { media: { url: media.url } },
+              { text: `Genera un texto alternativo (alt text) conciso y descriptivo para la siguiente imagen. El prompt original para la imagen fue: "${imgParams.prompt}". El texto debe estar en español y no exceder los 125 caracteres.` }
+            ]
         });
 
+        // FIX: Use the correct type from the union
         const result: GenerateVisualContentFlowOutput = {
             type: 'image',
             url: media.url,
@@ -502,3 +514,5 @@ Genera el código HTML completo y profesional AHORA.`;
     throw new Error(`The combination of category '${category}' and format '${format}' is not implemented or failed to produce output.`);
   }
 );
+
+    
