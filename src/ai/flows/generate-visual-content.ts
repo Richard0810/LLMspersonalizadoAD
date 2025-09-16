@@ -5,7 +5,7 @@
  * - generateVisualContent: Main exported function to call the flow.
  */
 
-import { ai } from '@/ai/genkit';
+import { ai, imagen } from '@/ai/genkit';
 import { z } from 'genkit';
 import {
   GenerateVisualContentFlowInput,
@@ -186,11 +186,8 @@ const generateVisualContentFlow = ai.defineFlow(
         const fullPrompt = buildImagePrompt(imgParams);
         
         const { media } = await ai.generate({
-            model: 'googleai/gemini-2.0-flash-exp', // Correct model from bitacora
+            model: imagen,
             prompt: fullPrompt,
-            config: {
-                responseModalities: ['TEXT', 'IMAGE'], // Mandatory config from bitacora
-            },
         });
         
         if (!media || !media.url) throw new Error("Image generation failed to return media.");
