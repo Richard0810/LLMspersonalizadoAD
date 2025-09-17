@@ -13,9 +13,17 @@ import { Pie, PieChart, ResponsiveContainer } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import type { ChartConfig } from '@/components/ui/chart';
 import { AppShell } from '@/components/layout/AppShell';
+import type { ReactNode, ElementType } from 'react';
 
 
-const InfoSection = ({ title, children, icon: Icon, className = "" }) => (
+interface InfoSectionProps {
+  title: string;
+  children: ReactNode;
+  icon: ElementType;
+  className?: string;
+}
+
+const InfoSection = ({ title, children, icon: Icon, className = "" }: InfoSectionProps) => (
     <Card className={`shadow-lg h-full border-l-4 border-primary/50 ${className}`}>
         <CardHeader className="flex flex-row items-center gap-4 space-y-0">
             <Icon className="w-8 h-8 text-primary" />
@@ -27,7 +35,13 @@ const InfoSection = ({ title, children, icon: Icon, className = "" }) => (
     </Card>
 );
 
-const InfoCard = ({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) => (
+interface InfoCardProps {
+  icon: ReactNode;
+  title: string;
+  description: string;
+}
+
+const InfoCard = ({ icon, title, description }: InfoCardProps) => (
     <div className="flex items-start gap-4">
         <div className="flex-shrink-0 text-primary">{icon}</div>
         <div>
@@ -37,8 +51,12 @@ const InfoCard = ({ icon, title, description }: { icon: React.ReactNode, title: 
     </div>
 );
 
+interface VideoEmbedProps {
+  videoId: string;
+  title: string;
+}
 
-const VideoEmbed = ({ videoId, title }) => (
+const VideoEmbed = ({ videoId, title }: VideoEmbedProps) => (
      <iframe
         src={`https://www.youtube.com/embed/${videoId}`}
         title={title}
@@ -49,7 +67,12 @@ const VideoEmbed = ({ videoId, title }) => (
     ></iframe>
 );
 
-const PresentationEmbed = ({ presentationId, title }) => (
+interface PresentationEmbedProps {
+  presentationId: string;
+  title: string;
+}
+
+const PresentationEmbed = ({ presentationId, title }: PresentationEmbedProps) => (
     <iframe
         src={`https://docs.google.com/presentation/d/${presentationId}/embed?start=false&loop=false&delayms=3000`}
         title={title}
@@ -310,3 +333,5 @@ export default function LearnPage() {
       </AppShell>
     );
 }
+
+    
