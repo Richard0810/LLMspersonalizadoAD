@@ -396,7 +396,7 @@ ${structuredContent}
 **Reglas de Estructura JSON (MUY IMPORTANTE):**
 1.  **Contenido:** Todos los elementos en los arrays "items" DEBEN derivarse del resumen.
 2.  **Etiquetas Claras:** Asigna una etiqueta clara a "circleA" y "circleB".
-3.  **Salida Final:** La respuesta debe ser ÚNICAMENTE el objeto JSON válido.`;
+3.  **Salida Final:** La respuesta debe ser ÚNICamente el objeto JSON válido.`;
                 outputSchema = VennDiagramDataContentSchema;
                 break;
                 
