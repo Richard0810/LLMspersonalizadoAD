@@ -594,7 +594,7 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ content, format }) => {
     const link = document.createElement('a');
     link.href = imageContent.url; 
     let filename = "imagen_generada_eduspark";
-    if (imageContent.alt) {
+    if (imageContent.alt && typeof imageContent.alt === 'string') {
       const sanitizedAlt = imageContent.alt.substring(0, 100).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^\w\s.-]/g, "").trim().replace(/\s+/g, "_");
       if (sanitizedAlt) filename = sanitizedAlt;
     }
@@ -717,3 +717,5 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ content, format }) => {
 };
 
 export default OutputDisplay;
+
+    
