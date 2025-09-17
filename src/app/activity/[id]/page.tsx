@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import InteractiveBackground from '@/components/shared/InteractiveBackground';
@@ -17,7 +17,15 @@ import { generateActivityDocument } from '@/ai/flows/generate-activity-document'
 import Image from 'next/image';
 import WordIcon from '@/components/icons/WordIcon';
 
-const SectionContent = ({ title, icon, content, generatedContent, className = "" }) => {
+interface SectionContentProps {
+  title: string;
+  icon: ReactNode;
+  content?: string;
+  generatedContent?: { text: string; imageUrl: string | null }[];
+  className?: string;
+}
+
+const SectionContent: React.FC<SectionContentProps> = ({ title, icon, content, generatedContent, className = "" }) => {
   const formatWithBold = (text: string) => {
     // Handles both **word** and *word:* and cleans up leading hyphens
     return text
