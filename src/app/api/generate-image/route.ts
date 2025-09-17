@@ -22,8 +22,8 @@ export async function POST(request: Request) {
     // El prompt para este modelo debe ser una única cadena
     const fullPrompt = `Genera una imagen basada en esta descripción: "${prompt}". Además, en una respuesta de texto separada, proporciona un texto alternativo (alt text) corto y descriptivo para la imagen.`;
 
-    // 2. Llama al modelo de generación de imágenes validado y estable
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+    // 2. Llama al modelo de generación de imágenes "Nano Banana"
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-image-preview" });
     const result = await model.generateContent(fullPrompt);
     
     // 3. Extrae los datos de la imagen y el texto de la respuesta
@@ -56,7 +56,7 @@ export async function POST(request: Request) {
     let errorMessage = "Ocurrió un error desconocido al generar la imagen.";
     let status = 500;
     
-    if (error instanceof Error) {
+    if (error instanceof Error && 'message' in error) {
         if (error.message.includes('429')) {
             errorMessage = "Límite de cuota excedido. Por favor, inténtalo de nuevo más tarde.";
             status = 429;
