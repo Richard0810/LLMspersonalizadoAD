@@ -126,7 +126,7 @@ const RenderConceptMap = forwardRef<HTMLDivElement, { data: GeneratedConceptMapD
           {data.connections.map((_, index) => (
             <line
               key={`line-${index}`}
-              ref={el => lineRefs.current[`line-${index}`] = el}
+              ref={el => { lineRefs.current[`line-${index}`] = el; }}
               className="stroke-gray-600 stroke-[1.5]"
             />
           ))}
@@ -592,13 +592,15 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ content, format }) => {
 
   const handleImageDownload = (imageContent: GeneratedImageType) => {
     const link = document.createElement('a');
-    link.href = imageContent.url; 
+    link.href = imageContent.url;
+    
     let filename = "imagen_generada_eduspark";
     if (imageContent.alt && typeof imageContent.alt === 'string') {
       const sanitizedAlt = imageContent.alt.substring(0, 100).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^\w\s.-]/g, "").trim().replace(/\s+/g, "_");
       if (sanitizedAlt) filename = sanitizedAlt;
     }
-    link.download = `${filename}.png`; 
+
+    link.download = `${filename}.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
