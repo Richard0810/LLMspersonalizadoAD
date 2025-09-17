@@ -232,7 +232,6 @@ Generando actividades iniciales...`,
       case 'computationalConcept': fieldLabel = 'Concepto computacional'; break;
       case 'subjectArea': fieldLabel = 'Área temática'; break;
       case 'gradeLevel': fieldLabel = 'Nivel de grado'; break;
-      default: fieldLabel = field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
     }
 
     addMessage({
