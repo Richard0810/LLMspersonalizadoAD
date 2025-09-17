@@ -7,7 +7,7 @@
  * - generateActivityVisuals - The main exported function to trigger the flow.
  */
 
-import { ai, geminiProVision } from '@/ai/genkit';
+import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import type { GenerateActivityVisualsInput, GeneratedActivityVisuals, VisualItem } from '@/types';
 
@@ -107,6 +107,7 @@ const generateImageThroughApiRoute = async (prompt: string): Promise<string | nu
         }
 
         const data = await response.json();
+        // The API now returns imageData and altText, we only need imageData here.
         return data.imageData || null;
 
     } catch (error) {

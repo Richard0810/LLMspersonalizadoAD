@@ -6,7 +6,7 @@
  * - generateVisualContent: Main exported function to call the flow.
  */
 
-import { ai, geminiFlash, geminiProVision } from '@/ai/genkit';
+import { ai, geminiFlash } from '@/ai/genkit';
 import { z } from 'genkit';
 import {
   GenerateVisualContentFlowInput,
@@ -204,7 +204,7 @@ function isConceptIllustParams(params: any): params is ConceptIllustParams {
     return params && typeof params.concept === 'string';
 }
 
-const generateImageThroughApiRoute = async (prompt: string): Promise<string> => {
+const generateImageThroughApiRoute = async (prompt: string): Promise<{ imageUrl: string, altText: string }> => {
     // This function calls the new Next.js API route.
     // It needs the absolute URL when running on the server.
     const apiUrl = process.env.VERCEL_URL
@@ -225,11 +225,11 @@ const generateImageThroughApiRoute = async (prompt: string): Promise<string> => 
     }
 
     const data = await response.json();
-    if (!data.imageData) {
-        throw new Error("La respuesta de la API no contenía los datos de la imagen.");
+    if (!data.imageData || !data.altText) {
+        throw new Error("La respuesta de la API no contenía los datos de la imagen o el texto alternativo.");
     }
 
-    return data.imageData;
+    return { imageUrl: data.imageData, altText: data.altText };
 };
 
 const generateVisualContentFlow = ai.defineFlow(
@@ -260,21 +260,12 @@ const generateVisualContentFlow = ai.defineFlow(
 
         const fullPrompt = buildImagePrompt(imgParams);
         
-        const imageUrl = await generateImageThroughApiRoute(fullPrompt);
-
-        // Generate alt text using Genkit (as it's a text task)
-        const { text: altText } = await ai.generate({
-            model: geminiProVision,
-            prompt: [
-              { media: { url: imageUrl } },
-              { text: `Genera un texto alternativo (alt text) conciso y descriptivo para la siguiente imagen. El prompt original para la imagen fue: "${imgParams.prompt}". El texto debe estar en español y no exceder los 125 caracteres.` }
-            ]
-        });
+        const { imageUrl, altText } = await generateImageThroughApiRoute(fullPrompt);
 
         return {
             type: 'image',
             url: imageUrl,
-            alt: altText || 'Imagen generada',
+            alt: altText,
         };
     }
 

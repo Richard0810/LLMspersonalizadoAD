@@ -18,36 +18,40 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-
-    // 2. Llama al modelo de generación de imágenes
-    const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" });
-    const result = await model.generateContent(prompt);
     
-    // 3. Extrae los datos de la imagen de la respuesta
-    const response = result.response;
-    const imagePart = response.candidates?.[0]?.content.parts[0];
+    // Prompt mejorado para pedir también un alt text
+    const fullPrompt = [
+        { text: prompt },
+        { text: "También, genera un texto alternativo (alt text) corto y descriptivo para la imagen."}
+    ];
 
-    // Esto es un workaround para un problema conocido en el que el modelo no devuelve 'inlineData'
-    // sino una función que devuelve los datos. Se revisa si la propiedad existe y si no,
-    // se intenta invocar la función para obtener los datos.
-    if (!imagePart || (typeof (imagePart as any).inlineData !== 'object' && typeof (imagePart as any).inline_data !== 'function')) {
+    // 2. Llama al modelo de generación de imágenes correcto
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-image-preview" });
+    const result = await model.generateContent(fullPrompt);
+    
+    // 3. Extrae los datos de la imagen y el texto de la respuesta
+    const response = result.response;
+    const parts = response.candidates?.[0]?.content.parts;
+
+    if (!parts || parts.length === 0) {
+        throw new Error("La respuesta del modelo no contiene partes válidas.");
+    }
+    
+    const imagePart = parts.find(p => 'inlineData' in p);
+    const textPart = parts.find(p => 'text' in p);
+
+    if (!imagePart || !('inlineData' in imagePart)) {
        throw new Error("No se pudo generar la imagen o la respuesta no tiene el formato esperado.");
     }
-    
-    let inlineData;
-    if (typeof (imagePart as any).inlineData === 'object') {
-        inlineData = (imagePart as any).inlineData;
-    } else {
-        // @ts-ignore
-        inlineData = imagePart.inline_data();
-    }
-    
-    // 4. Devuelve la imagen como un string Base64
-    const imageData = inlineData.data;
-    const mimeType = inlineData.mimeType;
+
+    // 4. Devuelve la imagen como un string Base64 y el alt text
+    const imageData = imagePart.inlineData.data;
+    const mimeType = imagePart.inlineData.mimeType;
+    const altText = textPart?.text || 'Imagen generada por IA';
     
     return NextResponse.json({ 
-      imageData: `data:${mimeType};base64,${imageData}` 
+      imageData: `data:${mimeType};base64,${imageData}`,
+      altText: altText
     });
 
   } catch (error) {
