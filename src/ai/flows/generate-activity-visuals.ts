@@ -6,7 +6,7 @@
  * - generateActivityVisuals - The main exported function to trigger the flow.
  */
 
-import { ai } from '@/ai/genkit';
+import { ai, geminiFlashImagePreview } from '@/ai/genkit';
 import { z } from 'genkit';
 import type { GenerateActivityVisualsInput, GeneratedActivityVisuals, VisualItem } from '@/types';
 
@@ -88,7 +88,7 @@ const generateImage = async (prompt: string): Promise<string | null> => {
     try {
         const fullPrompt = `Educational illustration, simple, clean, minimalist, whiteboard drawing style: ${prompt}`;
         const { media } = await ai.generate({
-            model: 'googleai/gemini-2.5-flash-image-preview',
+            model: geminiFlashImagePreview,
             prompt: fullPrompt,
             config: {
                 responseModalities: ['TEXT', 'IMAGE'],

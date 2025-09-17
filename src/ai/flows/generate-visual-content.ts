@@ -4,7 +4,7 @@
  * - generateVisualContent: Main exported function to call the flow.
  */
 
-import { ai } from '@/ai/genkit';
+import { ai, geminiFlash, geminiFlashImagePreview } from '@/ai/genkit';
 import { z } from 'genkit';
 import {
   GenerateVisualContentFlowInput,
@@ -235,7 +235,7 @@ const generateVisualContentFlow = ai.defineFlow(
         const fullPrompt = buildImagePrompt(imgParams);
         
         const { media } = await ai.generate({
-            model: 'googleai/gemini-2.5-flash-image-preview',
+            model: geminiFlashImagePreview,
             prompt: fullPrompt,
             config: {
                 responseModalities: ['TEXT', 'IMAGE'],
@@ -247,7 +247,7 @@ const generateVisualContentFlow = ai.defineFlow(
         }
 
         const { text: altText } = await ai.generate({
-            model: 'googleai/gemini-2.0-flash',
+            model: geminiFlash,
             prompt: [
               { media: { url: media.url } },
               { text: `Genera un texto alternativo (alt text) conciso y descriptivo para la siguiente imagen. El prompt original para la imagen fue: "${imgParams.prompt}". El texto debe estar en español y no exceder los 125 caracteres.` }
@@ -279,7 +279,7 @@ const generateVisualContentFlow = ai.defineFlow(
         const structuredContentPrompt = `Genera un resumen CONCISO Y DIRECTO para el tema '${topic}'. La longitud debe ser ${lengthInstruction}. Organiza los puntos principales y sub-puntos de forma lógica. El resumen DEBE estar completamente en español. Este resumen será la base para construir un diagrama visual. Detalles adicionales: ${details || ''}`;
         
         const { text: structuredContent } = await ai.generate({ 
-            model: 'googleai/gemini-2.0-flash', 
+            model: geminiFlash, 
             prompt: structuredContentPrompt 
         });
         
@@ -427,7 +427,7 @@ ${structuredContent}
 
 **Reglas de Estructura JSON (MUY IMPORTANTE):**
 1.  **Contenido:** Los campos "date", "title" y "description" deben derivarse del resumen y estar en orden cronológico.
-2.  **Salida Final:** La respuesta debe ser ÚNICAMENTE el objeto JSON válido.`;
+2.  **Salida Final:** La respuesta debe ser ÚNICamente el objeto JSON válido.`;
                 outputSchema = TimelineDataContentSchema;
                 break;
                 
@@ -471,7 +471,7 @@ Genera el código HTML completo y profesional AHORA.`;
         }
 
         const { output } = await ai.generate({
-            model: 'googleai/gemini-2.0-flash',
+            model: geminiFlash,
             prompt: finalPrompt,
             output: {
                 schema: outputSchema
@@ -504,5 +504,3 @@ Genera el código HTML completo y profesional AHORA.`;
     throw new Error(`The combination of category '${category}' and format '${format}' is not implemented or failed to produce output.`);
   }
 );
-
-    
