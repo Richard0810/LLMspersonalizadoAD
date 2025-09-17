@@ -126,7 +126,7 @@ const RenderConceptMap = forwardRef<HTMLDivElement, { data: GeneratedConceptMapD
           {data.connections.map((_, index) => (
             <line
               key={`line-${index}`}
-              ref={el => { lineRefs.current[`line-${index}`] = el; }}
+              ref={(el) => { lineRefs.current[`line-${index}`] = el; }}
               className="stroke-gray-600 stroke-[1.5]"
             />
           ))}
@@ -695,7 +695,7 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ content, format }) => {
 
   return (
     <div className="w-full space-y-4">
-      {content.title && <h3 className="text-lg font-semibold text-primary mb-2 text-center">{content.title}</h3>}
+      {'title' in content && content.title && <h3 className="text-lg font-semibold text-primary mb-2 text-center">{content.title}</h3>}
       {renderContent()}
       <div className="flex justify-center items-center gap-4 mt-4">
         {content.type === 'image' && (
