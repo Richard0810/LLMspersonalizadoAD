@@ -136,5 +136,3 @@ const generateActivityVisualsFlow = ai.defineFlow(
     return { materials, instructions, reflection, visualExamples };
   }
 );
-
-    
