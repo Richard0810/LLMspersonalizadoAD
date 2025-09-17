@@ -13,13 +13,7 @@ import {
   InfoOrgParams,
   ConceptIllustParams,
   VisualCategory,
-  VisualFormat,
-  GeneratedConceptMapDataType,
-  GeneratedMindMapDataType,
-  GeneratedFlowchartDataType,
-  GeneratedVennDiagramDataType,
-  GeneratedComparisonTableDataType,
-  GeneratedTimelineDataType
+  VisualFormat
 } from '@/types';
 
 // Internal Zod schemas for validation within the flow.
@@ -241,11 +235,8 @@ const generateVisualContentFlow = ai.defineFlow(
         const fullPrompt = buildImagePrompt(imgParams);
         
         const { media } = await ai.generate({
-            model: 'googleai/gemini-2.0-flash-exp',
+            model: 'googleai/gemini-2.5-flash-preview-04-17',
             prompt: fullPrompt,
-            config: {
-                responseModalities: ['TEXT', 'IMAGE'],
-            },
         });
         
         if (!media || !media.url) {
