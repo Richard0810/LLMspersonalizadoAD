@@ -38,7 +38,7 @@ export async function POST(request: Request) {
     const imagePart = parts.find(part => 'inlineData' in part);
     const textPart = parts.find(part => 'text' in part);
 
-    if (!imagePart || !('inlineData' in imagePart)) {
+    if (!imagePart || !('inlineData' in imagePart) || !imagePart.inlineData) {
        throw new Error("No se pudo generar la imagen o la respuesta no tiene el formato esperado.");
     }
     
