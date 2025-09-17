@@ -6,7 +6,7 @@
  * - generateVisualContent: Main exported function to call the flow.
  */
 
-import { ai, geminiFlash } from '@/ai/genkit';
+import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import {
   GenerateVisualContentFlowInput,
@@ -286,7 +286,7 @@ const generateVisualContentFlow = ai.defineFlow(
         const structuredContentPrompt = `Genera un resumen CONCISO Y DIRECTO para el tema '${topic}'. La longitud debe ser ${lengthInstruction}. Organiza los puntos principales y sub-puntos de forma lógica. El resumen DEBE estar completamente en español. Este resumen será la base para construir un diagrama visual. Detalles adicionales: ${details || ''}`;
         
         const { text: structuredContent } = await ai.generate({ 
-            model: geminiFlash, 
+            model: 'googleai/gemini-2.0-flash', 
             prompt: structuredContentPrompt 
         });
         
@@ -478,7 +478,7 @@ Genera el código HTML completo y profesional AHORA.`;
         }
 
         const { output } = await ai.generate({
-            model: geminiFlash,
+            model: 'googleai/gemini-2.0-flash',
             prompt: finalPrompt,
             output: {
                 schema: outputSchema

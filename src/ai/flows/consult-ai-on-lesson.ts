@@ -9,7 +9,7 @@
  * - ConsultAIOnLessonOutput - The return type for the consultAIOnLesson function.
  */
 
-import {ai, geminiFlash} from '@/ai/genkit';
+import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const ConsultAIOnLessonInputSchema = z.object({
@@ -32,7 +32,7 @@ export async function consultAIOnLesson(input: ConsultAIOnLessonInput): Promise<
 
 const prompt = ai.definePrompt({
   name: 'consultAIOnLessonPrompt',
-  model: geminiFlash,
+  model: 'googleai/gemini-2.0-flash',
   input: {schema: ConsultAIOnLessonInputSchema},
   output: {schema: ConsultAIOnLessonOutputSchema},
   prompt: `You are an expert in computational thinking and creating offline activities for education.
