@@ -209,9 +209,9 @@ function isConceptIllustParams(params: any): params is ConceptIllustParams {
  * This is now done directly within the Genkit flow for better stability.
  */
 async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: string, altText: string }> {
-    // Step 1: Generate the image using the correct model and config from BITACORA.md
+    // Step 1: Generate the image using the correct model and config
     const { media } = await ai.generate({
-        model: 'googleai/gemini-pro-vision',
+        model: 'gemini-2.5-flash-image-preview',
         prompt: prompt,
         config: {
             responseModalities: ['TEXT', 'IMAGE'],
