@@ -9,7 +9,7 @@
  * - GenerateEducationalActivitiesOutput - The return type for the generateEducationalactivities function.
  */
 
-import {ai} from '@/ai/genkit';
+import {ai, geminiFlash} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const GenerateEducationalActivitiesInputSchema = z.object({
@@ -51,6 +51,7 @@ const PromptInputSchema = GenerateEducationalActivitiesInputSchema.extend({
 
 const generateEducationalActivitiesPrompt = ai.definePrompt({
   name: 'generateEducationalActivitiesPrompt',
+  model: geminiFlash,
   input: {schema: PromptInputSchema},
   output: {schema: GenerateEducationalActivitiesOutputSchema},
   prompt: `Rol: Eres un diseñador instruccional experto y un asesor pedagógico especializado en pensamiento computacional para el contexto educativo de Colombia.
