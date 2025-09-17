@@ -54,6 +54,7 @@ export async function generateActivityVisuals(input: GenerateActivityVisualsInpu
 
 const analysisPrompt = ai.definePrompt({
     name: 'analyzeActivityForVisuals',
+    model: 'googleai/gemini-2.0-flash',
     input: { schema: GenerateActivityVisualsInputSchema },
     output: { schema: InternalOutputSchema },
     prompt: `You are an expert instructional designer and art director. Your task is to analyze an educational activity and decide which parts would benefit most from a visual aid.
@@ -86,27 +87,30 @@ Based on your analysis, provide the output in the required JSON format. For each
 
 const generateImageDirectly = async (prompt: string): Promise<string | null> => {
     if (!prompt) return null;
+    const fullPrompt = `Educational illustration, simple, clean, minimalist, whiteboard drawing style: ${prompt}`;
+
     try {
-        const fullPrompt = `Educational illustration, simple, clean, minimalist, whiteboard drawing style: ${prompt}`;
-        
         const { media } = await ai.generate({
             model: 'googleai/gemini-2.0-flash-exp', // Use the correct model from BITACORA
             prompt: fullPrompt,
             config: {
-                // The model will automatically determine output modalities based on the prompt
+                responseModalities: ['TEXT', 'IMAGE'],
             },
         });
 
-        if (!media || !media.url) {
-            console.warn(`Image generation returned no media for prompt: "${prompt}"`);
-            return null;
+        if (media?.url) {
+            return media.url;
         }
-
-        return media.url;
-
+        // If media or media.url is null, it will fall through to the catch block logic
+        throw new Error("AI generation did not return a valid image.");
+        
     } catch (error) {
-        console.error(`Failed to generate image for prompt "${prompt}":`, error);
-        return null; // Return null if image generation fails for any reason
+        console.warn(`AI image generation failed for prompt: "${prompt}". Falling back to Unsplash. Error:`, error);
+        
+        // Fallback strategy: Use Unsplash
+        const keywords = prompt.split(' ').filter(w => w.length > 3).slice(0, 3).join(',');
+        const unsplashUrl = `https://source.unsplash.com/500x500/?${encodeURIComponent(keywords)},education,illustration`;
+        return unsplashUrl;
     }
 };
 

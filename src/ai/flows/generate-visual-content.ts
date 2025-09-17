@@ -205,35 +205,41 @@ function isConceptIllustParams(params: any): params is ConceptIllustParams {
 }
 
 /**
- * Generates an image and a corresponding alt text using the AI model.
- * This is now done directly within the Genkit flow for better stability.
+ * Generates an image and a corresponding alt text using the AI model, with a fallback to Unsplash.
  */
 async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: string, altText: string }> {
-    // Step 1: Generate the image using the correct Genkit syntax
     const fullPrompt = `Educational illustration, simple, clean, minimalist, whiteboard drawing style: ${prompt}`;
+    let imageUrl = '';
     
-    const { media } = await ai.generate({
-        model: 'googleai/gemini-2.0-flash-exp',
-        prompt: fullPrompt,
-        config: {
-            // Note: responseModalities is not a valid config option in this version
-            // The model will automatically determine output modalities based on the prompt
-        },
-    });
+    try {
+        const { media } = await ai.generate({
+            model: 'googleai/gemini-2.0-flash-exp',
+            prompt: fullPrompt,
+            config: {
+                responseModalities: ['TEXT', 'IMAGE'],
+            },
+        });
 
-    if (!media || !media.url) {
-        throw new Error("Image generation failed to return media. This might be due to a safety policy violation or an internal model error.");
+        if (!media || !media.url) {
+            throw new Error("AI generation did not return a valid image.");
+        }
+        
+        imageUrl = media.url;
+
+    } catch (error) {
+        console.warn(`AI image generation failed for prompt: "${prompt}". Falling back to Unsplash. Error:`, error);
+        const keywords = prompt.split(' ').filter(w => w.length > 3).slice(0, 3).join(',');
+        imageUrl = `https://source.unsplash.com/800x600/?${encodeURIComponent(keywords)},education,illustration`;
     }
     
-    // Step 2: Generate alt text for the created image using the correct syntax
+    // Generate alt text regardless of image source
     const { text: altText } = await ai.generate({
-        model: 'googleai/gemini-2.0-flash', // Correct model for text generation
-        prompt: `Genera un texto alternativo (alt text) corto y descriptivo para la siguiente imagen. El texto debe estar en español y ser conciso.`,
-        input: { media: { url: media.url } },
+        model: 'googleai/gemini-2.0-flash', 
+        prompt: `Genera un texto alternativo (alt text) corto y descriptivo para el siguiente concepto: "${prompt}". El texto debe estar en español y ser conciso.`,
     });
 
     return { 
-      imageUrl: media.url, 
+      imageUrl: imageUrl, 
       altText: altText || "Imagen generada por IA, sin descripción disponible." 
     };
 };
@@ -399,7 +405,7 @@ ${structuredContent}
 **Reglas de Estructura JSON (MUY IMPORTANTE):**
 1.  **Contenido:** Todos los elementos en los arrays "items" DEBEN derivarse del resumen.
 2.  **Etiquetas Claras:** Asigna una etiqueta clara a "circleA" y "circleB".
-3.  **Salida Final:** La respuesta debe ser ÚNICamente el objeto JSON válido.`;
+3.  **Salida Final:** La respuesta debe ser ÚNICAMENTE el objeto JSON válido.`;
                 outputSchema = VennDiagramDataContentSchema;
                 break;
                 
