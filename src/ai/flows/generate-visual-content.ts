@@ -211,7 +211,7 @@ function isConceptIllustParams(params: any): params is ConceptIllustParams {
 async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: string, altText: string }> {
     // Step 1: Generate the image using the correct model and config
     const { media } = await ai.generate({
-        model: 'googleai/gemini-2.5-flash-image-preview',
+        model: 'googleai/gemini-2.0-flash-exp', // Use the correct model from BITACORA
         prompt: prompt,
         config: {
             responseModalities: ['TEXT', 'IMAGE'],
