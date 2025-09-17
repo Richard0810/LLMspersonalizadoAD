@@ -241,7 +241,7 @@ const generateVisualContentFlow = ai.defineFlow(
         const fullPrompt = buildImagePrompt(imgParams);
         
         const { media } = await ai.generate({
-            model: 'googleai/gemini-2.5-flash-preview-04-17',
+            model: 'googleai/gemini-2.0-flash-exp',
             prompt: fullPrompt,
             config: {
                 responseModalities: ['TEXT', 'IMAGE'],
