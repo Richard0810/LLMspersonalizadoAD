@@ -279,7 +279,7 @@ const RenderMindMap = forwardRef<HTMLDivElement, { data: GeneratedMindMapDataTyp
             className="relative border rounded bg-slate-50 shadow-inner overflow-hidden text-center"
             style={{ width: '100%', height: '800px', maxWidth: '1200px', margin: 'auto' }}
         >
-            <canvas ref={canvasRef} className="absolute top-0 left-0 pointer-events-none z-[1]"></canvas>
+            <canvas ref={el => { canvasRef.current = el; }} className="absolute top-0 left-0 pointer-events-none z-[1]"></canvas>
             <div 
                 id="central" 
                 ref={el => { nodeRefs.current['central'] = el; }}
@@ -596,8 +596,8 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ content, format }) => {
     
     let filename = "imagen_generada_eduspark";
     if (imageContent.alt && typeof imageContent.alt === 'string') {
-      const sanitizedAlt = imageContent.alt.substring(0, 100).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^\w\s.-]/g, "").trim().replace(/\s+/g, "_");
-      if (sanitizedAlt) filename = sanitizedAlt;
+        const sanitizedAlt = imageContent.alt.substring(0, 100).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^\w\s.-]/g, "").trim().replace(/\s+/g, "_");
+        if (sanitizedAlt) filename = sanitizedAlt;
     }
 
     link.download = `${filename}.png`;
