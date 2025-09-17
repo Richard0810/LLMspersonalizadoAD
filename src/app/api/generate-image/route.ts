@@ -25,7 +25,7 @@ export async function POST(request: Request) {
         { text: "También, genera un texto alternativo (alt text) corto y descriptivo para la imagen."}
     ];
 
-    // 2. Llama al modelo de generación de imágenes correcto
+    // 2. Llama al modelo de generación de imágenes correcto y estable
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-image-preview" });
     const result = await model.generateContent(fullPrompt);
     
@@ -56,10 +56,22 @@ export async function POST(request: Request) {
 
   } catch (error) {
     console.error("Error en la API route:", error);
-    const errorMessage = error instanceof Error ? error.message : "Ocurrió un error desconocido al generar la imagen.";
+    let errorMessage = "Ocurrió un error desconocido al generar la imagen.";
+    let status = 500;
+    
+    if (error instanceof Error && 'message' in error) {
+        // Intenta extraer el status code si está disponible (como en el error de cuota)
+        if (error.message.includes('429')) {
+            errorMessage = "Límite de cuota excedido. Por favor, inténtalo de nuevo más tarde.";
+            status = 429;
+        } else {
+             errorMessage = error.message;
+        }
+    }
+    
     return NextResponse.json(
       { error: errorMessage },
-      { status: 500 }
+      { status }
     );
   }
 }
