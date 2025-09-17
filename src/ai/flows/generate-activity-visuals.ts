@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview A Genkit flow to analyze an educational activity and generate relevant visual aids.
@@ -90,7 +91,9 @@ const generateImage = async (prompt: string): Promise<string | null> => {
         const { media } = await ai.generate({
             model: 'googleai/gemini-2.0-flash-exp',
             prompt: fullPrompt,
-            responseModalities: ['TEXT', 'IMAGE'],
+            config: {
+                responseModalities: ['TEXT', 'IMAGE'],
+            },
         });
         return media?.url || null;
     } catch (error) {
