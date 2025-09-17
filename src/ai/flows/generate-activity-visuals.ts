@@ -90,10 +90,10 @@ const generateImageDirectly = async (prompt: string): Promise<string | null> => 
         const fullPrompt = `Educational illustration, simple, clean, minimalist, whiteboard drawing style: ${prompt}`;
         
         const { media } = await ai.generate({
-            model: 'googleai/gemini-2.0-flash-exp', // Use the correct model from BITACORA
+            model: 'googleai/gemini-pro-vision',
             prompt: fullPrompt,
             config: {
-                responseModalities: ['TEXT', 'IMAGE'], // Crucial parameter
+                responseModalities: ['TEXT', 'IMAGE'],
             },
         });
 
