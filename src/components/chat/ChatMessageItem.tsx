@@ -12,6 +12,7 @@ import type { ChatMessage, LessonParams, Activity } from '@/types';
 import { cn } from '@/lib/utils';
 import { Bot, User, AlertTriangle, Settings2, Sparkles, CheckCircle, Loader2, FileSignature } from 'lucide-react';
 import { subjectAreas, gradeLevels } from '@/types';
+import { useAuth } from '@/hooks/useAuth';
 
 interface ChatMessageItemProps {
   message: ChatMessage;
@@ -21,6 +22,7 @@ interface ChatMessageItemProps {
 }
 
 const ChatMessageItem: React.FC<ChatMessageItemProps> = ({ message, onParameterChange, currentLessonParams, onEditMessage }) => {
+  const { user } = useAuth();
   const isUser = message.sender === 'user';
   const isAI = message.sender === 'ai';
   const isSystem = message.sender === 'system';
@@ -190,7 +192,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({ message, onParameterC
       </Card>
       {isUser && (
          <Avatar className="h-8 w-8">
-          <AvatarFallback><User className="h-5 w-5" /></AvatarFallback>
+          <AvatarFallback>{user?.username?.[0] || 'U'}</AvatarFallback>
         </Avatar>
       )}
     </div>
@@ -198,5 +200,3 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({ message, onParameterC
 };
 
 export default ChatMessageItem;
-
-    

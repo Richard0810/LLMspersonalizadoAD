@@ -135,7 +135,7 @@ const RenderConceptMap = forwardRef<HTMLDivElement, { data: GeneratedConceptMapD
         {data.nodes.map(node => (
           <div
             key={node.id}
-            ref={el => nodeRefs.current[node.id] = el}
+            ref={el => { nodeRefs.current[node.id] = el; }}
             className={cn(
                 "absolute p-2 px-4 rounded-lg cursor-move z-10 text-center select-none text-sm",
                 node.type === 'principal' && 'bg-blue-700 text-white border-2 border-blue-400 font-bold p-3 text-base',
@@ -282,7 +282,7 @@ const RenderMindMap = forwardRef<HTMLDivElement, { data: GeneratedMindMapDataTyp
             <canvas ref={canvasRef} className="absolute top-0 left-0 pointer-events-none z-[1]"></canvas>
             <div 
                 id="central" 
-                ref={el => nodeRefs.current['central'] = el}
+                ref={el => { nodeRefs.current['central'] = el; }}
                 className="node-draggable absolute bg-primary text-primary-foreground p-4 rounded-xl shadow-lg cursor-move z-[10] text-lg font-bold flex items-center justify-center"
                 style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)', minWidth: '150px', minHeight: '60px' }}
             >
@@ -292,7 +292,7 @@ const RenderMindMap = forwardRef<HTMLDivElement, { data: GeneratedMindMapDataTyp
                 <div
                     key={branch.id}
                     id={branch.id}
-                    ref={el => nodeRefs.current[branch.id] = el}
+                    ref={el => { nodeRefs.current[branch.id] = el; }}
                     className="node-draggable absolute bg-card text-card-foreground p-3 rounded-lg shadow-md cursor-move z-[10] w-48 text-left border border-border"
                     style={{ top: branch.position.top, left: branch.position.left }}
                 >
@@ -441,7 +441,7 @@ draggedNode = null;
                     <path
                         key={`line-${conn.from}-${conn.to}`}
                         id={`line-${conn.from}-${conn.to}`}
-                        ref={el => lineRefs.current[`line-${conn.from}-${conn.to}`] = el}
+                        ref={el => { lineRefs.current[`line-${conn.from}-${conn.to}`] = el; }}
                         stroke="#333"
                         strokeWidth="2"
                         markerEnd="url(#arrowhead)"
@@ -453,7 +453,7 @@ draggedNode = null;
             {data.nodes.map(node => (
                 <div
                     key={node.id}
-                    ref={el => nodeRefs.current[node.id] = el}
+                    ref={el => { nodeRefs.current[node.id] = el; }}
                     className={cn(
                         "flowchart-node absolute p-2 px-4 rounded-lg cursor-move z-10 text-center select-none text-sm border-2 border-gray-700 bg-white",
                         node.type === 'start-end' && 'rounded-full bg-pink-200 border-pink-500',
@@ -719,5 +719,3 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ content, format }) => {
 };
 
 export default OutputDisplay;
-
-    
