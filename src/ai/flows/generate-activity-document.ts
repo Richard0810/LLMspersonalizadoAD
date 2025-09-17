@@ -23,8 +23,6 @@ import {
   ImageRun,
   BorderStyle,
 } from 'docx';
-import * as fs from 'fs/promises';
-import * as path from 'path';
 import type { Activity } from '@/types';
 
 // Define Zod schemas for input and output
@@ -175,13 +173,32 @@ const generateActivityDocumentFlow = ai.defineFlow(
     outputSchema: GenerateActivityDocumentOutputSchema,
   },
   async (activity) => {
-    // --- 1. Load Logo Images ---
-    const logoUnicorPath = path.join(process.cwd(), 'public', 'logo_unicor.png');
-    const logoEscudoPath = path.join(process.cwd(), 'public', 'escudo.jpg');
-
+    // --- 1. Fetch Logo Images via URL ---
+    // This is the robust way to handle assets in a serverless environment like Vercel
+    const getAssetBuffer = async (assetPath: string): Promise<Buffer> => {
+        // Vercel provides a system environment variable `VERCEL_URL` for the deployment's URL.
+        // It automatically uses http for localhost.
+        const host = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:9002';
+        const url = new URL(assetPath, host).toString();
+        
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch image ${url}: ${response.statusText}`);
+            }
+            const arrayBuffer = await response.arrayBuffer();
+            return Buffer.from(arrayBuffer);
+        } catch (error) {
+            console.error(`Error fetching asset from ${url}:`, error);
+            // Return a placeholder buffer if fetching fails to avoid a crash.
+            // This is a 1x1 transparent GIF.
+            return Buffer.from('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', 'base64');
+        }
+    };
+    
     const [logoUnicorBuffer, logoEscudoBuffer] = await Promise.all([
-        fs.readFile(logoUnicorPath),
-        fs.readFile(logoEscudoPath)
+        getAssetBuffer('/logo_unicor.png'),
+        getAssetBuffer('/escudo.jpg'),
     ]);
     
     // --- 2. Create Header Table ---
