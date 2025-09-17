@@ -19,38 +19,53 @@ export async function POST(request: Request) {
       );
     }
     
-    // Prompt mejorado para pedir también un alt text
     const fullPrompt = [
         { text: prompt },
         { text: "También, genera un texto alternativo (alt text) corto y descriptivo para la imagen."}
     ];
 
-    // 2. Llama al modelo de generación de imágenes correcto y estable
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-image-preview" });
-    const result = await model.generateContent(fullPrompt);
+    // 2. Llama al modelo de generación de imágenes validado y estable
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+    const result = await model.generateContent({
+        contents: [{ parts: fullPrompt }],
+        // @ts-ignore - Este parámetro es necesario para este modelo específico
+        generationConfig: {
+            responseMimeType: "application/json",
+            responseSchema: {
+                type: "object",
+                properties: {
+                    image: {
+                        type: "string",
+                        description: "La imagen generada, como un string en formato base64."
+                    },
+                    altText: {
+                        type: "string",
+                        description: "Un texto alternativo corto y descriptivo para la imagen."
+                    }
+                }
+            }
+        }
+    });
     
     // 3. Extrae los datos de la imagen y el texto de la respuesta
     const response = result.response;
-    const parts = response.candidates?.[0]?.content.parts;
-
-    if (!parts || parts.length === 0) {
-        throw new Error("La respuesta del modelo no contiene partes válidas.");
-    }
+    const responseText = response.text();
     
-    const imagePart = parts.find(p => 'inlineData' in p);
-    const textPart = parts.find(p => 'text' in p);
+    if (!responseText) {
+        throw new Error("La respuesta del modelo vino vacía.");
+    }
 
-    if (!imagePart || !('inlineData' in imagePart)) {
+    const parsedResponse = JSON.parse(responseText);
+    
+    const imageData = parsedResponse.image;
+    const altText = parsedResponse.altText || 'Imagen generada por IA';
+
+    if (!imageData) {
        throw new Error("No se pudo generar la imagen o la respuesta no tiene el formato esperado.");
     }
-
-    // 4. Devuelve la imagen como un string Base64 y el alt text
-    const imageData = imagePart.inlineData.data;
-    const mimeType = imagePart.inlineData.mimeType;
-    const altText = textPart?.text || 'Imagen generada por IA';
     
     return NextResponse.json({ 
-      imageData: `data:${mimeType};base64,${imageData}`,
+      imageData: `data:image/png;base64,${imageData}`,
       altText: altText
     });
 
@@ -60,7 +75,6 @@ export async function POST(request: Request) {
     let status = 500;
     
     if (error instanceof Error && 'message' in error) {
-        // Intenta extraer el status code si está disponible (como en el error de cuota)
         if (error.message.includes('429')) {
             errorMessage = "Límite de cuota excedido. Por favor, inténtalo de nuevo más tarde.";
             status = 429;
