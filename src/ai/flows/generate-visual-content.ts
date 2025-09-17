@@ -2,10 +2,11 @@
 'use server';
 /**
  * @fileOverview Genkit flow for generating various visual content types.
+ * This has been refactored to use a Next.js API route for image generation.
  * - generateVisualContent: Main exported function to call the flow.
  */
 
-import { ai, geminiFlash } from '@/ai/genkit';
+import { ai, geminiFlash, geminiProVision } from '@/ai/genkit';
 import { z } from 'genkit';
 import {
   GenerateVisualContentFlowInput,
@@ -203,6 +204,34 @@ function isConceptIllustParams(params: any): params is ConceptIllustParams {
     return params && typeof params.concept === 'string';
 }
 
+const generateImageThroughApiRoute = async (prompt: string): Promise<string> => {
+    // This function calls the new Next.js API route.
+    // It needs the absolute URL when running on the server.
+    const apiUrl = process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}/api/generate-image`
+      : 'http://localhost:9002/api/generate-image';
+
+    const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ prompt }),
+    });
+
+    if (!response.ok) {
+        const errorBody = await response.json();
+        throw new Error(errorBody.error || `La llamada a la API falló con estado ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (!data.imageData) {
+        throw new Error("La respuesta de la API no contenía los datos de la imagen.");
+    }
+
+    return data.imageData;
+};
+
 const generateVisualContentFlow = ai.defineFlow(
   {
     name: 'generateVisualContentFlow',
@@ -210,16 +239,14 @@ const generateVisualContentFlow = ai.defineFlow(
     outputSchema: FlowOutputSchema,
   },
   async (input) => {
-    const { category, format, translatedFormatName, params } = input;
+    const { category, format, params } = input;
 
     // Handle single-step image generation categories
     if (category === VisualCategory.IMAGE_GENERATION || category === VisualCategory.CONCEPT_ILLUSTRATION) {
         let imgParams: ImageGenerationParams;
 
         if (category === VisualCategory.CONCEPT_ILLUSTRATION) {
-            if (!isConceptIllustParams(params)) {
-                throw new Error("Invalid parameters for concept illustration");
-            }
+            if (!isConceptIllustParams(params)) throw new Error("Parámetros inválidos para ilustración de concepto");
             const p = params as ConceptIllustParams;
             const visualStyle = format === VisualFormat.PHOTO_REALISTIC ? 'Fotorrealista' : p.visualStyle;
             imgParams = { 
@@ -227,40 +254,28 @@ const generateVisualContentFlow = ai.defineFlow(
                 theme: p.theme 
             };
         } else {
-            if (!isImageGenerationParams(params)) {
-                throw new Error("Invalid parameters for image generation");
-            }
+            if (!isImageGenerationParams(params)) throw new Error("Parámetros inválidos para generación de imágenes");
             imgParams = params as ImageGenerationParams;
         }
 
         const fullPrompt = buildImagePrompt(imgParams);
         
-        const { media } = await ai.generate({
-            model: 'googleai/gemini-2.5-flash-image-preview',
-            prompt: fullPrompt,
-            config: {
-              responseModalities: ['TEXT', 'IMAGE'],
-            },
-        });
-        
-        if (!media || !media.url) {
-            throw new Error("Image generation failed to return media.");
-        }
+        const imageUrl = await generateImageThroughApiRoute(fullPrompt);
 
+        // Generate alt text using Genkit (as it's a text task)
         const { text: altText } = await ai.generate({
-            model: geminiFlash,
+            model: geminiProVision,
             prompt: [
-              { media: { url: media.url } },
+              { media: { url: imageUrl } },
               { text: `Genera un texto alternativo (alt text) conciso y descriptivo para la siguiente imagen. El prompt original para la imagen fue: "${imgParams.prompt}". El texto debe estar en español y no exceder los 125 caracteres.` }
             ]
         });
 
-        const result: GenerateVisualContentFlowOutput = {
+        return {
             type: 'image',
-            url: media.url,
+            url: imageUrl,
             alt: altText || 'Imagen generada',
         };
-        return result;
     }
 
     // Handle multi-step information organization category
@@ -407,7 +422,7 @@ ${structuredContent}
 
 **Reglas de Estructura JSON (MUY IMPORTANTE):**
 1.  **Estructura:** El primer elemento de "headers" debe ser el criterio de comparación (ej. "Característica"). El resto son los ítems a comparar. Cada fila debe tener la misma cantidad de elementos que "headers".
-2.  **Salida Final:** La respuesta debe ser ÚNICAMENTE el objeto JSON válido.`;
+2.  **Salida Final:** La respuesta debe ser ÚNICamente el objeto JSON válido.`;
                 outputSchema = ComparisonTableDataContentSchema;
                 break;
                 
@@ -428,7 +443,7 @@ ${structuredContent}
 
 **Reglas de Estructura JSON (MUY IMPORTANTE):**
 1.  **Contenido:** Los campos "date", "title" y "description" deben derivarse del resumen y estar en orden cronológico.
-2.  **Salida Final:** La respuesta debe ser ÚNICamente el objeto JSON válido.`;
+2.  **Salida Final:** La respuesta debe ser ÚNICAMENTE el objeto JSON válido.`;
                 outputSchema = TimelineDataContentSchema;
                 break;
                 

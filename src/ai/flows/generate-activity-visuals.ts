@@ -3,11 +3,11 @@
 /**
  * @fileOverview A Genkit flow to analyze an educational activity and generate relevant visual aids.
  * The flow acts as an "Art Director AI", deciding what to illustrate and how.
- *
+ * It now uses a Next.js API route for the actual image generation.
  * - generateActivityVisuals - The main exported function to trigger the flow.
  */
 
-import { ai } from '@/ai/genkit';
+import { ai, geminiProVision } from '@/ai/genkit';
 import { z } from 'genkit';
 import type { GenerateActivityVisualsInput, GeneratedActivityVisuals, VisualItem } from '@/types';
 
@@ -84,18 +84,31 @@ Based on your analysis, provide the output in the required JSON format. For each
 `,
 });
 
-const generateImage = async (prompt: string): Promise<string | null> => {
+const generateImageThroughApiRoute = async (prompt: string): Promise<string | null> => {
     if (!prompt) return null;
     try {
         const fullPrompt = `Educational illustration, simple, clean, minimalist, whiteboard drawing style: ${prompt}`;
-        const { media } = await ai.generate({
-            model: 'googleai/gemini-2.5-flash-image-preview',
-            prompt: fullPrompt,
-            config: {
-                responseModalities: ['TEXT', 'IMAGE'],
-            },
+        
+        // This function calls the new Next.js API route.
+        // It needs the absolute URL when running on the server.
+        const apiUrl = process.env.VERCEL_URL
+          ? `https://${process.env.VERCEL_URL}/api/generate-image`
+          : 'http://localhost:9002/api/generate-image';
+
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: fullPrompt }),
         });
-        return media?.url || null;
+
+        if (!response.ok) {
+            const errorBody = await response.json();
+            throw new Error(errorBody.error || `La llamada a la API falló con estado ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data.imageData || null;
+
     } catch (error) {
         console.error(`Failed to generate image for prompt "${prompt}":`, error);
         return null; // Return null if image generation fails for any reason
@@ -120,7 +133,7 @@ const generateActivityVisualsFlow = ai.defineFlow(
       if (!items) return [];
       return Promise.all(
         items.map(async (item) => {
-          const imageUrl = item.imagePrompt ? await generateImage(item.imagePrompt) : null;
+          const imageUrl = item.imagePrompt ? await generateImageThroughApiRoute(item.imagePrompt) : null;
           return { text: item.text, imageUrl };
         })
       );
