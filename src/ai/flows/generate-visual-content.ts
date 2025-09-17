@@ -235,8 +235,11 @@ const generateVisualContentFlow = ai.defineFlow(
         const fullPrompt = buildImagePrompt(imgParams);
         
         const { media } = await ai.generate({
-            model: 'googleai/imagen-4.0-fast-generate-001',
-            prompt: fullPrompt
+            model: 'googleai/gemini-2.0-flash-exp',
+            prompt: fullPrompt,
+            config: {
+                responseModalities: ['TEXT', 'IMAGE'],
+            },
         });
         
         if (!media || !media.url) {
@@ -501,3 +504,5 @@ Genera el código HTML completo y profesional AHORA.`;
     throw new Error(`The combination of category '${category}' and format '${format}' is not implemented or failed to produce output.`);
   }
 );
+
+    
