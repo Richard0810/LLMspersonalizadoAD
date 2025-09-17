@@ -93,7 +93,7 @@ const generateImageDirectly = async (prompt: string): Promise<string | null> => 
             model: 'googleai/gemini-2.0-flash-exp', // Use the correct model from BITACORA
             prompt: fullPrompt,
             config: {
-                responseModalities: ['TEXT', 'IMAGE'],
+                // The model will automatically determine output modalities based on the prompt
             },
         });
 

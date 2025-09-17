@@ -209,12 +209,15 @@ function isConceptIllustParams(params: any): params is ConceptIllustParams {
  * This is now done directly within the Genkit flow for better stability.
  */
 async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: string, altText: string }> {
-    // Step 1: Generate the image using the correct model and config
+    // Step 1: Generate the image using the correct Genkit syntax
+    const fullPrompt = `Educational illustration, simple, clean, minimalist, whiteboard drawing style: ${prompt}`;
+    
     const { media } = await ai.generate({
-        model: 'googleai/gemini-2.0-flash-exp', // Use the correct model from BITACORA
-        prompt: prompt,
+        model: 'googleai/gemini-2.0-flash-exp',
+        prompt: fullPrompt,
         config: {
-            responseModalities: ['TEXT', 'IMAGE'],
+            // Note: responseModalities is not a valid config option in this version
+            // The model will automatically determine output modalities based on the prompt
         },
     });
 
@@ -222,7 +225,7 @@ async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: stri
         throw new Error("Image generation failed to return media. This might be due to a safety policy violation or an internal model error.");
     }
     
-    // Step 2: Generate alt text for the created image
+    // Step 2: Generate alt text for the created image using the correct syntax
     const { text: altText } = await ai.generate({
         model: 'googleai/gemini-2.0-flash', // Correct model for text generation
         prompt: `Genera un texto alternativo (alt text) corto y descriptivo para la siguiente imagen. El texto debe estar en español y ser conciso.`,
