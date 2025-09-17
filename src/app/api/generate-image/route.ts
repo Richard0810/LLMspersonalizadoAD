@@ -1,73 +1,146 @@
-
 'use server';
+/**
+ * @fileOverview A Genkit flow to analyze an educational activity and generate relevant visual aids.
+ * The flow acts as an "Art Director AI", deciding what to illustrate and how.
+ * It now calls the image generation model directly.
+ * - generateActivityVisuals - The main exported function to trigger the flow.
+ */
 
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import { NextResponse } from "next/server";
+import { ai } from '@/ai/genkit';
+import { z } from 'genkit';
+import type { GenerateActivityVisualsInput, GeneratedActivityVisuals, VisualItem } from '@/types';
 
-// Inicializa el cliente de Google AI con tu clave de API
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+// Define Zod schemas based on the types in src/types/index.ts
+const VisualItemSchema = z.object({
+  text: z.string().describe('The original text for the item or step.'),
+  imageUrl: z.string().nullable().describe('The data URI of the generated image (or null if no image was generated for this item).'),
+});
 
-export async function POST(request: Request) {
-  try {
-    // 1. Obtiene el prompt del cuerpo de la petición
-    const { prompt } = await request.json();
+const GenerateActivityVisualsOutputSchema = z.object({
+  materials: z.array(VisualItemSchema).describe('Visual aids for the necessary materials.'),
+  instructions: z.array(VisualItemSchema).describe('Visual aids for the step-by-step instructions.'),
+  reflection: z.array(VisualItemSchema).describe('Visual aids for the reflection questions.'),
+  visualExamples: z.array(VisualItemSchema).describe('Visual aids for the suggested visual examples.'),
+});
 
-    if (!prompt) {
-      return NextResponse.json(
-        { error: "El prompt es requerido" },
-        { status: 400 }
-      );
-    }
-    
-    // El prompt para este modelo debe ser una única cadena
-    const fullPrompt = `Genera una imagen basada en esta descripción: "${prompt}". Además, en una respuesta de texto separada, proporciona un texto alternativo (alt text) corto y descriptivo para la imagen.`;
+const GenerateActivityVisualsInputSchema = z.object({
+  materials: z.string(),
+  instructions: z.string(),
+  reflection: z.string(),
+  visualExamples: z.string(),
+});
 
-    // 2. Llama al modelo de generación de imágenes "Nano Banana"
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-image-preview" });
-    const result = await model.generateContent(fullPrompt);
-    
-    // 3. Extrae los datos de la imagen y el texto de la respuesta
-    const response = result.response;
-    const parts = response.candidates?.[0]?.content.parts;
-    
-    if (!parts || parts.length === 0) {
-        throw new Error("La respuesta del modelo vino vacía.");
-    }
-    
-    // Busca la parte de la imagen (inlineData) y la del texto (text)
-    const imagePart = parts.find(part => 'inlineData' in part);
-    const textPart = parts.find(part => 'text' in part);
+// This internal schema is what the AI will be prompted to produce.
+// It includes an additional field for the AI to decide on the image prompt.
+const InternalVisualItemSchema = z.object({
+    text: z.string().describe('The original, unmodified text for the item or step.'),
+    imagePrompt: z.string().nullable().describe('A concise, descriptive prompt for generating an image for this step. If no image is needed, this MUST be null. Example: "A simple drawing of a pencil and a notebook on a table".'),
+});
 
-    if (!imagePart || !('inlineData' in imagePart) || !imagePart.inlineData) {
-       throw new Error("No se pudo generar la imagen o la respuesta no tiene el formato esperado.");
-    }
-    
-    const imageData = imagePart.inlineData.data;
-    const mimeType = imagePart.inlineData.mimeType;
-    const altText = textPart?.text || 'Imagen generada por IA';
+const InternalOutputSchema = z.object({
+  materials: z.array(InternalVisualItemSchema),
+  instructions: z.array(InternalVisualItemSchema),
+  reflection: z.array(InternalVisualItemSchema),
+  visualExamples: z.array(InternalVisualItemSchema),
+});
 
-    return NextResponse.json({ 
-      imageData: `data:${mimeType};base64,${imageData}`,
-      altText: altText
-    });
 
-  } catch (error) {
-    console.error("Error en la API route:", error);
-    let errorMessage = "Ocurrió un error desconocido al generar la imagen.";
-    let status = 500;
-    
-    if (error instanceof Error && 'message' in error) {
-        if (error.message.includes('429')) {
-            errorMessage = "Límite de cuota excedido. Por favor, inténtalo de nuevo más tarde.";
-            status = 429;
-        } else {
-             errorMessage = error.message;
-        }
-    }
-    
-    return NextResponse.json(
-      { error: errorMessage },
-      { status }
-    );
-  }
+// Export the wrapper function that the client will call.
+export async function generateActivityVisuals(input: GenerateActivityVisualsInput): Promise<GeneratedActivityVisuals> {
+  return generateActivityVisualsFlow(input);
 }
+
+
+const analysisPrompt = ai.definePrompt({
+    name: 'analyzeActivityForVisuals',
+    input: { schema: GenerateActivityVisualsInputSchema },
+    output: { schema: InternalOutputSchema },
+    prompt: `You are an expert instructional designer and art director. Your task is to analyze an educational activity and decide which parts would benefit most from a visual aid.
+
+You will receive four sections of an activity: materials, instructions, reflection, and visualExamples.
+For EACH item in EACH section, you must make a decision:
+1.  Is an image useful here? Images should only be for concrete, visualizable objects or actions. Do not generate images for abstract concepts or simple instructions like "ask the students". For the 'visualExamples' section, always try to generate an image.
+2.  If yes, create a SIMPLE, CLEAR, and CONCISE prompt for an image generation model. The prompt should describe a clean, minimalistic, educational-style illustration. Think of simple icons or drawings a teacher would make on a whiteboard.
+3.  If no image is needed, the 'imagePrompt' field MUST be null.
+
+Analyze the following activity content:
+
+---
+**Materials:**
+{{{materials}}}
+---
+**Instructions:**
+{{{instructions}}}
+---
+**Reflection:**
+{{{reflection}}}
+---
+**Suggested Visuals:**
+{{{visualExamples}}}
+---
+
+Based on your analysis, provide the output in the required JSON format. For each line item in the original text, create a corresponding JSON object with the original text and either an 'imagePrompt' or null.
+`,
+});
+
+const generateImageDirectly = async (prompt: string): Promise<string | null> => {
+    if (!prompt) return null;
+    try {
+        const fullPrompt = `Educational illustration, simple, clean, minimalist, whiteboard drawing style: ${prompt}`;
+        
+        const { media } = await ai.generate({
+            model: 'googleai/gemini-2.0-flash-exp', // Use the correct model from BITACORA
+            prompt: fullPrompt,
+            config: {
+                responseModalities: ['TEXT', 'IMAGE'], // Crucial parameter
+            },
+        });
+
+        if (!media || !media.url) {
+            console.warn(`Image generation returned no media for prompt: "${prompt}"`);
+            return null;
+        }
+
+        return media.url;
+
+    } catch (error) {
+        console.error(`Failed to generate image for prompt "${prompt}":`, error);
+        return null; // Return null if image generation fails for any reason
+    }
+};
+
+const generateActivityVisualsFlow = ai.defineFlow(
+  {
+    name: 'generateActivityVisualsFlow',
+    inputSchema: GenerateActivityVisualsInputSchema,
+    outputSchema: GenerateActivityVisualsOutputSchema,
+  },
+  async (input) => {
+    // Step 1: AI analyzes the activity and decides on image prompts.
+    const { output: analysis } = await analysisPrompt(input);
+    if (!analysis) {
+      throw new Error("AI analysis failed to produce a visual plan.");
+    }
+
+    // Step 2: Concurrently generate all the required images.
+    const processSection = async (items: z.infer<typeof InternalVisualItemSchema>[]): Promise<VisualItem[]> => {
+      if (!items) return [];
+      return Promise.all(
+        items.map(async (item) => {
+          const imageUrl = item.imagePrompt ? await generateImageDirectly(item.imagePrompt) : null;
+          return { text: item.text, imageUrl };
+        })
+      );
+    };
+
+    const [materials, instructions, reflection, visualExamples] = await Promise.all([
+      processSection(analysis.materials),
+      processSection(analysis.instructions),
+      processSection(analysis.reflection),
+      processSection(analysis.visualExamples),
+    ]);
+    
+    // Step 3: Return the final structured object with image URLs.
+    return { materials, instructions, reflection, visualExamples };
+  }
+);

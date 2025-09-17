@@ -2,7 +2,7 @@
 'use server';
 /**
  * @fileOverview Genkit flow for generating various visual content types.
- * This has been refactored to use a Next.js API route for image generation.
+ * This has been refactored to call the AI model directly, removing the dependency on a Next.js API route.
  * - generateVisualContent: Main exported function to call the flow.
  */
 
@@ -204,33 +204,37 @@ function isConceptIllustParams(params: any): params is ConceptIllustParams {
     return params && typeof params.concept === 'string';
 }
 
-const generateImageThroughApiRoute = async (prompt: string): Promise<{ imageUrl: string, altText: string }> => {
-    // This function calls the new Next.js API route.
-    // It needs the absolute URL when running on the server.
-    const apiUrl = process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}/api/generate-image`
-      : 'http://localhost:9002/api/generate-image';
-
-    const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
+/**
+ * Generates an image and a corresponding alt text using the AI model.
+ * This is now done directly within the Genkit flow for better stability.
+ */
+async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: string, altText: string }> {
+    // Step 1: Generate the image using the correct model and config from BITACORA.md
+    const { media } = await ai.generate({
+        model: 'googleai/gemini-2.0-flash-exp', // Correct model for image generation
+        prompt: prompt,
+        config: {
+            responseModalities: ['TEXT', 'IMAGE'], // This is crucial
         },
-        body: JSON.stringify({ prompt }),
     });
 
-    if (!response.ok) {
-        const errorBody = await response.json();
-        throw new Error(errorBody.error || `La llamada a la API falló con estado ${response.status}`);
+    if (!media || !media.url) {
+        throw new Error("Image generation failed to return media. This might be due to a safety policy violation or an internal model error.");
     }
+    
+    // Step 2: Generate alt text for the created image
+    const { text: altText } = await ai.generate({
+        model: 'googleai/gemini-2.0-flash', // Correct model for text generation
+        prompt: `Genera un texto alternativo (alt text) corto y descriptivo para la siguiente imagen. El texto debe estar en español y ser conciso.`,
+        input: { media: { url: media.url } },
+    });
 
-    const data = await response.json();
-    if (!data.imageData || !data.altText) {
-        throw new Error("La respuesta de la API no contenía los datos de la imagen o el texto alternativo.");
-    }
-
-    return { imageUrl: data.imageData, altText: data.altText };
+    return { 
+      imageUrl: media.url, 
+      altText: altText || "Imagen generada por IA, sin descripción disponible." 
+    };
 };
+
 
 const generateVisualContentFlow = ai.defineFlow(
   {
@@ -260,7 +264,7 @@ const generateVisualContentFlow = ai.defineFlow(
 
         const fullPrompt = buildImagePrompt(imgParams);
         
-        const { imageUrl, altText } = await generateImageThroughApiRoute(fullPrompt);
+        const { imageUrl, altText } = await generateImageAndAltText(fullPrompt);
 
         return {
             type: 'image',
