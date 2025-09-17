@@ -4,7 +4,7 @@
  * - generateVisualContent: Main exported function to call the flow.
  */
 
-import { ai, geminiFlash, geminiFlashImagePreview } from '@/ai/genkit';
+import { ai, geminiFlash } from '@/ai/genkit';
 import { z } from 'genkit';
 import {
   GenerateVisualContentFlowInput,
@@ -235,11 +235,9 @@ const generateVisualContentFlow = ai.defineFlow(
         const fullPrompt = buildImagePrompt(imgParams);
         
         const { media } = await ai.generate({
-            model: geminiFlashImagePreview,
+            model: 'googleai/gemini-2.0-flash-exp',
             prompt: fullPrompt,
-            config: {
-                responseModalities: ['TEXT', 'IMAGE'],
-            },
+            responseModalities: ['TEXT', 'IMAGE'],
         });
         
         if (!media || !media.url) {
