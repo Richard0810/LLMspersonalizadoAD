@@ -211,7 +211,7 @@ function isConceptIllustParams(params: any): params is ConceptIllustParams {
 async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: string, altText: string }> {
     // Step 1: Generate the image using the correct model and config
     const { media } = await ai.generate({
-        model: 'gemini-2.5-flash-image-preview',
+        model: 'googleai/gemini-2.5-flash-image-preview',
         prompt: prompt,
         config: {
             responseModalities: ['TEXT', 'IMAGE'],
@@ -417,7 +417,7 @@ ${structuredContent}
 
 **Reglas de Estructura JSON (MUY IMPORTANTE):**
 1.  **Estructura:** El primer elemento de "headers" debe ser el criterio de comparación (ej. "Característica"). El resto son los ítems a comparar. Cada fila debe tener la misma cantidad de elementos que "headers".
-2.  **Salida Final:** La respuesta debe ser ÚNICamente el objeto JSON válido.`;
+2.  **Salida Final:** La respuesta debe ser ÚNICAMENTE el objeto JSON válido.`;
                 outputSchema = ComparisonTableDataContentSchema;
                 break;
                 
