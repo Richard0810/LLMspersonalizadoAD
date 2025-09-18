@@ -10,6 +10,7 @@ import { Download, Maximize } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Calendar } from 'lucide-react';
+import Image from 'next/image';
 
 
 interface OutputDisplayProps {
@@ -649,12 +650,13 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ content, format }) => {
       case 'image':
         return (
           <div className="flex flex-col items-center space-y-4">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img 
+            <Image
               src={content.url} 
               alt={content.alt || 'Imagen Generada'} 
+              width={800}
+              height={600}
               className="max-w-full h-auto rounded-lg shadow-lg border" 
-              style={{maxHeight: '70vh'}}
+              style={{maxHeight: '70vh', objectFit: 'contain'}}
             />
           </div>
         );
@@ -718,5 +720,3 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ content, format }) => {
 };
 
 export default OutputDisplay;
-
-    

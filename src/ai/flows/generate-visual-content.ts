@@ -206,10 +206,11 @@ function isConceptIllustParams(params: any): params is ConceptIllustParams {
 
 /**
  * Generates an image and a corresponding alt text using the AI model.
+ * This version simplifies alt text generation and provides a reliable fallback.
  */
 async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: string, altText: string }> {
     const fullPrompt = `Educational illustration, simple, clean, minimalist, whiteboard drawing style: ${prompt}`;
-    const altText = prompt.substring(0, 150); // Use the prompt as alt text
+    const altText = prompt.substring(0, 150); // Use the prompt as a simple, reliable alt text.
 
     try {
         const { media } = await ai.generate({
@@ -221,15 +222,15 @@ async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: stri
         });
         
         if (media && media.url) {
-            return { 
-                imageUrl: media.url, 
-                altText,
-            };
+            return { imageUrl: media.url, altText };
         }
+        
+        // If media or media.url is missing, throw an error to trigger the fallback.
         throw new Error("AI generation did not return a valid image media object.");
 
     } catch (error) {
         console.warn(`AI image generation failed for prompt: "${prompt}". Falling back to Unsplash. Error:`, error);
+        // Fallback to a reliable external image source.
         const keywords = prompt.split(' ').filter(w => w.length > 3).slice(0, 3).join(',');
         const fallbackUrl = `https://source.unsplash.com/800x600/?${encodeURIComponent(keywords)},education,illustration`;
         return {
@@ -519,5 +520,3 @@ Genera el código HTML completo y profesional AHORA.`;
     throw new Error(`The combination of category '${category}' and format '${format}' is not implemented or failed to produce output.`);
   }
 );
-
-    
