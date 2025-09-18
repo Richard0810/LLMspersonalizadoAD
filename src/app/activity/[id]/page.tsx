@@ -7,7 +7,7 @@ import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import InteractiveBackground from '@/components/shared/InteractiveBackground';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Download, ListChecks, BookOpen, Target, ThumbsUp, Sparkles, Loader2, Clock, ClipboardCheck, Brain, Eye, UserCheck, FileDown } from 'lucide-react';
+import { ArrowLeft, ListChecks, BookOpen, Target, ThumbsUp, Sparkles, Loader2, Clock, ClipboardCheck, Brain, Eye, UserCheck, FileDown, Layers } from 'lucide-react';
 import type { Activity, GeneratedActivityVisuals, VisualItem } from '@/types';
 import { getActivityByIdFromLocalStorage } from '@/lib/localStorageUtils';
 import { useToast } from '@/hooks/use-toast';
@@ -30,7 +30,7 @@ const SectionContent: React.FC<SectionContentProps> = ({ title, icon, content, g
     // Handles both **word** and *word:* and cleans up leading hyphens
     return text
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?):\*/g, '<strong>$1:</strong>')
+      .replace(/\*(.*?):\*/g, '<strong>$1</strong>')
       .replace(/^\s*-\s*/, '');
   };
   
@@ -81,7 +81,7 @@ const SectionContent: React.FC<SectionContentProps> = ({ title, icon, content, g
   const getListType = (title: string): 'bullet' | 'numeric' | 'paragraph' => {
       const bulletSections = ["Materiales Necesarios", "Preparación Previa del Docente", "Criterios de Evaluación"];
       const numericSections = ["Desarrollo Paso a Paso"];
-      const paragraphSections = ["Ejemplos Visuales Sugeridos", "Reflexión y Conexión"]
+      const paragraphSections = ["Recursos para la Actividad", "Reflexión y Conexión"]
       if (bulletSections.includes(title)) return 'bullet';
       if (numericSections.includes(title)) return 'numeric';
       if (paragraphSections.includes(title)) return 'paragraph';
@@ -160,7 +160,7 @@ export default function ActivityDetailPage() {
         materials: activity.materials,
         instructions: activity.stepByStepDevelopment,
         reflection: activity.reflectionQuestion,
-        visualExamples: activity.visualExamples,
+        activityResources: activity.activityResources,
       });
       
       setGeneratedContent(visualResult);
@@ -338,10 +338,10 @@ export default function ActivityDetailPage() {
               generatedContent={generatedContent?.instructions}
             />
             <SectionContent
-              title="Ejemplos Visuales Sugeridos"
-              icon={<Eye className="h-6 w-6" />}
-              content={activity.visualExamples}
-              generatedContent={generatedContent?.visualExamples}
+              title="Recursos para la Actividad"
+              icon={<Layers className="h-6 w-6" />}
+              content={activity.activityResources}
+              generatedContent={generatedContent?.activityResources}
             />
             <SectionContent
               title="Reflexión y Conexión"

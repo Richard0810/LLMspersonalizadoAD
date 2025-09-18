@@ -14,7 +14,7 @@ export interface Activity {
   estimatedTime: string;
   teacherPreparation: string;
   stepByStepDevelopment: string;
-  visualExamples: string;
+  activityResources: string;
   reflectionQuestion: string;
   evaluationCriteria: string;
 }
@@ -78,14 +78,14 @@ export interface GeneratedActivityVisuals {
   materials: VisualItem[];
   instructions: VisualItem[];
   reflection: VisualItem[];
-  visualExamples: VisualItem[];
+  activityResources: VisualItem[];
 }
 
 export interface GenerateActivityVisualsInput {
   materials: string;
   instructions: string;
   reflection: string;
-  visualExamples: string;
+  activityResources: string;
 }
 
 
@@ -238,5 +238,3 @@ export type GeneratedContentType =
   | GeneratedTimelineDataType;
 
 export type GenerateVisualContentFlowOutput = GeneratedContentType;
-
-    

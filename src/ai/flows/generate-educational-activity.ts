@@ -29,7 +29,7 @@ const EducationalActivitySchema = z.object({
   estimatedTime: z.string().describe('El tiempo estimado para la realización completa de la actividad (ej: "45 minutos", "2 horas de clase").'),
   teacherPreparation: z.string().describe('Los pasos o materiales que el docente debe preparar antes de la clase, donde cada paso está en una nueva línea.'),
   stepByStepDevelopment: z.string().describe('Guion de clase para el docente, detallando qué decir y hacer. Debe ser una guía numerada con acciones específicas para estudiantes, gestión de tiempos y ejemplos prácticos. Cada paso debe estar en una nueva línea.'),
-  visualExamples: z.string().describe('Sugerencias de ejemplos visuales o diagramas que el docente puede dibujar en el tablero o en hojas para facilitar la comprensión (tablas, cuadrículas, mapas, pictogramas).'),
+  activityResources: z.string().describe("Una lista de recursos tangibles y específicos que el docente debe crear o dibujar. No deben ser ejemplos, sino el contenido final. Para tablas, se deben definir columnas y filas exactas. Para tarjetas, se debe describir su contenido (acción, descripción, símbolo). Cada recurso debe estar en una nueva línea."),
   reflectionQuestion: z.string().describe("Una explicación detallada y clara que demuestre cómo la actividad evidencia el concepto de pensamiento computacional, conectando las acciones específicas del ejercicio con la teoría. A continuación, debe incluir preguntas para guiar la reflexión del estudiante, con cada pregunta en una nueva línea y precedida por un guion."),
   evaluationCriteria: z.string().describe('Los criterios de evaluación o evidencias de aprendizaje que el docente puede usar para valorar el desempeño de los estudiantes, donde cada criterio está en una nueva línea.')
 });
@@ -86,7 +86,7 @@ Asegúrate de que cada actividad generada cumpla estrictamente con lo siguiente:
     - **Gestión del tiempo:** Ofrece una estimación de tiempo para cada bloque de la actividad.
     - **Ejemplos prácticos:** Incluye ejemplos concretos que el docente pueda usar o dibujar en el tablero.
     - **Cada paso numerado debe estar en una nueva línea.**
-- **visualExamples:** Describe ejemplos visuales o diagramas que el docente pueda dibujar en el tablero o en hojas para apoyar la explicación (ej: "una tabla de 3x3", "un diagrama de flujo simple con flechas", "pictogramas para representar acciones").
+- **activityResources:** Describe de manera exhaustiva y como una lista los recursos específicos y tangibles que el docente debe crear o dibujar. No des ejemplos, proporciona el contenido final. Para tablas, define las columnas y filas exactas. Para tarjetas de acción, describe cada una: su título, acción (ej: 'Avanzar'), descripción y un símbolo sugerido. **Cada recurso debe estar en una nueva línea.**
 - **reflectionQuestion:** El contenido debe tener dos partes. Primero, una explicación detallada y clara que demuestre cómo la actividad evidencia el concepto de pensamiento computacional, conectando las acciones específicas del ejercicio con la teoría. Segundo, a continuación de la explicación, debe incluir preguntas para guiar la reflexión y la metacognición de los estudiantes. **Cada pregunta debe estar en una nueva línea y comenzar con un guion (-).**
 - **evaluationCriteria:** Describe las evidencias de aprendizaje o los criterios que el docente puede observar para evaluar si los estudiantes alcanzaron el objetivo. **Cada criterio debe estar en una nueva línea.**
 
