@@ -98,19 +98,11 @@ const generateImageDirectly = async (prompt: string): Promise<string | null> => 
             },
         });
 
-        if (media?.url) {
-            return media.url;
-        }
-        // If media or media.url is null, it will fall through to the catch block logic
-        throw new Error("AI generation did not return a valid image.");
+        return media?.url || null;
         
     } catch (error) {
-        console.warn(`AI image generation failed for prompt: "${prompt}". Falling back to Unsplash. Error:`, error);
-        
-        // Fallback strategy: Use Unsplash
-        const keywords = prompt.split(' ').filter(w => w.length > 3).slice(0, 3).join(',');
-        const unsplashUrl = `https://source.unsplash.com/500x500/?${encodeURIComponent(keywords)},education,illustration`;
-        return unsplashUrl;
+        console.warn(`AI image generation failed for prompt: "${prompt}". Error:`, error);
+        return null; // Return null on failure
     }
 };
 

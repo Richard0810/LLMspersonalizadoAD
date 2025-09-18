@@ -656,7 +656,6 @@ const OutputDisplay: React.FC<OutputDisplayProps> = ({ content, format }) => {
               className="max-w-full h-auto rounded-lg shadow-lg border" 
               style={{maxHeight: '70vh'}}
             />
-            {content.alt && <p className="text-sm text-muted-foreground text-center mt-2">{content.alt}</p>}
           </div>
         );
       case 'html':

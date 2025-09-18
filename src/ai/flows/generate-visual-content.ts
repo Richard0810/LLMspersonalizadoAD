@@ -205,11 +205,11 @@ function isConceptIllustParams(params: any): params is ConceptIllustParams {
 }
 
 /**
- * Generates an image and a corresponding alt text using the AI model, with a fallback to Unsplash.
+ * Generates an image and a corresponding alt text using the AI model.
  */
-async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: string, altText: string }> {
+async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: string | null, altText: string }> {
     const fullPrompt = `Educational illustration, simple, clean, minimalist, whiteboard drawing style: ${prompt}`;
-    let imageUrl = '';
+    let imageUrl: string | null = null;
     
     try {
         const { media } = await ai.generate({
@@ -219,28 +219,22 @@ async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: stri
                 responseModalities: ['TEXT', 'IMAGE'],
             },
         });
-
-        if (!media || !media.url) {
-            throw new Error("AI generation did not return a valid image.");
-        }
         
-        imageUrl = media.url;
+        imageUrl = media?.url || null;
 
     } catch (error) {
-        console.warn(`AI image generation failed for prompt: "${prompt}". Falling back to Unsplash. Error:`, error);
+        console.warn(`AI image generation failed for prompt: "${prompt}". Error:`, error);
+        // Fallback to Unsplash if AI fails
         const keywords = prompt.split(' ').filter(w => w.length > 3).slice(0, 3).join(',');
         imageUrl = `https://source.unsplash.com/800x600/?${encodeURIComponent(keywords)},education,illustration`;
     }
-    
-    // Generate alt text regardless of image source
-    const { text: altText } = await ai.generate({
-        model: 'googleai/gemini-2.0-flash', 
-        prompt: `Genera un texto alternativo (alt text) corto y descriptivo para el siguiente concepto: "${prompt}". El texto debe estar en español y ser conciso.`,
-    });
+
+    // Use a simplified version of the prompt as alt text. No second AI call.
+    const altText = prompt.substring(0, 150);
 
     return { 
-      imageUrl: imageUrl, 
-      altText: altText || "Imagen generada por IA, sin descripción disponible." 
+      imageUrl, 
+      altText,
     };
 };
 
@@ -274,6 +268,10 @@ const generateVisualContentFlow = ai.defineFlow(
         const fullPrompt = buildImagePrompt(imgParams);
         
         const { imageUrl, altText } = await generateImageAndAltText(fullPrompt);
+
+        if (!imageUrl) {
+          throw new Error("La generación de la imagen falló y no se pudo obtener una imagen de respaldo.");
+        }
 
         return {
             type: 'image',
