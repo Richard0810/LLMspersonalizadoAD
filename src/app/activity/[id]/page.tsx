@@ -26,31 +26,24 @@ interface SectionContentProps {
 }
 
 const SectionContent: React.FC<SectionContentProps> = ({ title, icon, content, generatedContent, className = "" }) => {
-  const formatWithBold = (text: string) => {
-    // This function can be simplified as we are moving towards structured rendering
-    return text.replace(/^\s*-\s*/, '');
-  };
-  
-  const renderList = (items: string[]) => {
-    if (items.length === 0) return null;
-    
-    const listItems = items.map((line, index) => (
-      <li 
-        key={index} 
-        className="text-muted-foreground whitespace-pre-line relative pl-5 before:content-['•'] before:absolute before:left-0 before:text-primary"
-        dangerouslySetInnerHTML={{ __html: formatWithBold(line) }} 
-      />
-    ));
-
-    return <ul className="space-y-2">{listItems}</ul>;
-  };
-
-  const formatContent = (text: string | undefined) => {
+  const renderList = (text: string | undefined) => {
     if (!text) return null;
-    const lines = text.split('\n').filter(line => line.trim() !== '');
-    return renderList(lines);
+    const items = text.split('\n').filter(line => line.trim() !== '');
+    if (items.length === 0) return null;
+
+    return (
+      <ul className="space-y-2">
+        {items.map((line, index) => (
+          <li
+            key={index}
+            className="text-muted-foreground whitespace-pre-line relative pl-5 before:content-['•'] before:absolute before:left-0 before:text-primary"
+            dangerouslySetInnerHTML={{ __html: line.replace(/^\s*-\s*/, '') }}
+          />
+        ))}
+      </ul>
+    );
   };
-  
+
   // Render generated content if it exists and has items.
   // Otherwise, fall back to rendering the original content.
   const hasGeneratedContent = generatedContent && generatedContent.length > 0;
@@ -62,7 +55,7 @@ const SectionContent: React.FC<SectionContentProps> = ({ title, icon, content, g
       </h3>
       {hasGeneratedContent ? (
         <div className="space-y-6">
-          {generatedContent?.map((item, index) => (
+          {generatedContent.map((item, index) => (
             <div key={index} className="p-4 bg-muted/30 rounded-lg border border-primary/20">
               {item.htmlContent ? (
                 // If HTML content exists, render it directly.
@@ -71,14 +64,14 @@ const SectionContent: React.FC<SectionContentProps> = ({ title, icon, content, g
                 // Otherwise, display the plain text, formatted.
                 <p
                   className="text-muted-foreground whitespace-pre-line"
-                  dangerouslySetInnerHTML={{ __html: formatWithBold(item.text) }}
+                  dangerouslySetInnerHTML={{ __html: item.text }}
                 />
               )}
             </div>
           ))}
         </div>
       ) : (
-         formatContent(content) // Fallback to original content
+         renderList(content) // Fallback to original content, formatted as a list
       )}
     </div>
   );
