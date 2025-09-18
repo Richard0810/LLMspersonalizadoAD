@@ -71,7 +71,7 @@ export const computationalConcepts = [
 // Activity Visuals Types
 export interface VisualItem {
   text: string;
-  imageUrl: string | null; // URL de la imagen generada (Base64)
+  htmlContent: string | null;
 }
 
 export interface GeneratedActivityVisuals {

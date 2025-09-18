@@ -2,8 +2,7 @@
 'use server';
 /**
  * @fileOverview A Genkit flow to analyze an educational activity and generate relevant visual aids.
- * The flow acts as an "Art Director AI", deciding what to illustrate and how.
- * It now calls the image generation model directly.
+ * The flow acts as an "Art Director AI", generating rich HTML components for activity resources.
  * - generateActivityVisuals - The main exported function to trigger the flow.
  */
 
@@ -14,7 +13,7 @@ import type { GenerateActivityVisualsInput, GeneratedActivityVisuals, VisualItem
 // Define Zod schemas based on the types in src/types/index.ts
 const VisualItemSchema = z.object({
   text: z.string().describe('The original text for the item or step.'),
-  imageUrl: z.string().nullable().describe('The data URI of the generated image (or null if no image was generated for this item).'),
+  htmlContent: z.string().nullable().describe('The data URI of the generated image (or null if no image was generated for this item).'),
 });
 
 const GenerateActivityVisualsOutputSchema = z.object({
@@ -32,10 +31,10 @@ const GenerateActivityVisualsInputSchema = z.object({
 });
 
 // This internal schema is what the AI will be prompted to produce.
-// It includes an additional field for the AI to decide on the image prompt.
+// It now includes a field for the AI to decide on the HTML content.
 const InternalVisualItemSchema = z.object({
     text: z.string().describe('The original, unmodified text for the item or step.'),
-    imagePrompt: z.string().nullable().describe('A concise, descriptive prompt for generating an image for this step. If no image is needed, this MUST be null. Example: "A simple drawing of a pencil and a notebook on a table".'),
+    htmlContent: z.string().nullable().describe('A self-contained HTML block for this resource. If no special visualization is needed, this MUST be null.'),
 });
 
 const InternalOutputSchema = z.object({
@@ -57,17 +56,20 @@ const analysisPrompt = ai.definePrompt({
     model: 'googleai/gemini-2.0-flash',
     input: { schema: GenerateActivityVisualsInputSchema },
     output: { schema: InternalOutputSchema },
-    prompt: `You are an expert instructional designer and art director. Your task is to analyze an educational activity and decide which parts would benefit most from a visual aid.
-
-You will receive four sections of an activity: materials, instructions, reflection, and activityResources.
+    prompt: `You are an expert UI/UX designer specializing in creating educational materials with HTML and Tailwind CSS.
+Your task is to analyze an educational activity and generate rich HTML components for the 'activityResources'.
 
 **CRITICAL RULES:**
-1.  **For 'materials', 'instructions', and 'reflection' sections, NEVER generate an image.** These are lists of text. The 'imagePrompt' field for all items in these sections MUST ALWAYS be null.
-2.  **For the 'activityResources' section, you MUST be very selective.**
-    *   **LAST RESORT:** Only generate an image if the resource describes a complex, purely visual scene that cannot be represented by text (e.g., "a drawing of a medieval castle", "a photo of a rainforest").
-    *   **DO NOT GENERATE IMAGES FOR:** Simple objects (like 'pencil'), tables, charts, simple diagrams, or abstract concepts. If the text says "una tabla para representar...", the imagePrompt MUST be null, as the text itself is the visual guide.
-    *   If an image is truly necessary, create a SIMPLE, CLEAR, and CONCISE prompt for an image generation model. The prompt should describe a clean, minimalist, educational-style illustration.
-    *   If no image is needed, the 'imagePrompt' field MUST be null.
+1.  **For 'materials', 'instructions', and 'reflection' sections, NEVER generate HTML.** The 'htmlContent' field for all items in these sections MUST ALWAYS be null. These will be displayed as simple text lists.
+2.  **For 'activityResources', you MUST generate a self-contained HTML component for EACH item.** Each item describes a resource like a card, a table, or a small diagram.
+3.  **HTML & Styling Requirements (VERY IMPORTANT):**
+    *   The output for 'htmlContent' MUST be a **single block of HTML**, starting with a \`<div>\` and containing all necessary elements and styles.
+    *   Use **Tailwind CSS classes** for styling. DO NOT use inline \`<style>\` tags or external stylesheets.
+    *   Create visually appealing "cards" or "widgets". Use classes like \`border\`, \`rounded-lg\`, \`p-4\`, \`bg-white\`, \`shadow-md\`.
+    *   Use semantic and structural HTML (e.g., \`h3\`, \`p\`, \`strong\`).
+    *   For elements like symbols or large icons (e.g., '+1', an arrow), use large font sizes (\`text-6xl\`, \`font-bold\`) and center them.
+    *   Example for a card: \`<div class="border rounded-lg p-6 bg-white shadow-lg w-full max-w-sm mx-auto text-center font-sans"> <h3 class="text-3xl font-bold mb-4">SUMAR</h3> <div class="text-left space-y-2"> <p><strong>ACCIÓN:</strong> Sumar</p> <p><strong>DESCRIPCIÓN:</strong> Suma 1 al valor de la casilla actual</p> </div> <div class="text-8xl font-bold text-green-600 mt-6">+1</div> </div>\`
+    *   Ensure the HTML is clean, valid, and self-contained for each resource.
 
 Analyze the following activity content and provide the output in the required JSON format.
 
@@ -87,31 +89,6 @@ Analyze the following activity content and provide the output in the required JS
 `,
 });
 
-const generateImageDirectly = async (prompt: string): Promise<string | null> => {
-    if (!prompt) return null;
-    const fullPrompt = `Educational illustration, simple, clean, minimalist, whiteboard drawing style: ${prompt}`;
-
-    try {
-        const { media } = await ai.generate({
-            model: 'googleai/gemini-2.0-flash-exp', // Use the correct model from the bitacora
-            prompt: fullPrompt,
-            config: {
-                responseModalities: ['TEXT', 'IMAGE'],
-            },
-        });
-
-        if (media && media.url) {
-          return media.url;
-        }
-        console.warn(`Image generation succeeded but returned no media object for prompt: "${prompt}"`);
-        return null;
-        
-    } catch (error) {
-        console.warn(`AI image generation failed for prompt: "${prompt}". Error:`, error);
-        return null; // Return null on failure
-    }
-};
-
 const generateActivityVisualsFlow = ai.defineFlow(
   {
     name: 'generateActivityVisualsFlow',
@@ -119,31 +96,27 @@ const generateActivityVisualsFlow = ai.defineFlow(
     outputSchema: GenerateActivityVisualsOutputSchema,
   },
   async (input) => {
-    // Step 1: AI analyzes the activity and decides on image prompts.
+    // Step 1: AI analyzes the activity and generates HTML content for resources.
     const { output: analysis } = await analysisPrompt(input);
     if (!analysis) {
       throw new Error("AI analysis failed to produce a visual plan.");
     }
-
-    // Step 2: Concurrently generate all the required images.
-    const processSection = async (items: z.infer<typeof InternalVisualItemSchema>[]): Promise<VisualItem[]> => {
+    
+    // The analysis now directly contains the htmlContent, so we just need to map the types.
+    const processSection = (items: z.infer<typeof InternalVisualItemSchema>[]): VisualItem[] => {
       if (!items) return [];
-      return Promise.all(
-        items.map(async (item) => {
-          const imageUrl = item.imagePrompt ? await generateImageDirectly(item.imagePrompt) : null;
-          return { text: item.text, imageUrl };
-        })
-      );
+      return items.map(item => ({
+        text: item.text,
+        htmlContent: item.htmlContent
+      }));
     };
 
-    const [materials, instructions, reflection, activityResources] = await Promise.all([
-      processSection(analysis.materials),
-      processSection(analysis.instructions),
-      processSection(analysis.reflection),
-      processSection(analysis.activityResources),
-    ]);
+    const materials = processSection(analysis.materials);
+    const instructions = processSection(analysis.instructions);
+    const reflection = processSection(analysis.reflection);
+    const activityResources = processSection(analysis.activityResources);
     
-    // Step 3: Return the final structured object with image URLs.
+    // Step 2: Return the final structured object.
     return { materials, instructions, reflection, activityResources };
   }
 );

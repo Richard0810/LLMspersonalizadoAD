@@ -30,100 +30,61 @@ const SectionContent: React.FC<SectionContentProps> = ({ title, icon, content, g
     // Handles both **word** and *word:* and cleans up leading hyphens
     return text
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?):\*/g, '<strong>$1_</strong>') // Note: using a temporary placeholder
+      .replace(/\*(.*?):\*/g, '<strong>$1</strong>_</strong>') // Note: using a temporary placeholder
       .replace(/(\w+):/g, '<strong>$1:</strong>') // Bold any word followed by a colon
       .replace(/_</g, ':<') // Restore the colon if it was part of the *word:* pattern
       .replace(/^\s*-\s*/, '');
   };
   
-  const renderList = (items: string[], listType: 'bullet' | 'numeric' | 'paragraph') => {
+  const renderList = (items: string[]) => {
     if (items.length === 0) return null;
     
     const listItems = items.map((line, index) => (
       <li 
         key={index} 
-        className="text-muted-foreground whitespace-pre-line relative"
+        className="text-muted-foreground whitespace-pre-line relative pl-5 before:content-['•'] before:absolute before:left-0 before:text-primary"
         dangerouslySetInnerHTML={{ __html: formatWithBold(line) }} 
       />
     ));
 
-    if (listType === 'bullet') {
-      return (
-        <ul className="list-disc pl-5 space-y-2">
-          {listItems}
-        </ul>
-      );
-    }
-    
-    if (listType === 'numeric') {
-       return (
-        <ol className="list-decimal pl-5 space-y-2">
-            {listItems}
-        </ol>
-      );
-    }
-
-    // Default paragraph rendering
-    return items.map((line, index) => (
-        <p 
-          key={index} 
-          className="text-muted-foreground whitespace-pre-line" 
-          dangerouslySetInnerHTML={{ __html: formatWithBold(line) }} 
-        />
-    ));
+    return (
+      <ul className="space-y-2">
+        {listItems}
+      </ul>
+    );
   };
 
-
-  const formatContent = (text: string | undefined, listType: 'bullet' | 'numeric' | 'paragraph') => {
+  const formatContent = (text: string | undefined) => {
     if (!text) return null;
     const lines = text.split('\n').filter(line => line.trim() !== '');
-    return renderList(lines, listType);
+    return renderList(lines);
   };
   
-  const getListType = (title: string): 'bullet' | 'numeric' | 'paragraph' => {
-      const bulletSections = ["Materiales Necesarios", "Preparación Previa del Docente", "Criterios de Evaluación", "Recursos para la Actividad"];
-      const numericSections = ["Desarrollo Paso a Paso"];
-      const paragraphSections = ["Reflexión y Conexión"]
-      if (bulletSections.includes(title)) return 'bullet';
-      if (numericSections.includes(title)) return 'numeric';
-      if (paragraphSections.includes(title)) return 'paragraph';
-      return 'paragraph';
-  }
-
-  const listType = getListType(title);
-
   // Render generated content if it exists and has items, otherwise render original content
   const hasGeneratedVisuals = generatedContent && generatedContent.length > 0;
 
   return (
     <div className={className}>
-      <h3 className="text-xl font-semibold flex items-center gap-2 text-accent font-headline mb-2">
+      <h3 className="text-xl font-semibold flex items-center gap-2 text-accent font-headline mb-4">
         {icon} {title}
       </h3>
       {hasGeneratedVisuals ? (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {generatedContent?.map((item, index) => (
-            <div key={index} className="p-4 bg-muted/50 rounded-lg border border-primary/20">
-              <p
-                className="text-muted-foreground whitespace-pre-line mb-3"
-                dangerouslySetInnerHTML={{ __html: formatWithBold(item.text) }}
-              />
-              {item.imageUrl && (
-                <div className="mt-2 text-center border-t border-dashed pt-3">
-                  <Image 
-                    src={item.imageUrl} 
-                    alt={`Ilustración para: ${item.text.substring(0, 50)}`} 
-                    width={400} 
-                    height={400} 
-                    className="rounded-md shadow-md mx-auto"
-                  />
-                </div>
+            <div key={index} className="p-4 bg-muted/30 rounded-lg border border-primary/20">
+              {item.htmlContent ? (
+                <div dangerouslySetInnerHTML={{ __html: item.htmlContent }} />
+              ) : (
+                <p
+                  className="text-muted-foreground whitespace-pre-line"
+                  dangerouslySetInnerHTML={{ __html: formatWithBold(item.text) }}
+                />
               )}
             </div>
           ))}
         </div>
       ) : (
-         formatContent(content, listType)
+         formatContent(content)
       )}
     </div>
   );
