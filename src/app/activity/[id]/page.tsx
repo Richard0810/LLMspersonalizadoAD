@@ -79,9 +79,9 @@ const SectionContent: React.FC<SectionContentProps> = ({ title, icon, content, g
   };
   
   const getListType = (title: string): 'bullet' | 'numeric' | 'paragraph' => {
-      const bulletSections = ["Materiales Necesarios", "Preparación Previa del Docente", "Criterios de Evaluación"];
+      const bulletSections = ["Materiales Necesarios", "Preparación Previa del Docente", "Criterios de Evaluación", "Recursos para la Actividad"];
       const numericSections = ["Desarrollo Paso a Paso"];
-      const paragraphSections = ["Recursos para la Actividad", "Reflexión y Conexión"]
+      const paragraphSections = ["Reflexión y Conexión"]
       if (bulletSections.includes(title)) return 'bullet';
       if (numericSections.includes(title)) return 'numeric';
       if (paragraphSections.includes(title)) return 'paragraph';
