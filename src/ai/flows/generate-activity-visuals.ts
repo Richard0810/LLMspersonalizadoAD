@@ -91,7 +91,7 @@ const generateImageDirectly = async (prompt: string): Promise<string | null> => 
 
     try {
         const { media } = await ai.generate({
-            model: 'googleai/imagen-3', // Use the correct model
+            model: 'googleai/gemini-2.0-flash-exp', // Use the correct model from the bitacora
             prompt: fullPrompt,
             config: {
                 responseModalities: ['TEXT', 'IMAGE'],
@@ -101,7 +101,8 @@ const generateImageDirectly = async (prompt: string): Promise<string | null> => 
         if (media && media.url) {
           return media.url;
         }
-        throw new Error('Image generation succeeded but returned no media object.');
+        console.warn(`Image generation succeeded but returned no media object for prompt: "${prompt}"`);
+        return null;
         
     } catch (error) {
         console.warn(`AI image generation failed for prompt: "${prompt}". Error:`, error);

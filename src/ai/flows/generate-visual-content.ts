@@ -206,7 +206,7 @@ function isConceptIllustParams(params: any): params is ConceptIllustParams {
 
 /**
  * Generates an image and a corresponding alt text using the AI model.
- * This version simplifies alt text generation and provides a reliable fallback.
+ * This version uses the model specified in the bitacora and a simple alt text.
  */
 async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: string, altText: string }> {
     const fullPrompt = `Educational illustration, simple, clean, minimalist, whiteboard drawing style: ${prompt}`;
@@ -214,7 +214,7 @@ async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: stri
 
     try {
         const { media } = await ai.generate({
-            model: 'googleai/imagen-3',
+            model: 'googleai/gemini-2.0-flash-exp', // Using model from bitacora
             prompt: fullPrompt,
             config: {
                 responseModalities: ['TEXT', 'IMAGE'],
@@ -225,16 +225,14 @@ async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: stri
             return { imageUrl: media.url, altText };
         }
         
-        // If media or media.url is missing, throw an error to trigger the fallback.
-        throw new Error("AI generation did not return a valid image media object.");
+        // If media or media.url is missing, return a null URL to be handled by the frontend.
+        console.warn(`AI generation did not return a valid image media object for prompt: "${prompt}"`);
+        return { imageUrl: '', altText };
 
     } catch (error) {
-        console.warn(`AI image generation failed for prompt: "${prompt}". Falling back to Unsplash. Error:`, error);
-        // Fallback to a reliable external image source.
-        const keywords = prompt.split(' ').filter(w => w.length > 3).slice(0, 3).join(',');
-        const fallbackUrl = `https://source.unsplash.com/800x600/?${encodeURIComponent(keywords)},education,illustration`;
+        console.warn(`AI image generation failed for prompt: "${prompt}". Error:`, error);
         return {
-            imageUrl: fallbackUrl,
+            imageUrl: '', // Return empty string on failure
             altText,
         };
     }
