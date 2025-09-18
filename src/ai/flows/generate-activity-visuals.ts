@@ -61,9 +61,10 @@ const analysisPrompt = ai.definePrompt({
 
 You will receive four sections of an activity: materials, instructions, reflection, and visualExamples.
 For EACH item in EACH section, you must make a decision:
-1.  Is an image useful here? Images should only be for concrete, visualizable objects or actions. Do not generate images for abstract concepts or simple instructions like "ask the students". For the 'visualExamples' section, always try to generate an image.
-2.  If yes, create a SIMPLE, CLEAR, and CONCISE prompt for an image generation model. The prompt should describe a clean, minimalistic, educational-style illustration. Think of simple icons or drawings a teacher would make on a whiteboard.
-3.  If no image is needed, the 'imagePrompt' field MUST be null.
+1.  Is an image useful here? Images should only be for concrete, visualizable objects or actions. Do not generate images for abstract concepts, simple materials (like 'pencil', 'paper'), or simple instructions like "ask the students".
+2.  For the 'visualExamples' section, prioritize generating an image, but only if it describes a concrete visual.
+3.  If an image is useful, create a SIMPLE, CLEAR, and CONCISE prompt for an image generation model. The prompt should describe a clean, minimalistic, educational-style illustration. Think of simple icons or drawings a teacher would make on a whiteboard.
+4.  If no image is needed (especially for most materials), the 'imagePrompt' field MUST be null.
 
 Analyze the following activity content:
 
@@ -90,7 +91,6 @@ const generateImageDirectly = async (prompt: string): Promise<string | null> => 
     const fullPrompt = `Educational illustration, simple, clean, minimalist, whiteboard drawing style: ${prompt}`;
 
     try {
-        // @ts-ignore - This is added to bypass the type check in Vercel build
         const { media } = await ai.generate({
             model: 'googleai/gemini-2.0-flash-exp', // Use the correct model from the bitacora
             prompt: fullPrompt,

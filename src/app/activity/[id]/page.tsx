@@ -8,7 +8,7 @@ import InteractiveBackground from '@/components/shared/InteractiveBackground';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Download, ListChecks, BookOpen, Target, ThumbsUp, Sparkles, Loader2, Clock, ClipboardCheck, Brain, Eye, UserCheck, FileDown } from 'lucide-react';
-import type { Activity, GeneratedActivityVisuals } from '@/types';
+import type { Activity, GeneratedActivityVisuals, VisualItem } from '@/types';
 import { getActivityByIdFromLocalStorage } from '@/lib/localStorageUtils';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -21,7 +21,7 @@ interface SectionContentProps {
   title: string;
   icon: ReactNode;
   content?: string;
-  generatedContent?: { text: string; imageUrl: string | null }[];
+  generatedContent?: VisualItem[];
   className?: string;
 }
 
@@ -33,17 +33,14 @@ const SectionContent: React.FC<SectionContentProps> = ({ title, icon, content, g
       .replace(/\*(.*?):\*/g, '<strong>$1:</strong>')
       .replace(/^\s*-\s*/, '');
   };
-
-  const formatContent = (text: string | undefined, listType: 'bullet' | 'numeric' | 'paragraph') => {
-    if (!text) return null;
-
-    const lines = text.split('\n').filter(line => line.trim() !== '');
-    if (lines.length === 0) return null;
+  
+  const renderList = (items: string[], listType: 'bullet' | 'numeric' | 'paragraph') => {
+    if (items.length === 0) return null;
 
     if (listType === 'bullet') {
       return (
         <ul className="list-none pl-5 space-y-1">
-          {lines.map((line, index) => (
+          {items.map((line, index) => (
             <li 
               key={index} 
               className="text-muted-foreground whitespace-pre-line relative before:content-['-_'] before:absolute before:left-[-1.25rem] before:top-0 before:text-primary before:font-bold"
@@ -53,62 +50,9 @@ const SectionContent: React.FC<SectionContentProps> = ({ title, icon, content, g
         </ul>
       );
     }
-    
-    if (listType === 'numeric') {
-        const stepRegex = /^\(?\d+\.?|^\(\d+.*?\)/; // Matches "1.", "1", "(1...)"
-        
-        // For Criterios, just split by lines
-        if (title === "Criterios de Evaluación") {
-          return (
-             <ol className="list-decimal list-outside pl-5 space-y-2">
-                {lines.map((line, index) => (
-                  <li key={index} className="text-muted-foreground whitespace-pre-line"
-                      dangerouslySetInnerHTML={{ __html: formatWithBold(line) }} 
-                  />
-                ))}
-            </ol>
-          );
-        }
-
-      // For Step by Step Development
-      const groupedLines: string[][] = [];
-      let currentGroup: string[] = [];
-
-      lines.forEach(line => {
-        if (stepRegex.test(line.trim())) {
-          if (currentGroup.length > 0) {
-            groupedLines.push(currentGroup);
-          }
-          currentGroup = [line];
-        } else {
-          if (currentGroup.length > 0) {
-            currentGroup.push(line);
-          } else {
-             // Handle case where first line is not a step
-             currentGroup = [line];
-          }
-        }
-      });
-      if (currentGroup.length > 0) {
-        groupedLines.push(currentGroup);
-      }
-
-      return (
-        <ol className="list-decimal list-outside pl-5 space-y-4">
-          {groupedLines.map((group, groupIndex) => (
-            <li key={groupIndex} className="text-muted-foreground whitespace-pre-line">
-              {group.map((line, lineIndex) => {
-                 const formattedLine = formatWithBold(line.replace(stepRegex, '').trim());
-                 return <p key={lineIndex} dangerouslySetInnerHTML={{ __html: formattedLine }} />;
-              })}
-            </li>
-          ))}
-        </ol>
-      );
-    }
 
     // Default paragraph rendering
-    return lines.map((line, index) => (
+    return items.map((line, index) => (
         <p 
           key={index} 
           className="text-muted-foreground whitespace-pre-line" 
@@ -116,9 +60,16 @@ const SectionContent: React.FC<SectionContentProps> = ({ title, icon, content, g
         />
     ));
   };
+
+
+  const formatContent = (text: string | undefined, listType: 'bullet' | 'numeric' | 'paragraph') => {
+    if (!text) return null;
+    const lines = text.split('\n').filter(line => line.trim() !== '');
+    return renderList(lines, listType);
+  };
   
   const getListType = (title: string): 'bullet' | 'numeric' | 'paragraph' => {
-      const bulletSections = ["Materiales Necesarios", "Preparación Previa del Docente", "Ejemplos Visuales Sugeridos", "Criterios de Evaluación"];
+      const bulletSections = ["Materiales Necesarios", "Preparación Previa del Docente", "Ejemplos Visuales Sugeridos", "Criterios de Evaluación", "Reflexión y Conexión"];
       const numericSections = ["Desarrollo Paso a Paso"];
       if (bulletSections.includes(title)) return 'bullet';
       if (numericSections.includes(title)) return 'numeric';
@@ -127,14 +78,16 @@ const SectionContent: React.FC<SectionContentProps> = ({ title, icon, content, g
 
   const listType = getListType(title);
 
+  const hasGeneratedVisuals = generatedContent && generatedContent.some(item => item.imageUrl);
+
   return (
     <div className={className}>
       <h3 className="text-xl font-semibold flex items-center gap-2 text-accent font-headline mb-2">
         {icon} {title}
       </h3>
-      {generatedContent && generatedContent.length > 0 ? (
+      {hasGeneratedVisuals ? (
         <div className="space-y-4">
-          {generatedContent.map((item, index) => (
+          {generatedContent?.map((item, index) => (
             <div key={index} className="p-4 bg-muted/50 rounded-lg border border-primary/20">
               <p
                 className="text-muted-foreground whitespace-pre-line mb-3"
@@ -155,7 +108,7 @@ const SectionContent: React.FC<SectionContentProps> = ({ title, icon, content, g
           ))}
         </div>
       ) : (
-        formatContent(content, listType)
+         formatContent(content, listType)
       )}
     </div>
   );
