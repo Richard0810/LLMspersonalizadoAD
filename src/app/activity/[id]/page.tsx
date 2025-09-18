@@ -27,13 +27,8 @@ interface SectionContentProps {
 
 const SectionContent: React.FC<SectionContentProps> = ({ title, icon, content, generatedContent, className = "" }) => {
   const formatWithBold = (text: string) => {
-    // Handles both **word** and *word:* and cleans up leading hyphens
-    return text
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?):\*/g, '<strong>$1</strong>_</strong>') // Note: using a temporary placeholder
-      .replace(/(\w+):/g, '<strong>$1:</strong>') // Bold any word followed by a colon
-      .replace(/_</g, ':<') // Restore the colon if it was part of the *word:* pattern
-      .replace(/^\s*-\s*/, '');
+    // This function can be simplified as we are moving towards structured rendering
+    return text.replace(/^\s*-\s*/, '');
   };
   
   const renderList = (items: string[]) => {
@@ -47,11 +42,7 @@ const SectionContent: React.FC<SectionContentProps> = ({ title, icon, content, g
       />
     ));
 
-    return (
-      <ul className="space-y-2">
-        {listItems}
-      </ul>
-    );
+    return <ul className="space-y-2">{listItems}</ul>;
   };
 
   const formatContent = (text: string | undefined) => {
@@ -60,21 +51,24 @@ const SectionContent: React.FC<SectionContentProps> = ({ title, icon, content, g
     return renderList(lines);
   };
   
-  // Render generated content if it exists and has items, otherwise render original content
-  const hasGeneratedVisuals = generatedContent && generatedContent.length > 0;
+  // Render generated content if it exists and has items.
+  // Otherwise, fall back to rendering the original content.
+  const hasGeneratedContent = generatedContent && generatedContent.length > 0;
 
   return (
     <div className={className}>
       <h3 className="text-xl font-semibold flex items-center gap-2 text-accent font-headline mb-4">
         {icon} {title}
       </h3>
-      {hasGeneratedVisuals ? (
+      {hasGeneratedContent ? (
         <div className="space-y-6">
           {generatedContent?.map((item, index) => (
             <div key={index} className="p-4 bg-muted/30 rounded-lg border border-primary/20">
               {item.htmlContent ? (
+                // If HTML content exists, render it directly.
                 <div dangerouslySetInnerHTML={{ __html: item.htmlContent }} />
               ) : (
+                // Otherwise, display the plain text, formatted.
                 <p
                   className="text-muted-foreground whitespace-pre-line"
                   dangerouslySetInnerHTML={{ __html: formatWithBold(item.text) }}
@@ -84,7 +78,7 @@ const SectionContent: React.FC<SectionContentProps> = ({ title, icon, content, g
           ))}
         </div>
       ) : (
-         formatContent(content)
+         formatContent(content) // Fallback to original content
       )}
     </div>
   );
