@@ -30,7 +30,9 @@ const SectionContent: React.FC<SectionContentProps> = ({ title, icon, content, g
     // Handles both **word** and *word:* and cleans up leading hyphens
     return text
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?):\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?):\*/g, '<strong>$1_</strong>') // Note: using a temporary placeholder
+      .replace(/(\w+):/g, '<strong>$1:</strong>') // Bold any word followed by a colon
+      .replace(/_</g, ':<') // Restore the colon if it was part of the *word:* pattern
       .replace(/^\s*-\s*/, '');
   };
   
@@ -90,7 +92,8 @@ const SectionContent: React.FC<SectionContentProps> = ({ title, icon, content, g
 
   const listType = getListType(title);
 
-  const hasGeneratedVisuals = generatedContent && generatedContent.some(item => item.imageUrl);
+  // Render generated content if it exists and has items, otherwise render original content
+  const hasGeneratedVisuals = generatedContent && generatedContent.length > 0;
 
   return (
     <div className={className}>
@@ -277,9 +280,9 @@ export default function ActivityDetailPage() {
               <p className="text-muted-foreground">La actividad que estás buscando no existe o no pudo ser cargada.</p>
             </CardContent>
             <CardFooter>
-              <Button onClick={() => router.push('/')} className="w-full">
-                <ArrowLeft className="mr-2 h-4 w-4" /> Volver al Chat
-              </Button>
+                <Button onClick={() => router.push('/')} className="w-full">
+                    <ArrowLeft className="mr-2 h-4 w-4" /> Volver al Chat
+                </Button>
             </CardFooter>
           </Card>
         </div>
