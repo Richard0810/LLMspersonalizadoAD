@@ -32,7 +32,7 @@ export async function consultAIOnLesson(input: ConsultAIOnLessonInput): Promise<
 
 const prompt = ai.definePrompt({
   name: 'consultAIOnLessonPrompt',
-  model: 'googleai/gemini-2.0-flash',
+  model: 'googleai/gemini-2.5-flash',
   input: {schema: ConsultAIOnLessonInputSchema},
   output: {schema: ConsultAIOnLessonOutputSchema},
   prompt: `You are an expert in computational thinking and creating offline activities for education.
