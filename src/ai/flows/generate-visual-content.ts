@@ -207,10 +207,10 @@ function isConceptIllustParams(params: any): params is ConceptIllustParams {
 /**
  * Generates an image and a corresponding alt text using the AI model.
  */
-async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: string | null, altText: string }> {
+async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: string, altText: string }> {
     const fullPrompt = `Educational illustration, simple, clean, minimalist, whiteboard drawing style: ${prompt}`;
-    let imageUrl: string | null = null;
-    
+    const altText = prompt.substring(0, 150); // Use the prompt as alt text
+
     try {
         const { media } = await ai.generate({
             model: 'googleai/imagen-3',
@@ -220,22 +220,23 @@ async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: stri
             },
         });
         
-        imageUrl = media?.url || null;
+        if (media && media.url) {
+            return { 
+                imageUrl: media.url, 
+                altText,
+            };
+        }
+        throw new Error("AI generation did not return a valid image media object.");
 
     } catch (error) {
-        console.warn(`AI image generation failed for prompt: "${prompt}". Error:`, error);
-        // Fallback to Unsplash if AI fails
+        console.warn(`AI image generation failed for prompt: "${prompt}". Falling back to Unsplash. Error:`, error);
         const keywords = prompt.split(' ').filter(w => w.length > 3).slice(0, 3).join(',');
-        imageUrl = `https://source.unsplash.com/800x600/?${encodeURIComponent(keywords)},education,illustration`;
+        const fallbackUrl = `https://source.unsplash.com/800x600/?${encodeURIComponent(keywords)},education,illustration`;
+        return {
+            imageUrl: fallbackUrl,
+            altText,
+        };
     }
-
-    // Use a simplified version of the prompt as alt text. No second AI call.
-    const altText = prompt.substring(0, 150);
-
-    return { 
-      imageUrl, 
-      altText,
-    };
 };
 
 
@@ -268,10 +269,6 @@ const generateVisualContentFlow = ai.defineFlow(
         const fullPrompt = buildImagePrompt(imgParams);
         
         const { imageUrl, altText } = await generateImageAndAltText(fullPrompt);
-
-        if (!imageUrl) {
-          throw new Error("La generación de la imagen falló y no se pudo obtener una imagen de respaldo.");
-        }
 
         return {
             type: 'image',
@@ -522,3 +519,5 @@ Genera el código HTML completo y profesional AHORA.`;
     throw new Error(`The combination of category '${category}' and format '${format}' is not implemented or failed to produce output.`);
   }
 );
+
+    

@@ -98,7 +98,10 @@ const generateImageDirectly = async (prompt: string): Promise<string | null> => 
             },
         });
 
-        return media?.url || null;
+        if (media && media.url) {
+          return media.url;
+        }
+        throw new Error('Image generation succeeded but returned no media object.');
         
     } catch (error) {
         console.warn(`AI image generation failed for prompt: "${prompt}". Error:`, error);
@@ -141,3 +144,5 @@ const generateActivityVisualsFlow = ai.defineFlow(
     return { materials, instructions, reflection, visualExamples };
   }
 );
+
+    
