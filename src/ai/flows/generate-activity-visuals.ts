@@ -91,7 +91,7 @@ const generateImageDirectly = async (prompt: string): Promise<string | null> => 
 
     try {
         const { media } = await ai.generate({
-            model: 'googleai/gemini-2.0-flash-exp', // Use the correct model from BITACORA
+            model: 'googleai/imagen-3', // Use the correct model
             prompt: fullPrompt,
             config: {
                 responseModalities: ['TEXT', 'IMAGE'],

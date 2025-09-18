@@ -213,7 +213,7 @@ async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: stri
     
     try {
         const { media } = await ai.generate({
-            model: 'googleai/gemini-2.0-flash-exp',
+            model: 'googleai/imagen-3',
             prompt: fullPrompt,
             config: {
                 responseModalities: ['TEXT', 'IMAGE'],
