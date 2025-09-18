@@ -36,18 +36,28 @@ const SectionContent: React.FC<SectionContentProps> = ({ title, icon, content, g
   
   const renderList = (items: string[], listType: 'bullet' | 'numeric' | 'paragraph') => {
     if (items.length === 0) return null;
+    
+    const listItems = items.map((line, index) => (
+      <li 
+        key={index} 
+        className="text-muted-foreground whitespace-pre-line relative"
+        dangerouslySetInnerHTML={{ __html: formatWithBold(line) }} 
+      />
+    ));
 
     if (listType === 'bullet') {
       return (
-        <ul className="list-none pl-5 space-y-1">
-          {items.map((line, index) => (
-            <li 
-              key={index} 
-              className="text-muted-foreground whitespace-pre-line relative before:content-['-_'] before:absolute before:left-[-1.25rem] before:top-0 before:text-primary before:font-bold"
-              dangerouslySetInnerHTML={{ __html: formatWithBold(line) }} 
-            />
-          ))}
+        <ul className="list-disc pl-5 space-y-2">
+          {listItems}
         </ul>
+      );
+    }
+    
+    if (listType === 'numeric') {
+       return (
+        <ol className="list-decimal pl-5 space-y-2">
+            {listItems}
+        </ol>
       );
     }
 
@@ -69,10 +79,12 @@ const SectionContent: React.FC<SectionContentProps> = ({ title, icon, content, g
   };
   
   const getListType = (title: string): 'bullet' | 'numeric' | 'paragraph' => {
-      const bulletSections = ["Materiales Necesarios", "Preparación Previa del Docente", "Ejemplos Visuales Sugeridos", "Criterios de Evaluación", "Reflexión y Conexión"];
+      const bulletSections = ["Materiales Necesarios", "Preparación Previa del Docente", "Criterios de Evaluación"];
       const numericSections = ["Desarrollo Paso a Paso"];
+      const paragraphSections = ["Ejemplos Visuales Sugeridos", "Reflexión y Conexión"]
       if (bulletSections.includes(title)) return 'bullet';
       if (numericSections.includes(title)) return 'numeric';
+      if (paragraphSections.includes(title)) return 'paragraph';
       return 'paragraph';
   }
 

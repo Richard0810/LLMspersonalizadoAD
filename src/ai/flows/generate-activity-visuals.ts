@@ -60,13 +60,16 @@ const analysisPrompt = ai.definePrompt({
     prompt: `You are an expert instructional designer and art director. Your task is to analyze an educational activity and decide which parts would benefit most from a visual aid.
 
 You will receive four sections of an activity: materials, instructions, reflection, and visualExamples.
-For EACH item in EACH section, you must make a decision:
-1.  Is an image useful here? Images should only be for concrete, visualizable objects or actions. Do not generate images for abstract concepts, simple materials (like 'pencil', 'paper'), or simple instructions like "ask the students".
-2.  For the 'visualExamples' section, prioritize generating an image, but only if it describes a concrete visual.
-3.  If an image is useful, create a SIMPLE, CLEAR, and CONCISE prompt for an image generation model. The prompt should describe a clean, minimalistic, educational-style illustration. Think of simple icons or drawings a teacher would make on a whiteboard.
-4.  If no image is needed (especially for most materials), the 'imagePrompt' field MUST be null.
 
-Analyze the following activity content:
+**CRITICAL RULES:**
+1.  **For 'materials', 'instructions', and 'reflection' sections, NEVER generate an image.** These are lists of text. The 'imagePrompt' field for all items in these sections MUST ALWAYS be null.
+2.  **For the 'visualExamples' section, you MUST be very selective.**
+    *   **LAST RESORT:** Only generate an image if the example describes a complex, purely visual scene that cannot be represented by text (e.g., "a drawing of a medieval castle", "a photo of a rainforest").
+    *   **DO NOT GENERATE IMAGES FOR:** Simple objects (like 'pencil'), tables, charts, simple diagrams, or abstract concepts. If the text says "una tabla para representar...", the imagePrompt MUST be null, as the text itself is the visual guide.
+    *   If an image is truly necessary, create a SIMPLE, CLEAR, and CONCISE prompt for an image generation model. The prompt should describe a clean, minimalist, educational-style illustration.
+    *   If no image is needed, the 'imagePrompt' field MUST be null.
+
+Analyze the following activity content and provide the output in the required JSON format.
 
 ---
 **Materials:**
@@ -78,11 +81,9 @@ Analyze the following activity content:
 **Reflection:**
 {{{reflection}}}
 ---
-**Suggested Visuals:**
+**Suggested Visuals (visualExamples):**
 {{{visualExamples}}}
 ---
-
-Based on your analysis, provide the output in the required JSON format. For each line item in the original text, create a corresponding JSON object with the original text and either an 'imagePrompt' or null.
 `,
 });
 
