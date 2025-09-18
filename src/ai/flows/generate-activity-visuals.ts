@@ -60,7 +60,7 @@ const analysisPrompt = ai.definePrompt({
 Your task is to analyze an educational activity and generate rich HTML components for the 'activityResources'.
 
 **CRITICAL RULES:**
-1.  **For 'materials', 'instructions', and 'reflection' sections, NEVER generate HTML.** The 'htmlContent' field for all items in these sections MUST ALWAYS be null. Their 'text' field must contain the original unmodified text.
+1.  **For 'materials', 'instructions', and 'reflection' sections, NEVER generate HTML.** The 'htmlContent' field for all items in these sections MUST ALWAYS be null. Their 'text' field must contain the original unmodified text provided in the input. Split the text for these sections by newlines into individual 'text' items in the array.
 2.  **For 'activityResources', you MUST generate a self-contained HTML component for EACH item.** Each item describes a resource like a card, a table, or a small diagram.
 3.  **HTML & Styling Requirements (VERY IMPORTANT):**
     *   The output for 'htmlContent' MUST be a **single block of HTML**, starting with a \`<div>\` and containing all necessary elements and styles.
@@ -72,7 +72,7 @@ Your task is to analyze an educational activity and generate rich HTML component
     *   If the resource describes a table, generate a valid HTML \`<table>\` with Tailwind classes for styling (e.g. \`w-full\`, \`text-left\`, \`border-collapse\`). Style the header (\`<thead>\`) with a background color (e.g. \`bg-gray-100\`).
     *   Ensure the HTML is clean, valid, and self-contained for each resource.
 
-Analyze the following activity content and provide the output in the required JSON format. Ensure all original text for materials, instructions, and reflection is preserved in the 'text' field.
+Analyze the following activity content and provide the output in the required JSON format. Ensure all original text for materials, instructions, and reflection is preserved in the 'text' field, split into items by newlines.
 
 ---
 **Materials:**
