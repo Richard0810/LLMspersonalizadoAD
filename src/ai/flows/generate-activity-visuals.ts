@@ -54,7 +54,7 @@ export async function generateActivityVisuals(input: GenerateActivityVisualsInpu
 
 const analysisPrompt = ai.definePrompt({
     name: 'analyzeActivityForVisuals',
-    model: 'googleai/gemini-2.5-flash',
+    model: 'googleai/gemini-2.0-flash',
     input: { schema: GenerateActivityVisualsInputSchema },
     output: { schema: InternalOutputSchema },
     prompt: `You are an expert instructional designer and art director. Your task is to analyze an educational activity and decide which parts would benefit most from a visual aid.
