@@ -305,7 +305,11 @@ export default function ActivityDetailPage() {
               content={activity.stepByStepDevelopment}
             />
             
-            {/* The generated visuals will now appear in their own card below */}
+            <SectionContent
+              title="Recursos para la Actividad"
+              icon={<Layers className="h-6 w-6" />}
+              content={activity.activityResources}
+            />
 
             <SectionContent
               title="Reflexión y Conexión"
@@ -395,5 +399,3 @@ export default function ActivityDetailPage() {
     </ProtectedRoute>
   );
 }
-
-    
