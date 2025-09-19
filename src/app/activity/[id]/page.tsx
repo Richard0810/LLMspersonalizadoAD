@@ -44,29 +44,25 @@ const SectionContent: React.FC<SectionContentProps> = ({ title, icon, content, c
         const groupedItems: (string | string[])[] = [];
 
         lines.forEach(line => {
+            const trimmedLine = line.trim();
             const isSubItem = line.startsWith('  ') || line.startsWith('- ') || /^\s{2,}/.test(line);
-             // Also check for common sub-item patterns from AI
-            const isSubItemPattern = /^(Unidad|Título:|Acción:|Descripción:|Símbolo:)/.test(line.trim());
-
-            if (!isSubItem && !isSubItemPattern && groupedItems.length > 0 && typeof groupedItems[groupedItems.length - 1] === 'string') {
-                 // Current line is a main item, and the previous was a main item
-                 groupedItems.push(line);
-            } else if (isSubItem || isSubItemPattern) {
-                // Current line is a sub-item
+            const isHeaderLike = /:$/.test(trimmedLine);
+            
+            if (isSubItem || (groupedItems.length > 0 && Array.isArray(groupedItems[groupedItems.length - 1]) && !isHeaderLike)) {
+                // If it's a sub-item, or the previous item was a group and this one doesn't look like a new header
                 const lastItem = groupedItems[groupedItems.length - 1];
                 if (Array.isArray(lastItem)) {
-                    // Add to existing sub-item list
                     lastItem.push(line);
                 } else {
-                    // Convert the last main item into a group
                     const mainItem = groupedItems.pop() as string;
                     groupedItems.push([mainItem, line]);
                 }
             } else {
-                // Current line is a main item
+                // It's a main item or a new header for a group
                 groupedItems.push(line);
             }
         });
+
 
         return (
              <ul className="space-y-4">
@@ -365,31 +361,36 @@ export default function ActivityDetailPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {generatedVisuals.map((item, index) => (
-                <div key={index} className="p-4 bg-muted/30 rounded-lg border border-primary/20">
-                  <p
-                    className="text-muted-foreground whitespace-pre-line mb-4 italic border-l-4 border-muted-foreground/30 pl-3"
-                    dangerouslySetInnerHTML={{ __html: item.text }}
-                  />
+              {generatedVisuals.map((item, index) => {
+                // No renderizar tarjetas vacías
+                if (!item.htmlContent && !item.imageUrl) return null;
+                
+                return (
+                    <div key={index} className="p-4 bg-muted/30 rounded-lg border border-primary/20">
+                    <p
+                        className="text-muted-foreground whitespace-pre-line mb-4 italic border-l-4 border-muted-foreground/30 pl-3"
+                        dangerouslySetInnerHTML={{ __html: item.text }}
+                    />
 
-                  {item.htmlContent && (
-                    <div className="mb-4" dangerouslySetInnerHTML={{ __html: item.htmlContent }} />
-                  )}
+                    {item.htmlContent && (
+                        <div className="mb-4" dangerouslySetInnerHTML={{ __html: item.htmlContent }} />
+                    )}
 
-                  {item.imageUrl && (
-                    <div className="mt-4">
-                        <p className="text-sm font-semibold text-foreground mb-2">Guía Visual Sugerida:</p>
-                        <Image
-                            src={item.imageUrl}
-                            alt={item.imageAlt || 'Guía visual generada'}
-                            width={500}
-                            height={300}
-                            className="rounded-md border shadow-md object-contain"
-                        />
+                    {item.imageUrl && (
+                        <div className="mt-4">
+                            <p className="text-sm font-semibold text-foreground mb-2">Guía Visual Sugerida:</p>
+                            <Image
+                                src={item.imageUrl}
+                                alt={item.imageAlt || 'Guía visual generada'}
+                                width={500}
+                                height={300}
+                                className="rounded-md border shadow-md object-contain"
+                            />
+                        </div>
+                    )}
                     </div>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </CardContent>
           </Card>
         )}

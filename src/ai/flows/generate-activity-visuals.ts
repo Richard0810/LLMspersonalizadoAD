@@ -70,7 +70,8 @@ Your task is to analyze a list of activity resources and, for EACH item, generat
 
 **CRITICAL RULES:**
 1.  You MUST process EACH item from the input string, which is separated by newlines.
-2.  For each item, you MUST generate a corresponding object in the output array. This object MUST contain:
+2.  If an item is a header for a list of sub-items (e.g., "Tarjetas de 'Instrucción':"), you MUST process each sub-item individually and generate a corresponding object for it. The main header itself should also have its own object in the output array, but its 'htmlContent' and 'imagePrompt' should be null.
+3.  For each item/sub-item, you MUST generate a corresponding object in the output array. This object MUST contain:
     *   'text': The original, unmodified text of the resource item.
     *   'htmlContent': A self-contained HTML block styled with Tailwind CSS. If the resource is simple text that doesn't need a visual component (like "Un lápiz" or a coded message), this MUST be null. For all others, generate a visually appealing HTML "card" or "widget".
     *   'imagePrompt': A detailed text-to-image prompt. This field is CRUCIAL. It MUST be null for most items. Only generate a prompt string if the resource explicitly describes a physical, visual item to be drawn or created by the teacher (e.g., "Dibuja un tablero con 20 casillas", "Crea un mapa del tesoro en una cartulina"). For abstract items like "Tarjeta de Acción: Sumar" or text-based content, the prompt MUST be null.
@@ -80,9 +81,9 @@ Your task is to analyze a list of activity resources and, for EACH item, generat
 *   Use Tailwind CSS classes ONLY. DO NOT use inline \`<style>\` tags.
 *   Create visually appealing cards: use \`border\`, \`rounded-lg\`, \`p-4\`, \`bg-white\`, \`shadow-md\`.
 *   Use semantic HTML (\`h3\`, \`p\`, \`strong\`).
-*   For symbols/icons (e.g., '+1'), use large font sizes (\`text-6xl\`) and accent colors (\`text-green-600\`).
+*   For symbols/icons (e.g., '+1', '💡'), use large font sizes (\`text-6xl\`) and accent colors (\`text-green-600\`). Use unicode characters for symbols where possible.
 *   **For tables**: If the resource describes a "tabla", you MUST generate a valid HTML \`<table>\` with Tailwind classes (\`w-full\`, \`border-collapse\`), and style the header (\`bg-gray-100\`).
-*   Example for a card: \`<div class="border rounded-lg p-6 bg-white shadow-lg w-full max-w-sm mx-auto text-center font-sans"> <h3 class="text-3xl font-bold mb-4">SUMAR</h3> <div class="text-left space-y-2"> <p><strong>ACCIÓN:</strong> Sumar</p> <p><strong>DESCRIPCIÓN:</strong> Suma 1 al valor de la casilla actual</p> </div> <div class="text-8xl font-bold text-green-600 mt-6">+1</div> </div>\`
+*   Example for a card: \`<div class="border rounded-lg p-6 bg-white shadow-lg w-full max-w-sm mx-auto text-center font-sans"> <h3 class="text-3xl font-bold mb-4 uppercase text-primary">INSTRUCCIÓN</h3> <div class="text-left space-y-2 text-muted-foreground"> <p><strong>Acción:</strong> Indica la tarea a realizar por la CPU.</p> <p><strong>Descripción:</strong> Contiene la orden específica que debe ejecutar la CPU (ej: Sumar, Restar, Multiplicar).</p> </div> <div class="text-8xl font-bold text-accent mt-6">💡</div> </div>\`
 
 **IMAGE PROMPT REQUIREMENTS ('imagePrompt'):**
 *   Be specific. Instead of "un tablero", describe "Un tablero de juego simple, estilo dibujo, con 20 casillas numeradas del 1 al 20. La casilla 1 dice 'Inicio' y la 20 'Fin'. Algunas casillas tienen símbolos simples como un engranaje o una lupa."
