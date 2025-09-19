@@ -26,22 +26,27 @@ interface SectionContentProps {
 }
 
 const SectionContent: React.FC<SectionContentProps> = ({ title, icon, content, generatedContent, className = "" }) => {
+  // Always render the list from the original content if it exists
   const renderList = (text: string | undefined) => {
     if (!text) return null;
     const items = text.split('\n').filter(line => line.trim() !== '');
     if (items.length === 0) return null;
 
-    return (
-      <ul className="space-y-2">
-        {items.map((line, index) => (
-          <li
-            key={index}
-            className="text-muted-foreground whitespace-pre-line relative pl-5 before:content-['•'] before:absolute before:left-0 before:text-primary"
-            dangerouslySetInnerHTML={{ __html: line.replace(/^\s*-\s*/, '') }}
-          />
-        ))}
-      </ul>
-    );
+    // If there is no generated content, just show the plain list
+    if (!generatedContent || generatedContent.length === 0) {
+        return (
+          <ul className="space-y-2">
+            {items.map((line, index) => (
+              <li
+                key={index}
+                className="text-muted-foreground whitespace-pre-line relative pl-5 before:content-['•'] before:absolute before:left-0 before:text-primary"
+                dangerouslySetInnerHTML={{ __html: line.replace(/^\s*-\s*/, '') }}
+              />
+            ))}
+          </ul>
+        );
+    }
+    return null; // Don't render the plain list if we have generated content to show
   };
 
   const hasGeneratedContent = generatedContent && generatedContent.length > 0;
@@ -55,13 +60,29 @@ const SectionContent: React.FC<SectionContentProps> = ({ title, icon, content, g
         <div className="space-y-6">
           {generatedContent.map((item, index) => (
             <div key={index} className="p-4 bg-muted/30 rounded-lg border border-primary/20">
-              {item.htmlContent ? (
-                <div dangerouslySetInnerHTML={{ __html: item.htmlContent }} />
-              ) : (
-                <p
-                  className="text-muted-foreground whitespace-pre-line"
-                  dangerouslySetInnerHTML={{ __html: item.text }}
-                />
+              {/* Always show the original text */}
+              <p
+                className="text-muted-foreground whitespace-pre-line mb-4 italic border-l-4 border-muted-foreground/30 pl-3"
+                dangerouslySetInnerHTML={{ __html: item.text }}
+              />
+
+              {/* Show the rich HTML component if it exists */}
+              {item.htmlContent && (
+                <div className="mb-4" dangerouslySetInnerHTML={{ __html: item.htmlContent }} />
+              )}
+
+              {/* Show the generated image guide if it exists */}
+              {item.imageUrl && (
+                <div className="mt-4">
+                    <p className="text-sm font-semibold text-foreground mb-2">Ejemplo Visual Generado:</p>
+                    <Image
+                        src={item.imageUrl}
+                        alt={item.imageAlt || 'Guía visual generada'}
+                        width={500}
+                        height={300}
+                        className="rounded-md border shadow-md object-contain"
+                    />
+                </div>
               )}
             </div>
           ))}
@@ -103,6 +124,7 @@ export default function ActivityDetailPage() {
     });
 
     try {
+      // The flow now only needs the specific resources string
       const visualResult = await generateActivityVisuals(activity.activityResources);
       
       setGeneratedActivityResources(visualResult);
@@ -298,7 +320,7 @@ export default function ActivityDetailPage() {
               {isGeneratingContent ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Sparkles className="mr-2 h-5 w-5" />}
               {isGeneratingContent ? 'Generando...' : 'Crear Contenido Visual'}
             </Button>
-            <Button onClick={handleDownload} disabled={isDownloading || isGeneratingContent} variant="secondary" className="text-lg py-3 px-6 text-primary hover:text-primary/90">
+            <Button onClick={handleDownload} disabled={isDownloading || isDownloading} variant="secondary" className="text-lg py-3 px-6 text-primary hover:text-primary/90">
               {isDownloading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <WordIcon className="mr-2 h-5 w-5" />}
               {isDownloading ? 'Generando DOCX...' : 'Descargar (DOCX)'}
             </Button>

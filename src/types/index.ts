@@ -72,6 +72,8 @@ export const computationalConcepts = [
 export interface VisualItem {
   text: string;
   htmlContent: string | null;
+  imageUrl: string | null;
+  imageAlt: string | null;
 }
 
 
