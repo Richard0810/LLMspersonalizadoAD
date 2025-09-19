@@ -44,7 +44,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({ message, onParameterC
         fullText += `Tiempo Estimado:\n${activity.estimatedTime}\n\n`;
         fullText += `Preparación Previa:\n${activity.teacherPreparation}\n\n`;
         fullText += `Desarrollo Paso a Paso:\n${activity.stepByStepDevelopment}\n\n`;
-        fullText += `Ejemplos Visuales:\n${activity.visualExamples}\n\n`;
+        fullText += `Recursos para la Actividad:\n${activity.activityResources}\n\n`;
         fullText += `Pregunta de Reflexión:\n${activity.reflectionQuestion}\n\n`;
         fullText += `Criterios de Evaluación:\n${activity.evaluationCriteria}\n\n`;
         if (index < activities.length - 1) {
@@ -200,3 +200,5 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({ message, onParameterC
 };
 
 export default ChatMessageItem;
+
+    

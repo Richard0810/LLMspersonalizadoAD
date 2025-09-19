@@ -7,7 +7,7 @@ import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import InteractiveBackground from '@/components/shared/InteractiveBackground';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, ListChecks, BookOpen, Target, ThumbsUp, Sparkles, Loader2, Clock, ClipboardCheck, Brain, Eye, UserCheck, FileDown, Layers } from 'lucide-react';
+import { ArrowLeft, ListChecks, BookOpen, Target, ThumbsUp, Sparkles, Loader2, Clock, ClipboardCheck, Brain, Eye, UserCheck, FileDown, Layers, Wand2 } from 'lucide-react';
 import type { Activity, VisualItem } from '@/types';
 import { getActivityByIdFromLocalStorage } from '@/lib/localStorageUtils';
 import { useToast } from '@/hooks/use-toast';
@@ -21,75 +21,34 @@ interface SectionContentProps {
   title: string;
   icon: ReactNode;
   content?: string;
-  generatedContent?: VisualItem[];
   className?: string;
 }
 
-const SectionContent: React.FC<SectionContentProps> = ({ title, icon, content, generatedContent, className = "" }) => {
-  // Always render the list from the original content if it exists
+const SectionContent: React.FC<SectionContentProps> = ({ title, icon, content, className = "" }) => {
   const renderList = (text: string | undefined) => {
     if (!text) return null;
     const items = text.split('\n').filter(line => line.trim() !== '');
     if (items.length === 0) return null;
 
-    // If there is no generated content, just show the plain list
-    if (!generatedContent || generatedContent.length === 0) {
-        return (
-          <ul className="space-y-2">
-            {items.map((line, index) => (
-              <li
-                key={index}
-                className="text-muted-foreground whitespace-pre-line relative pl-5 before:content-['•'] before:absolute before:left-0 before:text-primary"
-                dangerouslySetInnerHTML={{ __html: line.replace(/^\s*-\s*/, '') }}
-              />
-            ))}
-          </ul>
-        );
-    }
-    return null; // Don't render the plain list if we have generated content to show
+    return (
+        <ul className="space-y-2">
+        {items.map((line, index) => (
+            <li
+            key={index}
+            className="text-muted-foreground whitespace-pre-line relative pl-5 before:content-['•'] before:absolute before:left-0 before:text-primary"
+            dangerouslySetInnerHTML={{ __html: line.replace(/^\s*-\s*/, '') }}
+            />
+        ))}
+        </ul>
+    );
   };
-
-  const hasGeneratedContent = generatedContent && generatedContent.length > 0;
 
   return (
     <div className={className}>
       <h3 className="text-xl font-semibold flex items-center gap-2 text-accent font-headline mb-4">
         {icon} {title}
       </h3>
-      {hasGeneratedContent ? (
-        <div className="space-y-6">
-          {generatedContent.map((item, index) => (
-            <div key={index} className="p-4 bg-muted/30 rounded-lg border border-primary/20">
-              {/* Always show the original text */}
-              <p
-                className="text-muted-foreground whitespace-pre-line mb-4 italic border-l-4 border-muted-foreground/30 pl-3"
-                dangerouslySetInnerHTML={{ __html: item.text }}
-              />
-
-              {/* Show the rich HTML component if it exists */}
-              {item.htmlContent && (
-                <div className="mb-4" dangerouslySetInnerHTML={{ __html: item.htmlContent }} />
-              )}
-
-              {/* Show the generated image guide if it exists */}
-              {item.imageUrl && (
-                <div className="mt-4">
-                    <p className="text-sm font-semibold text-foreground mb-2">Ejemplo Visual Generado:</p>
-                    <Image
-                        src={item.imageUrl}
-                        alt={item.imageAlt || 'Guía visual generada'}
-                        width={500}
-                        height={300}
-                        className="rounded-md border shadow-md object-contain"
-                    />
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      ) : (
-         renderList(content)
-      )}
+      {renderList(content)}
     </div>
   );
 };
@@ -103,7 +62,7 @@ export default function ActivityDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isGeneratingContent, setIsGeneratingContent] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
-  const [generatedActivityResources, setGeneratedActivityResources] = useState<VisualItem[] | null>(null);
+  const [generatedVisuals, setGeneratedVisuals] = useState<VisualItem[] | null>(null);
 
   useEffect(() => {
     if (params.id) {
@@ -117,20 +76,20 @@ export default function ActivityDetailPage() {
   const handleGenerateVisualContent = async () => {
     if (!activity) return;
     setIsGeneratingContent(true);
+    setGeneratedVisuals(null); 
 
     toast({
       title: "Generación en Proceso",
-      description: "La IA está analizando los recursos de la actividad y creando contenido visual. Esto puede tardar unos minutos...",
+      description: "La IA está analizando los recursos y creando apoyos visuales. Esto puede tardar unos minutos...",
     });
 
     try {
-      // The flow now only needs the specific resources string
       const visualResult = await generateActivityVisuals(activity.activityResources);
       
-      setGeneratedActivityResources(visualResult);
+      setGeneratedVisuals(visualResult);
 
       toast({
-        title: "¡Contenido Visual Generado!",
+        title: "¡Apoyo Visual Generado!",
         description: "Los recursos visuales para tu actividad están listos.",
         className: 'bg-green-100 border-green-400 text-green-800'
       });
@@ -302,7 +261,6 @@ export default function ActivityDetailPage() {
               title="Recursos para la Actividad"
               icon={<Layers className="h-6 w-6" />}
               content={activity.activityResources}
-              generatedContent={generatedActivityResources}
             />
             <SectionContent
               title="Reflexión y Conexión"
@@ -318,7 +276,7 @@ export default function ActivityDetailPage() {
           <CardFooter className="border-t p-6 flex-wrap gap-2 justify-between">
              <Button onClick={handleGenerateVisualContent} disabled={isGeneratingContent || isDownloading} className="text-lg py-3 px-6">
               {isGeneratingContent ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Sparkles className="mr-2 h-5 w-5" />}
-              {isGeneratingContent ? 'Generando...' : 'Crear Contenido Visual'}
+              {isGeneratingContent ? 'Generando...' : 'Crear Apoyo Visual'}
             </Button>
             <Button onClick={handleDownload} disabled={isDownloading || isDownloading} variant="secondary" className="text-lg py-3 px-6 text-primary hover:text-primary/90">
               {isDownloading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <WordIcon className="mr-2 h-5 w-5" />}
@@ -326,8 +284,54 @@ export default function ActivityDetailPage() {
             </Button>
           </CardFooter>
         </Card>
+        
+        {generatedVisuals && generatedVisuals.length > 0 && (
+          <Card className="w-full shadow-2xl mt-8 animate-fade-in">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-primary/20 rounded-full">
+                    <Wand2 className="h-8 w-8 text-primary" />
+                </div>
+                <CardTitle className="text-2xl font-headline text-primary">Recursos para la Actividad (Contenido Visual)</CardTitle>
+              </div>
+              <CardDescription>
+                Estos son los apoyos visuales generados por IA para los recursos de tu actividad.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {generatedVisuals.map((item, index) => (
+                <div key={index} className="p-4 bg-muted/30 rounded-lg border border-primary/20">
+                  <p
+                    className="text-muted-foreground whitespace-pre-line mb-4 italic border-l-4 border-muted-foreground/30 pl-3"
+                    dangerouslySetInnerHTML={{ __html: item.text }}
+                  />
+
+                  {item.htmlContent && (
+                    <div className="mb-4" dangerouslySetInnerHTML={{ __html: item.htmlContent }} />
+                  )}
+
+                  {item.imageUrl && (
+                    <div className="mt-4">
+                        <p className="text-sm font-semibold text-foreground mb-2">Guía Visual Sugerida:</p>
+                        <Image
+                            src={item.imageUrl}
+                            alt={item.imageAlt || 'Guía visual generada'}
+                            width={500}
+                            height={300}
+                            className="rounded-md border shadow-md object-contain"
+                        />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
+        
         </main>
       </div>
     </ProtectedRoute>
   );
 }
+
+    
