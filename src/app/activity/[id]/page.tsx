@@ -17,6 +17,15 @@ import { generateActivityDocument } from '@/ai/flows/generate-activity-document'
 import Image from 'next/image';
 import WordIcon from '@/components/icons/WordIcon';
 
+const createMarkup = (text: string) => {
+    if (!text) return { __html: '' };
+    const htmlText = text
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/^\s*-\s*/, ''); // Remove leading hyphens
+    return { __html: htmlText };
+};
+
+
 interface SectionContentProps {
   title: string;
   icon: ReactNode;
@@ -25,30 +34,68 @@ interface SectionContentProps {
 }
 
 const SectionContent: React.FC<SectionContentProps> = ({ title, icon, content, className = "" }) => {
-  const renderList = (text: string | undefined) => {
-    if (!text) return null;
-    const items = text.split('\n').filter(line => line.trim() !== '');
-    if (items.length === 0) return null;
+    
+    const renderSmartList = (text: string | undefined) => {
+        if (!text) return null;
+        
+        const lines = text.split('\n').filter(line => line.trim() !== '');
+        if (lines.length === 0) return null;
 
-    return (
-        <ul className="space-y-2">
-        {items.map((line, index) => (
-            <li
-            key={index}
-            className="text-muted-foreground whitespace-pre-line relative pl-5 before:content-['•'] before:absolute before:left-0 before:text-primary"
-            dangerouslySetInnerHTML={{ __html: line.replace(/^\s*-\s*/, '') }}
-            />
-        ))}
-        </ul>
-    );
-  };
+        const groupedItems: (string | string[])[] = [];
+
+        lines.forEach(line => {
+            const isSubItem = line.startsWith('  ') || line.startsWith('- ') || /^\s{2,}/.test(line);
+             // Also check for common sub-item patterns from AI
+            const isSubItemPattern = /^(Unidad|Título:|Acción:|Descripción:|Símbolo:)/.test(line.trim());
+
+            if (!isSubItem && !isSubItemPattern && groupedItems.length > 0 && typeof groupedItems[groupedItems.length - 1] === 'string') {
+                 // Current line is a main item, and the previous was a main item
+                 groupedItems.push(line);
+            } else if (isSubItem || isSubItemPattern) {
+                // Current line is a sub-item
+                const lastItem = groupedItems[groupedItems.length - 1];
+                if (Array.isArray(lastItem)) {
+                    // Add to existing sub-item list
+                    lastItem.push(line);
+                } else {
+                    // Convert the last main item into a group
+                    const mainItem = groupedItems.pop() as string;
+                    groupedItems.push([mainItem, line]);
+                }
+            } else {
+                // Current line is a main item
+                groupedItems.push(line);
+            }
+        });
+
+        return (
+             <ul className="space-y-4">
+                {groupedItems.map((item, index) => (
+                    <li key={index} className="text-muted-foreground relative pl-5 before:content-['•'] before:absolute before:left-0 before:top-1 before:text-primary">
+                        {Array.isArray(item) ? (
+                            <>
+                                <span dangerouslySetInnerHTML={createMarkup(item[0])} />
+                                <ul className="mt-2 space-y-1 pl-4">
+                                    {item.slice(1).map((subItem, subIndex) => (
+                                        <li key={subIndex} className="text-sm whitespace-pre-line" dangerouslySetInnerHTML={createMarkup(subItem)} />
+                                    ))}
+                                </ul>
+                            </>
+                        ) : (
+                            <span className="whitespace-pre-line" dangerouslySetInnerHTML={createMarkup(item)} />
+                        )}
+                    </li>
+                ))}
+            </ul>
+        );
+    };
 
   return (
     <div className={className}>
       <h3 className="text-xl font-semibold flex items-center gap-2 text-accent font-headline mb-4">
         {icon} {title}
       </h3>
-      {renderList(content)}
+      {renderSmartList(content)}
     </div>
   );
 };
@@ -257,11 +304,9 @@ export default function ActivityDetailPage() {
               icon={<Target className="h-6 w-6" />}
               content={activity.stepByStepDevelopment}
             />
-            <SectionContent
-              title="Recursos para la Actividad"
-              icon={<Layers className="h-6 w-6" />}
-              content={activity.activityResources}
-            />
+            
+            {/* The generated visuals will now appear in their own card below */}
+
             <SectionContent
               title="Reflexión y Conexión"
               icon={<ThumbsUp className="h-6 w-6" />}
@@ -285,7 +330,24 @@ export default function ActivityDetailPage() {
           </CardFooter>
         </Card>
         
-        {generatedVisuals && generatedVisuals.length > 0 && (
+        {isGeneratingContent && (
+            <Card className="w-full shadow-2xl mt-8 animate-fade-in">
+                <CardHeader>
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-primary/20 rounded-full">
+                            <Wand2 className="h-8 w-8 text-primary" />
+                        </div>
+                        <CardTitle className="text-2xl font-headline text-primary">Generando Apoyo Visual...</CardTitle>
+                    </div>
+                </CardHeader>
+                <CardContent className="text-center">
+                    <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" />
+                    <p className="mt-4 text-muted-foreground">La IA está creando los componentes visuales...</p>
+                </CardContent>
+            </Card>
+        )}
+        
+        {generatedVisuals && generatedVisuals.length > 0 && !isGeneratingContent && (
           <Card className="w-full shadow-2xl mt-8 animate-fade-in">
             <CardHeader>
               <div className="flex items-center gap-3">
