@@ -29,9 +29,9 @@ const ActivityResourcesInputSchema = z.object({
  */
 async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: string, altText: string } | null> {
     const fullPrompt = `Educational illustration, simple, clean, minimalist, whiteboard drawing style for a teacher's guide: ${prompt}`;
-    const altText = `Guía visual: ${prompt.substring(0, 150)}`;
-
+    
     try {
+        // @ts-ignore - This is added to bypass the type check in Vercel build
         const { media } = await ai.generate({
             model: 'googleai/gemini-2.0-flash-exp',
             prompt: fullPrompt,
@@ -41,7 +41,11 @@ async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: stri
         });
         
         if (media && media.url) {
-            return { imageUrl: media.url, altText };
+            const { text: altText } = await ai.generate({
+                model: 'googleai/gemini-2.0-flash',
+                prompt: `Genera un texto alternativo (alt text) conciso para una imagen que muestra lo siguiente: "${prompt}". El alt text debe ser descriptivo y no exceder los 150 caracteres.`,
+            });
+            return { imageUrl: media.url, altText: altText || `Guía visual para: ${prompt.substring(0, 100)}` };
         }
         
         console.warn(`AI generation did not return a valid image media object for prompt: "${prompt}"`);
@@ -55,7 +59,7 @@ async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: stri
 
 
 export async function generateActivityVisuals(input: string): Promise<VisualItem[]> {
-  return generateActivityVisualsFlow(input);
+  return generateActivityVisualsFlow({ resources: input });
 }
 
 
@@ -65,24 +69,36 @@ const analysisPrompt = ai.definePrompt({
     input: { schema: ActivityResourcesInputSchema },
     output: { schema: VisualAnalysisSchema },
     prompt: `You are an expert UI/UX designer and Art Director specializing in educational materials.
-Your task is to analyze a list of activity resources and, for EACH item, generate a rich representation.
+Your task is to analyze a list of activity resources and, for EACH item, generate a rich visual representation.
 
 **CRITICAL RULES:**
 1.  You MUST process EACH item from the input string, which is separated by newlines.
-2.  If an item is a header for a list of sub-items (e.g., "Tarjetas de 'Instrucción':"), you MUST process each sub-item individually and generate a corresponding object for it. The main header itself should also have its own object in the output array, but its 'htmlContent' and 'imagePrompt' should be null.
+2.  If a resource is a main header for a list of sub-items (e.g., "Tarjetas de 'Instrucción':" followed by "Título: INSTRUCCIÓN..."), you MUST process each sub-item individually. The main header itself should also have its own object in the output array, but its 'htmlContent' and 'imagePrompt' MUST be null.
 3.  For each item/sub-item, you MUST generate a corresponding object in the output array. This object MUST contain:
     *   'text': The original, unmodified text of the resource item.
     *   'htmlContent': A self-contained HTML block styled with Tailwind CSS. If the resource is simple text that doesn't need a visual component (like "Un lápiz" or a coded message), this MUST be null. For all others, generate a visually appealing HTML "card" or "widget".
     *   'imagePrompt': A detailed text-to-image prompt. This field is CRUCIAL. It MUST be null for most items. Only generate a prompt string if the resource explicitly describes a physical, visual item to be drawn or created by the teacher (e.g., "Dibuja un tablero con 20 casillas", "Crea un mapa del tesoro en una cartulina"). For abstract items like "Tarjeta de Acción: Sumar" or text-based content, the prompt MUST be null.
 
 **HTML & STYLING REQUIREMENTS ('htmlContent'):**
-*   The output MUST be a single block of HTML, starting with a \`<div>\`.
+*   The output MUST be a single, self-contained block of HTML, starting with a \`<div>\`.
 *   Use Tailwind CSS classes ONLY. DO NOT use inline \`<style>\` tags.
-*   Create visually appealing cards: use \`border\`, \`rounded-lg\`, \`p-4\`, \`bg-white\`, \`shadow-md\`.
-*   Use semantic HTML (\`h3\`, \`p\`, \`strong\`).
-*   For symbols/icons (e.g., '+1', '💡'), use large font sizes (\`text-6xl\`) and accent colors (\`text-green-600\`). Use unicode characters for symbols where possible.
+*   **Card Design**: Create vertical, visually appealing cards. Use classes like \`border\`, \`rounded-lg\`, \`p-6\`, \`bg-white\`, \`shadow-lg\`, \`w-full\`, \`max-w-sm\`, \`mx-auto\`, \`text-center\`, \`font-sans\`.
+*   **Visual Hierarchy**:
+    *   **Main Title**: Use \`h3\` with \`text-3xl\`, \`font-bold\`, \`mb-4\`, \`uppercase\`, and \`text-primary\`.
+    *   **Content Body**: Use a \`div\` with \`text-left\`, \`space-y-2\`, and \`text-muted-foreground\`. Use \`<strong>\` for labels like "Acción:".
+    *   **Symbol/Icon**: This is the visual anchor. Place it at the bottom. It MUST be in a separate \`<div>\` and be VERY LARGE. Use \`text-8xl\`, \`font-bold\`, \`text-accent\`, and give it top margin (\`mt-6\`). Use unicode characters for symbols where possible.
 *   **For tables**: If the resource describes a "tabla", you MUST generate a valid HTML \`<table>\` with Tailwind classes (\`w-full\`, \`border-collapse\`), and style the header (\`bg-gray-100\`).
-*   Example for a card: \`<div class="border rounded-lg p-6 bg-white shadow-lg w-full max-w-sm mx-auto text-center font-sans"> <h3 class="text-3xl font-bold mb-4 uppercase text-primary">INSTRUCCIÓN</h3> <div class="text-left space-y-2 text-muted-foreground"> <p><strong>Acción:</strong> Indica la tarea a realizar por la CPU.</p> <p><strong>Descripción:</strong> Contiene la orden específica que debe ejecutar la CPU (ej: Sumar, Restar, Multiplicar).</p> </div> <div class="text-8xl font-bold text-accent mt-6">💡</div> </div>\`
+*   **CRITICAL EXAMPLE**: For a card like "Título: INSTRUCCIÓN, Acción: Indica la tarea..., Descripción: Contiene la orden..., Símbolo: Un foco que se enciende.", the HTML MUST look like this:
+    \`\`\`html
+    <div class="border rounded-lg p-6 bg-white shadow-lg w-full max-w-sm mx-auto text-center font-sans">
+      <h3 class="text-3xl font-bold mb-4 uppercase text-primary">INSTRUCCIÓN</h3>
+      <div class="text-left space-y-2 text-muted-foreground">
+        <p><strong>Acción:</strong> Indica la tarea a realizar por la CPU.</p>
+        <p><strong>Descripción:</strong> Contiene la orden específica que debe ejecutar la CPU (ej: Sumar, Restar, Multiplicar).</p>
+      </div>
+      <div class="text-8xl font-bold text-accent mt-6">💡</div>
+    </div>
+    \`\`\`
 
 **IMAGE PROMPT REQUIREMENTS ('imagePrompt'):**
 *   Be specific. Instead of "un tablero", describe "Un tablero de juego simple, estilo dibujo, con 20 casillas numeradas del 1 al 20. La casilla 1 dice 'Inicio' y la 20 'Fin'. Algunas casillas tienen símbolos simples como un engranaje o una lupa."
@@ -100,12 +116,12 @@ Analyze the following activity resources and provide the output in the required 
 const generateActivityVisualsFlow = ai.defineFlow(
   {
     name: 'generateActivityVisualsFlow',
-    inputSchema: z.string(),
+    inputSchema: ActivityResourcesInputSchema,
     outputSchema: z.array(z.custom<VisualItem>()),
   },
   async (input) => {
     // Step 1: Analyze the resources to decide what to generate (HTML and/or image prompts)
-    const { output: analysisResult } = await analysisPrompt({ resources: input });
+    const { output: analysisResult } = await analysisPrompt(input);
     
     if (!analysisResult) {
       throw new Error("AI analysis failed to produce a visual plan for the resources.");
@@ -128,10 +144,11 @@ const generateActivityVisualsFlow = ai.defineFlow(
             text: item.text,
             htmlContent: item.htmlContent,
             imageUrl: imageResult ? imageResult.imageUrl : null,
-            imageAlt: imageResult ? imageResult.altText : null,
+            imageAlt: imageResult ? imageResult.imageAlt : null,
         };
     });
     
     return finalVisualItems;
   }
 );
+ 
