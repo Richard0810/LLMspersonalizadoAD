@@ -19,13 +19,15 @@ const VisualAnalysisItemSchema = z.object({
 
 const VisualAnalysisSchema = z.array(VisualAnalysisItemSchema);
 
-const ActivityResourcesInputSchema = z.string().describe('A string containing the newline-separated list of resources for the activity.');
+const ActivityResourcesInputSchema = z.object({
+    resources: z.string().describe('A string containing the newline-separated list of resources for the activity.'),
+});
 
 
 /**
  * Generates an image and a corresponding alt text using the AI model.
  */
-async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: string, altText: string }> {
+async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: string, altText: string } | null> {
     const fullPrompt = `Educational illustration, simple, clean, minimalist, whiteboard drawing style for a teacher's guide: ${prompt}`;
     const altText = `Guía visual: ${prompt.substring(0, 150)}`;
 
@@ -43,14 +45,11 @@ async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: stri
         }
         
         console.warn(`AI generation did not return a valid image media object for prompt: "${prompt}"`);
-        return { imageUrl: '', altText };
+        return null;
 
     } catch (error) {
         console.warn(`AI image generation failed for prompt: "${prompt}". Error:`, error);
-        return {
-            imageUrl: '',
-            altText,
-        };
+        return null;
     }
 };
 
@@ -93,7 +92,7 @@ Analyze the following activity resources and provide the output in the required 
 
 ---
 **Activity Resources:**
-{{{input}}}
+{{{resources}}}
 ---
 `,
 });
@@ -101,12 +100,12 @@ Analyze the following activity resources and provide the output in the required 
 const generateActivityVisualsFlow = ai.defineFlow(
   {
     name: 'generateActivityVisualsFlow',
-    inputSchema: ActivityResourcesInputSchema,
+    inputSchema: z.string(),
     outputSchema: z.array(z.custom<VisualItem>()),
   },
   async (input) => {
     // Step 1: Analyze the resources to decide what to generate (HTML and/or image prompts)
-    const { output: analysisResult } = await analysisPrompt(input);
+    const { output: analysisResult } = await analysisPrompt({ resources: input });
     
     if (!analysisResult) {
       throw new Error("AI analysis failed to produce a visual plan for the resources.");

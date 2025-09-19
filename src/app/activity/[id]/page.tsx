@@ -19,9 +19,19 @@ import WordIcon from '@/components/icons/WordIcon';
 
 const createMarkup = (text: string) => {
     if (!text) return { __html: '' };
-    const htmlText = text
+    // First, escape HTML to prevent XSS
+    const escapedText = text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+    // Then, apply markdown-style bolding
+    const htmlText = escapedText
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/^\s*-\s*/, ''); // Remove leading hyphens
+       // Also handle the case where the AI might add a hyphen for reflection questions
+      .replace(/^\s*-\s*/, ''); 
     return { __html: htmlText };
 };
 
@@ -45,19 +55,21 @@ const SectionContent: React.FC<SectionContentProps> = ({ title, icon, content, c
 
         lines.forEach(line => {
             const trimmedLine = line.trim();
-            const isSubItem = line.startsWith('  ') || line.startsWith('- ') || /^\s{2,}/.test(line);
-            const isHeaderLike = /:$/.test(trimmedLine);
-            
-            if (isSubItem || (groupedItems.length > 0 && Array.isArray(groupedItems[groupedItems.length - 1]) && !isHeaderLike)) {
-                // If it's a sub-item, or the previous item was a group and this one doesn't look like a new header
-                const lastItem = groupedItems[groupedItems.length - 1];
-                if (Array.isArray(lastItem)) {
-                    lastItem.push(line);
-                } else {
-                    const mainItem = groupedItems.pop() as string;
-                    groupedItems.push([mainItem, line]);
-                }
-            } else {
+            // Sub-item if it starts with spaces, a hyphen, or a number followed by a dot.
+            const isSubItem = line.startsWith('  ') || /^\s*(-|\d+\.)\s+/.test(line);
+            const isHeaderLike = /:$/.test(trimmedLine) && !isSubItem;
+
+            const lastItemGroup = groupedItems[groupedItems.length - 1];
+
+            if (isSubItem && Array.isArray(lastItemGroup)) {
+                // It's a sub-item and the last item was a group, so add it to that group
+                lastItemGroup.push(line);
+            } else if (isSubItem && typeof lastItemGroup === 'string') {
+                 // It's a sub-item, but the last item was a simple string. Create a new group.
+                 groupedItems.pop(); // Remove the last string item
+                 groupedItems.push([lastItemGroup, line]); // Replace it with a group
+            }
+            else {
                 // It's a main item or a new header for a group
                 groupedItems.push(line);
             }
@@ -71,10 +83,11 @@ const SectionContent: React.FC<SectionContentProps> = ({ title, icon, content, c
                         {Array.isArray(item) ? (
                             <>
                                 <span dangerouslySetInnerHTML={createMarkup(item[0])} />
-                                <ul className="mt-2 space-y-1 pl-4">
+                                <ul className="mt-2 space-y-2 pl-4">
                                     {item.slice(1).map((subItem, subIndex) => (
                                         <li key={subIndex} className="text-sm whitespace-pre-line" dangerouslySetInnerHTML={createMarkup(subItem)} />
                                     ))}
+
                                 </ul>
                             </>
                         ) : (
@@ -323,7 +336,7 @@ export default function ActivityDetailPage() {
               {isGeneratingContent ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Sparkles className="mr-2 h-5 w-5" />}
               {isGeneratingContent ? 'Generando...' : 'Crear Apoyo Visual'}
             </Button>
-            <Button onClick={handleDownload} disabled={isDownloading || isDownloading} variant="secondary" className="text-lg py-3 px-6 text-primary hover:text-primary/90">
+            <Button onClick={handleDownload} disabled={isDownloading || isGeneratingContent} variant="secondary" className="text-lg py-3 px-6 text-primary hover:text-primary/90">
               {isDownloading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <WordIcon className="mr-2 h-5 w-5" />}
               {isDownloading ? 'Generando DOCX...' : 'Descargar (DOCX)'}
             </Button>
@@ -362,7 +375,7 @@ export default function ActivityDetailPage() {
             </CardHeader>
             <CardContent className="space-y-6">
               {generatedVisuals.map((item, index) => {
-                // No renderizar tarjetas vacías
+                // No renderizar tarjetas vacías si no hay ni HTML ni imagen
                 if (!item.htmlContent && !item.imageUrl) return null;
                 
                 return (
