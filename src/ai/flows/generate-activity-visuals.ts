@@ -31,7 +31,6 @@ async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: stri
     const fullPrompt = `Educational illustration, simple, clean, minimalist, whiteboard drawing style for a teacher's guide: ${prompt}`;
     
     try {
-        // @ts-ignore - This is added to bypass the type check in Vercel build
         const { media } = await ai.generate({
             model: 'googleai/gemini-2.0-flash-exp',
             prompt: fullPrompt,
@@ -73,7 +72,7 @@ Your task is to analyze a list of activity resources and, for EACH item, generat
 
 **CRITICAL RULES:**
 1.  You MUST process EACH item from the input string, which is separated by newlines.
-2.  If a resource is a main header for a list of sub-items (e.g., "Tarjetas de 'Instrucción':" followed by "Título: INSTRUCCIÓN..."), you MUST process each sub-item individually. The main header itself should also have its own object in the output array, but its 'htmlContent' and 'imagePrompt' MUST be null.
+2.  If an item is a main header for sub-items (e.g., "Tarjetas de 'Instrucción':" followed by "Título: INSTRUCCIÓN..."), you MUST process each sub-item individually. The main header itself should also have its own object in the output array, but its 'htmlContent' and 'imagePrompt' MUST be null.
 3.  For each item/sub-item, you MUST generate a corresponding object in the output array. This object MUST contain:
     *   'text': The original, unmodified text of the resource item.
     *   'htmlContent': A self-contained HTML block styled with Tailwind CSS. If the resource is simple text that doesn't need a visual component (like "Un lápiz" or a coded message), this MUST be null. For all others, generate a visually appealing HTML "card" or "widget".
@@ -82,21 +81,29 @@ Your task is to analyze a list of activity resources and, for EACH item, generat
 **HTML & STYLING REQUIREMENTS ('htmlContent'):**
 *   The output MUST be a single, self-contained block of HTML, starting with a \`<div>\`.
 *   Use Tailwind CSS classes ONLY. DO NOT use inline \`<style>\` tags.
-*   **Card Design**: Create vertical, visually appealing cards. Use classes like \`border\`, \`rounded-lg\`, \`p-6\`, \`bg-white\`, \`shadow-lg\`, \`w-full\`, \`max-w-sm\`, \`mx-auto\`, \`text-center\`, \`font-sans\`.
+*   **Card Design**: Create a vertical card. Use classes like \`border\`, \`rounded-lg\`, \`shadow-lg\`, \`w-full\`, \`max-w-xs\`, \`mx-auto\`, \`bg-card\`, \`font-sans\`, \`overflow-hidden\`.
 *   **Visual Hierarchy**:
-    *   **Main Title**: Use \`h3\` with \`text-3xl\`, \`font-bold\`, \`mb-4\`, \`uppercase\`, and \`text-primary\`.
-    *   **Content Body**: Use a \`div\` with \`text-left\`, \`space-y-2\`, and \`text-muted-foreground\`. Use \`<strong>\` for labels like "Acción:".
-    *   **Symbol/Icon**: This is the visual anchor. Place it at the bottom. It MUST be in a separate \`<div>\` and be VERY LARGE. Use \`text-8xl\`, \`font-bold\`, \`text-accent\`, and give it top margin (\`mt-6\`). Use unicode characters for symbols where possible.
+    *   **Header**: The card must start with a header div with a background color (\`bg-primary\`, \`p-3\`).
+    *   **Main Title**: Inside the header, use an \`h3\` with \`text-xl\`, \`font-bold\`, \`text-primary-foreground\`, \`text-center\`, \`uppercase\`.
+    *   **Content Body**: The main content area should have padding (\`p-6\`).
+    *   **Symbol/Icon**: This is the visual anchor. Place it after the header. It must be in a \`div\`, centered (\`text-center\`), and large (\`text-6xl\`). Give it some space (\`my-4\`). Use unicode characters for symbols where possible.
+    *   **Separator**: After the icon, add a horizontal rule (\`<hr class="border-border">\`).
+    *   **Text Details**: The text content (Action, Description) should be in a div with spacing (\`mt-4 space-y-2\`). Labels like "Acción:" MUST be wrapped in \`<strong>\` tags and have a distinct color (\`text-foreground\`). The rest of the text should use \`text-muted-foreground\`.
 *   **For tables**: If the resource describes a "tabla", you MUST generate a valid HTML \`<table>\` with Tailwind classes (\`w-full\`, \`border-collapse\`), and style the header (\`bg-gray-100\`).
-*   **CRITICAL EXAMPLE**: For a card like "Título: INSTRUCCIÓN, Acción: Indica la tarea..., Descripción: Contiene la orden..., Símbolo: Un foco que se enciende.", the HTML MUST look like this:
+*   **CRITICAL EXAMPLE**: For a card like "Título: PALMADA, Acción: Dar una palmada., Descripción: Golpear las palmas de las manos., Símbolo: 👏", the HTML MUST look like this:
     \`\`\`html
-    <div class="border rounded-lg p-6 bg-white shadow-lg w-full max-w-sm mx-auto text-center font-sans">
-      <h3 class="text-3xl font-bold mb-4 uppercase text-primary">INSTRUCCIÓN</h3>
-      <div class="text-left space-y-2 text-muted-foreground">
-        <p><strong>Acción:</strong> Indica la tarea a realizar por la CPU.</p>
-        <p><strong>Descripción:</strong> Contiene la orden específica que debe ejecutar la CPU (ej: Sumar, Restar, Multiplicar).</p>
+    <div class="border rounded-lg shadow-lg w-full max-w-xs mx-auto bg-card font-sans overflow-hidden">
+      <div class="bg-primary p-3">
+        <h3 class="text-xl font-bold text-primary-foreground text-center uppercase">PALMADA</h3>
       </div>
-      <div class="text-8xl font-bold text-accent mt-6">💡</div>
+      <div class="p-6">
+        <div class="text-center text-6xl my-4">👏</div>
+        <hr class="border-border">
+        <div class="mt-4 space-y-2 text-sm">
+          <p><strong class="text-foreground">Acción:</strong> <span class="text-muted-foreground">Dar una palmada.</span></p>
+          <p><strong class="text-foreground">Descripción:</strong> <span class="text-muted-foreground">Golpear las palmas de las manos.</span></p>
+        </div>
+      </div>
     </div>
     \`\`\`
 
@@ -144,7 +151,7 @@ const generateActivityVisualsFlow = ai.defineFlow(
             text: item.text,
             htmlContent: item.htmlContent,
             imageUrl: imageResult ? imageResult.imageUrl : null,
-            imageAlt: imageResult ? imageResult.imageAlt : null,
+            imageAlt: imageResult ? imageResult.altText : null,
         };
     });
     
@@ -152,3 +159,4 @@ const generateActivityVisualsFlow = ai.defineFlow(
   }
 );
  
+    
