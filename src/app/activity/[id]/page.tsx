@@ -8,7 +8,7 @@ import InteractiveBackground from '@/components/shared/InteractiveBackground';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, ListChecks, BookOpen, Target, ThumbsUp, Sparkles, Loader2, Clock, ClipboardCheck, Brain, Eye, UserCheck, FileDown, Layers } from 'lucide-react';
-import type { Activity, GeneratedActivityVisuals, VisualItem } from '@/types';
+import type { Activity, VisualItem } from '@/types';
 import { getActivityByIdFromLocalStorage } from '@/lib/localStorageUtils';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -44,8 +44,6 @@ const SectionContent: React.FC<SectionContentProps> = ({ title, icon, content, g
     );
   };
 
-  // Render generated content if it exists and has items.
-  // Otherwise, fall back to rendering the original content.
   const hasGeneratedContent = generatedContent && generatedContent.length > 0;
 
   return (
@@ -58,10 +56,8 @@ const SectionContent: React.FC<SectionContentProps> = ({ title, icon, content, g
           {generatedContent.map((item, index) => (
             <div key={index} className="p-4 bg-muted/30 rounded-lg border border-primary/20">
               {item.htmlContent ? (
-                // If HTML content exists, render it directly.
                 <div dangerouslySetInnerHTML={{ __html: item.htmlContent }} />
               ) : (
-                // Otherwise, display the plain text, formatted.
                 <p
                   className="text-muted-foreground whitespace-pre-line"
                   dangerouslySetInnerHTML={{ __html: item.text }}
@@ -71,7 +67,7 @@ const SectionContent: React.FC<SectionContentProps> = ({ title, icon, content, g
           ))}
         </div>
       ) : (
-         renderList(content) // Fallback to original content, formatted as a list
+         renderList(content)
       )}
     </div>
   );
@@ -86,7 +82,7 @@ export default function ActivityDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isGeneratingContent, setIsGeneratingContent] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
-  const [generatedContent, setGeneratedContent] = useState<GeneratedActivityVisuals | null>(null);
+  const [generatedActivityResources, setGeneratedActivityResources] = useState<VisualItem[] | null>(null);
 
   useEffect(() => {
     if (params.id) {
@@ -103,18 +99,14 @@ export default function ActivityDetailPage() {
 
     toast({
       title: "Generación en Proceso",
-      description: "La IA está analizando la actividad y creando contenido visual. Esto puede tardar unos minutos...",
+      description: "La IA está analizando los recursos de la actividad y creando contenido visual. Esto puede tardar unos minutos...",
     });
 
     try {
-      const visualResult = await generateActivityVisuals({
-        materials: activity.materials,
-        instructions: activity.stepByStepDevelopment,
-        reflection: activity.reflectionQuestion,
-        activityResources: activity.activityResources,
-      });
+      const visualResult = await generateActivityVisuals(activity.activityResources);
       
-      setGeneratedContent(visualResult);
+      setGeneratedActivityResources(visualResult);
+
       toast({
         title: "¡Contenido Visual Generado!",
         description: "Los recursos visuales para tu actividad están listos.",
@@ -149,7 +141,6 @@ export default function ActivityDetailPage() {
             throw new Error("El servidor no devolvió un archivo.");
         }
 
-        // Convert Base64 to a Blob
         const byteCharacters = atob(result.docxBase64);
         const byteNumbers = new Array(byteCharacters.length);
         for (let i = 0; i < byteCharacters.length; i++) {
@@ -158,7 +149,6 @@ export default function ActivityDetailPage() {
         const byteArray = new Uint8Array(byteNumbers);
         const blob = new Blob([byteArray], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
 
-        // Create a link and trigger the download
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
@@ -280,25 +270,22 @@ export default function ActivityDetailPage() {
               title="Materiales Necesarios"
               icon={<ListChecks className="h-6 w-6" />}
               content={activity.materials}
-              generatedContent={generatedContent?.materials}
             />
             <SectionContent
               title="Desarrollo Paso a Paso"
               icon={<Target className="h-6 w-6" />}
               content={activity.stepByStepDevelopment}
-              generatedContent={generatedContent?.instructions}
             />
             <SectionContent
               title="Recursos para la Actividad"
               icon={<Layers className="h-6 w-6" />}
               content={activity.activityResources}
-              generatedContent={generatedContent?.activityResources}
+              generatedContent={generatedActivityResources}
             />
             <SectionContent
               title="Reflexión y Conexión"
               icon={<ThumbsUp className="h-6 w-6" />}
               content={activity.reflectionQuestion}
-              generatedContent={generatedContent?.reflection}
             />
             <SectionContent
               title="Criterios de Evaluación"

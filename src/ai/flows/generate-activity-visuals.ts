@@ -1,52 +1,26 @@
 
 'use server';
 /**
- * @fileOverview A Genkit flow to analyze an educational activity and generate relevant visual aids.
+ * @fileOverview A Genkit flow to analyze an educational activity's resources and generate rich HTML components.
  * The flow acts as an "Art Director AI", generating rich HTML components for activity resources.
  * - generateActivityVisuals - The main exported function to trigger the flow.
  */
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
-import type { GenerateActivityVisualsInput, GeneratedActivityVisuals, VisualItem } from '@/types';
+import type { VisualItem } from '@/types';
 
-// Define Zod schemas based on the types in src/types/index.ts
 const VisualItemSchema = z.object({
   text: z.string().describe('The original text for the item or step.'),
-  htmlContent: z.string().nullable().describe('The data URI of the generated image (or null if no image was generated for this item).'),
+  htmlContent: z.string().nullable().describe('The self-contained HTML block for this resource. If no special visualization is needed, this MUST be null.'),
 });
 
-const GenerateActivityVisualsOutputSchema = z.object({
-  materials: z.array(VisualItemSchema).describe('Visual aids for the necessary materials.'),
-  instructions: z.array(VisualItemSchema).describe('Visual aids for the step-by-step instructions.'),
-  reflection: z.array(VisualItemSchema).describe('Visual aids for the reflection questions.'),
-  activityResources: z.array(VisualItemSchema).describe('Visual aids for the suggested visual examples.'),
-});
+const GenerateActivityVisualsOutputSchema = z.array(VisualItemSchema);
 
-const GenerateActivityVisualsInputSchema = z.object({
-  materials: z.string(),
-  instructions: z.string(),
-  reflection: z.string(),
-  activityResources: z.string(),
-});
-
-// This internal schema is what the AI will be prompted to produce.
-// It now includes a field for the AI to decide on the HTML content.
-const InternalVisualItemSchema = z.object({
-    text: z.string().describe('The original, unmodified text for the item or step.'),
-    htmlContent: z.string().nullable().describe('A self-contained HTML block for this resource. If no special visualization is needed, this MUST be null.'),
-});
-
-const InternalOutputSchema = z.object({
-  materials: z.array(InternalVisualItemSchema),
-  instructions: z.array(InternalVisualItemSchema),
-  reflection: z.array(InternalVisualItemSchema),
-  activityResources: z.array(InternalVisualItemSchema),
-});
+const ActivityResourcesInputSchema = z.string().describe('A string containing the newline-separated list of resources for the activity.');
 
 
-// Export the wrapper function that the client will call.
-export async function generateActivityVisuals(input: GenerateActivityVisualsInput): Promise<GeneratedActivityVisuals> {
+export async function generateActivityVisuals(input: string): Promise<VisualItem[]> {
   return generateActivityVisualsFlow(input);
 }
 
@@ -54,14 +28,16 @@ export async function generateActivityVisuals(input: GenerateActivityVisualsInpu
 const analysisPrompt = ai.definePrompt({
     name: 'analyzeActivityForVisuals',
     model: 'googleai/gemini-2.0-flash',
-    input: { schema: GenerateActivityVisualsInputSchema },
-    output: { schema: InternalOutputSchema },
+    input: { schema: ActivityResourcesInputSchema },
+    output: { schema: GenerateActivityVisualsOutputSchema },
     prompt: `You are an expert UI/UX designer specializing in creating educational materials with HTML and Tailwind CSS.
-Your task is to analyze an educational activity and generate rich HTML components for the 'activityResources'.
+Your task is to analyze a list of activity resources and generate a rich, self-contained HTML component for EACH item.
 
 **CRITICAL RULES:**
-1.  **For 'materials', 'instructions', and 'reflection' sections, NEVER generate HTML.** The 'htmlContent' field for all items in these sections MUST ALWAYS be null. Their 'text' field must contain the original unmodified text provided in the input. Split the text for these sections by newlines into individual 'text' items in the array.
-2.  **For 'activityResources', you MUST generate a self-contained HTML component for EACH item.** Each item describes a resource like a card, a table, or a small diagram.
+1.  You MUST process EACH item from the input string, which is separated by newlines.
+2.  For each item, you MUST generate a corresponding object in the output array. This object MUST contain:
+    *   'text': The original, unmodified text of the resource item.
+    *   'htmlContent': A self-contained HTML block for this resource. If the resource is simple text that doesn't need a visual component (like "Un lápiz"), this MUST be null. For all others, generate HTML.
 3.  **HTML & Styling Requirements (VERY IMPORTANT):**
     *   The output for 'htmlContent' MUST be a **single block of HTML**, starting with a \`<div>\` and containing all necessary elements and styles.
     *   Use **Tailwind CSS classes** for styling. DO NOT use inline \`<style>\` tags or external stylesheets.
@@ -72,20 +48,11 @@ Your task is to analyze an educational activity and generate rich HTML component
     *   If the resource describes a table, generate a valid HTML \`<table>\` with Tailwind classes for styling (e.g. \`w-full\`, \`text-left\`, \`border-collapse\`). Style the header (\`<thead>\`) with a background color (e.g. \`bg-gray-100\`).
     *   Ensure the HTML is clean, valid, and self-contained for each resource.
 
-Analyze the following activity content and provide the output in the required JSON format. Ensure all original text for materials, instructions, and reflection is preserved in the 'text' field, split into items by newlines.
+Analyze the following activity resources and provide the output in the required JSON array format.
 
 ---
-**Materials:**
-{{{materials}}}
----
-**Instructions:**
-{{{instructions}}}
----
-**Reflection:**
-{{{reflection}}}
----
-**Activity Resources (activityResources):**
-{{{activityResources}}}
+**Activity Resources:**
+{{{input}}}
 ---
 `,
 });
@@ -93,30 +60,14 @@ Analyze the following activity content and provide the output in the required JS
 const generateActivityVisualsFlow = ai.defineFlow(
   {
     name: 'generateActivityVisualsFlow',
-    inputSchema: GenerateActivityVisualsInputSchema,
+    inputSchema: ActivityResourcesInputSchema,
     outputSchema: GenerateActivityVisualsOutputSchema,
   },
   async (input) => {
-    // Step 1: AI analyzes the activity and generates HTML content for resources.
-    const { output: analysis } = await analysisPrompt(input);
-    if (!analysis) {
-      throw new Error("AI analysis failed to produce a visual plan.");
+    const { output } = await analysisPrompt(input);
+    if (!output) {
+      throw new Error("AI analysis failed to produce a visual plan for the resources.");
     }
-    
-    // The analysis now directly contains the htmlContent, so we just need to map the types.
-    const processSection = (items: z.infer<typeof InternalVisualItemSchema>[] | undefined): VisualItem[] => {
-      if (!items) return [];
-      return items.map(item => ({
-        text: item.text,
-        htmlContent: item.htmlContent
-      }));
-    };
-
-    return {
-        materials: processSection(analysis.materials),
-        instructions: processSection(analysis.instructions),
-        reflection: processSection(analysis.reflection),
-        activityResources: processSection(analysis.activityResources),
-    };
+    return output;
   }
 );

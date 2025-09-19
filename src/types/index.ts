@@ -74,20 +74,6 @@ export interface VisualItem {
   htmlContent: string | null;
 }
 
-export interface GeneratedActivityVisuals {
-  materials: VisualItem[];
-  instructions: VisualItem[];
-  reflection: VisualItem[];
-  activityResources: VisualItem[];
-}
-
-export interface GenerateActivityVisualsInput {
-  materials: string;
-  instructions: string;
-  reflection: string;
-  activityResources: string;
-}
-
 
 // Visual Generator Types
 
