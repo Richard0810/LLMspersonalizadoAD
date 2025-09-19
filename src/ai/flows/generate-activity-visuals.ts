@@ -72,14 +72,17 @@ Your task is to analyze a list of activity resources and, for EACH item, generat
 
 **CRITICAL RULES:**
 1.  You MUST process EACH item from the input string, which is separated by newlines.
-2.  If an item is a main header for sub-items (e.g., "Tarjetas de 'Instrucción':" followed by "Título: INSTRUCCIÓN..."), you MUST process each sub-item individually. The main header itself should also have its own object in the output array, but its 'htmlContent' and 'imagePrompt' MUST be null.
+2.  If an item is a main header for sub-items (e.g., "Tarjetas de 'Instrucción':" followed by "Título: INSTRUCCIÓN..."), you MUST process each sub-item individually.
 3.  For each item/sub-item, you MUST generate a corresponding object in the output array. This object MUST contain:
     *   'text': The original, unmodified text of the resource item.
-    *   'htmlContent': A self-contained HTML block styled with Tailwind CSS. If the resource is simple text that doesn't need a visual component (like "Un lápiz" or a coded message), this MUST be null. For all others, generate a visually appealing HTML "card" or "widget".
-    *   'imagePrompt': A detailed text-to-image prompt. This field is CRUCIAL. It MUST be null for most items. Only generate a prompt string if the resource explicitly describes a physical, visual item to be drawn or created by the teacher (e.g., "Dibuja un tablero con 20 casillas", "Crea un mapa del tesoro en una cartulina"). For abstract items like "Tarjeta de Acción: Sumar" or text-based content, the prompt MUST be null.
+    *   'htmlContent': A self-contained HTML block styled with Tailwind CSS.
+        *   For items that are HEADERS (like "Tarjetas de acción rítmica:"), you MUST generate an HTML block that styles it as a title (e.g., \`<h4 class="text-xl font-bold text-primary mb-2 border-b pb-1">Tarjetas de acción rítmica:</h4>\`).
+        *   For items that are visual components (like cards), generate the full card HTML.
+        *   If the resource is simple text that doesn't need a visual component (like "Un lápiz" or a coded message), this MUST be null.
+    *   'imagePrompt': A detailed text-to-image prompt. This field is CRUCIAL. It MUST be null for most items. Only generate a prompt string if the resource explicitly describes a physical, visual item to be drawn or created by the teacher (e.g., "Dibuja un tablero con 20 casillas", "Crea un mapa del tesoro en una cartulina"). For abstract items like "Tarjeta de Acción: Sumar", text-based content, or section headers, the prompt MUST be null.
 
 **HTML & STYLING REQUIREMENTS ('htmlContent'):**
-*   The output MUST be a single, self-contained block of HTML, starting with a \`<div>\`.
+*   The output MUST be a single, self-contained block of HTML, starting with a \`<div>\` for cards or \`<h4>\` for headers.
 *   Use Tailwind CSS classes ONLY. DO NOT use inline \`<style>\` tags.
 *   **Card Design**: Create a vertical card. Use classes like \`border\`, \`rounded-lg\`, \`shadow-lg\`, \`w-full\`, \`max-w-xs\`, \`mx-auto\`, \`bg-card\`, \`font-sans\`, \`overflow-hidden\`.
 *   **Visual Hierarchy**:
