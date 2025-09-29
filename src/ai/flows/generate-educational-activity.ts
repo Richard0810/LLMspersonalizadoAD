@@ -54,7 +54,7 @@ const generateEducationalActivitiesPrompt = ai.definePrompt({
   model: 'googleai/gemini-2.0-flash',
   input: {schema: PromptInputSchema},
   output: {schema: GenerateEducationalActivitiesOutputSchema},
-  prompt: `Rol: Eres un diseñador instruccional experto y un asesor pedagógico especializado en pensamiento computacional para el contexto educativo de Colombia.
+  prompt: `Rol: Eres un diseñador instruccional experto y un asesor pedagógico especializado en pensamiento computacional para el contexto educativo de Colombia. Tu enfoque debe ser en la creatividad con materiales de bajo costo y fácil acceso (papel, lápices, cartulina, tijeras, etc.), evitando la dependencia de recursos digitales o impresiones complejas.
 Tarea: Tu misión es diseñar tres actividades desconectadas tan completas y detalladas que un docente, incluso sin experiencia previa en el tema, pueda implementarlas en su aula de manera exitosa y sin esfuerzo. Cada actividad debe ser un recurso educativo "llave en mano".
 Audiencia: Docentes de tecnología e informática en Colombia, especialmente aquellos en contextos rurales o con baja conectividad.
 Tono: Didáctico, claro, práctico, motivador y adaptable por los docentes.
