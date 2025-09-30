@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState, type ReactNode } from 'react';
@@ -7,9 +8,9 @@ import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import InteractiveBackground from '@/components/shared/InteractiveBackground';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, ListChecks, BookOpen, Target, ThumbsUp, Sparkles, Loader2, Clock, ClipboardCheck, Brain, Eye, UserCheck, FileDown, Layers, Wand2 } from 'lucide-react';
+import { ArrowLeft, ListChecks, BookOpen, ThumbsUp, Sparkles, Loader2, Clock, ClipboardCheck, Brain, Layers, Wand2, FileDown, UserCheck } from 'lucide-react';
 import type { Activity, VisualItem } from '@/types';
-import { getActivityByIdFromLocalStorage } from '@/lib/localStorageUtils';
+import { getActivityByIdFromLocalStorage, saveVisualsForActivity, getVisualsForActivity } from '@/lib/localStorageUtils';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { generateActivityVisuals } from '@/ai/flows/generate-activity-visuals';
@@ -56,7 +57,7 @@ const SectionContent: React.FC<SectionContentProps> = ({ title, icon, content, c
         lines.forEach(line => {
             const trimmedLine = line.trim();
             // Sub-item if it starts with spaces, a hyphen, or a number followed by a dot.
-            const isSubItem = line.startsWith('  ') || /^\s*(-|\d+\.)\s+/.test(line);
+            const isSubItem = line.startsWith('  ') || /^\s*(-|\*|\d+\.)\s+/.test(line);
             const isHeaderLike = /:$/.test(trimmedLine) && !isSubItem;
 
             const lastItemGroup = groupedItems[groupedItems.length - 1];
@@ -119,15 +120,20 @@ export default function ActivityDetailPage() {
   const [isGeneratingContent, setIsGeneratingContent] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [generatedVisuals, setGeneratedVisuals] = useState<VisualItem[] | null>(null);
+  const activityId = Array.isArray(params.id) ? params.id[0] : params.id as string;
 
   useEffect(() => {
-    if (params.id) {
-      const activityId = Array.isArray(params.id) ? params.id[0] : params.id;
+    if (activityId) {
       const fetchedActivity = getActivityByIdFromLocalStorage(activityId);
       setActivity(fetchedActivity);
+      
+      const savedVisuals = getVisualsForActivity(activityId);
+      if (savedVisuals) {
+        setGeneratedVisuals(savedVisuals);
+      }
     }
     setIsLoading(false);
-  }, [params.id]);
+  }, [activityId]);
 
   const handleGenerateVisualContent = async () => {
     if (!activity) return;
@@ -143,6 +149,7 @@ export default function ActivityDetailPage() {
       const visualResult = await generateActivityVisuals(activity.activityResources);
       
       setGeneratedVisuals(visualResult);
+      saveVisualsForActivity(activity.id, visualResult); // Save to localStorage
 
       toast({
         title: "¡Apoyo Visual Generado!",
@@ -310,7 +317,7 @@ export default function ActivityDetailPage() {
             />
             <SectionContent
               title="Desarrollo Paso a Paso"
-              icon={<Target className="h-6 w-6" />}
+              icon={<BookOpen className="h-6 w-6" />}
               content={activity.stepByStepDevelopment}
             />
             
