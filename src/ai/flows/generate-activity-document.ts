@@ -333,7 +333,7 @@ const generateActivityDocumentFlow = ai.defineFlow(
             ...createStepByStepList(activity.stepByStepDevelopment, 'numbering-list'),
 
             new Paragraph({ text: "👀 Ejemplos Visuales Sugeridos", style: "section-title" }),
-            ...createBulletedList(activity.visualExamples),
+            ...createBulletedList(activity.activityResources),
 
             new Paragraph({ text: "👍 Reflexión y Conexión", style: "section-title" }),
             ...createParagraphsFromText(activity.reflectionQuestion),
@@ -359,3 +359,5 @@ export async function generateActivityDocument(
 ): Promise<z.infer<typeof GenerateActivityDocumentOutputSchema>> {
   return generateActivityDocumentFlow(input);
 }
+
+    
