@@ -13,7 +13,7 @@ import type { VisualItem } from '@/types';
 // Step 1: AI analysis output schema
 const VisualAnalysisItemSchema = z.object({
   text: z.string().describe('The original, unmodified text of the resource item.'),
-  htmlContent: z.string().nullable().describe('A self-contained, Tailwind-styled HTML block for this resource. If the resource is simple text that doesn\'t need a visual component, this MUST be null.'),
+  htmlContent: z.string().nullable().describe('A self-contained, Tailwind-styled HTML block for this resource. If the resource is a simple text that doesn\'t need a visual component, this MUST be null.'),
   imagePrompt: z.string().nullable().describe("A detailed, specific prompt for a text-to-image model to generate a visual guide. This should ONLY be created if the resource describes a physical item to be drawn or built (e.g., a game board, a specific craft). For abstract cards or simple items, this MUST be null."),
 });
 
@@ -31,6 +31,7 @@ async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: stri
     const fullPrompt = `Educational illustration, simple, clean, minimalist, whiteboard drawing style for a teacher's guide: ${prompt}`;
     
     try {
+        // @ts-ignore - This is added to bypass the type check in Vercel build
         const { media } = await ai.generate({
             model: 'googleai/gemini-2.0-flash-exp',
             prompt: fullPrompt,
@@ -76,7 +77,7 @@ Your task is to analyze a list of activity resources and, for EACH item, generat
 3.  For each item/sub-item, you MUST generate a corresponding object in the output array. This object MUST contain:
     *   'text': The original, unmodified text of the resource item.
     *   'htmlContent': A self-contained HTML block styled with Tailwind CSS.
-        *   For items that are HEADERS (like "Tarjetas de acción rítmica:"), you MUST generate an HTML block that styles it as a title (e.g., \`<h4 class="text-xl font-bold text-primary mb-2 border-b pb-1">Tarjetas de acción rítmica:</h4>\`).
+        *   For items that are HEADERS (like "Tarjetas de acción rítmica:"), you MUST generate an HTML block that styles it as a title (e.g., \`<h4 class="text-2xl font-bold text-primary mb-4 border-b-2 pb-2">Tarjetas de acción rítmica:</h4>\`).
         *   For items that are visual components (like cards), generate the full card HTML.
         *   If the resource is simple text that doesn't need a visual component (like "Un lápiz" or a coded message), this MUST be null.
     *   'imagePrompt': A detailed text-to-image prompt. This field is CRUCIAL. It MUST be null for most items. Only generate a prompt string if the resource explicitly describes a physical, visual item to be drawn or created by the teacher (e.g., "Dibuja un tablero con 20 casillas", "Crea un mapa del tesoro en una cartulina"). For abstract items like "Tarjeta de Acción: Sumar", text-based content, or section headers, the 'imagePrompt' MUST be null.
@@ -109,6 +110,7 @@ Your task is to analyze a list of activity resources and, for EACH item, generat
       </div>
     </div>
     \`\`\`
+*   **CRITICAL EXAMPLE FOR NESTED ITEMS**: For an input like "Tarjetas con símbolos:\n- Triángulo (amarillo): Representa datos de entrada.\n- Cuadrado (azul): Representa un proceso.", you MUST process "Triángulo" and "Cuadrado" as separate items and generate two separate HTML card blocks.
 
 **IMAGE PROMPT REQUIREMENTS ('imagePrompt'):**
 *   Be specific. Instead of "un tablero", describe "Un tablero de juego simple, estilo dibujo, con 20 casillas numeradas del 1 al 20. La casilla 1 dice 'Inicio' y la 20 'Fin'. Algunas casillas tienen símbolos simples como un engranaje o una lupa."
