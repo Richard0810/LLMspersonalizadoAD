@@ -8,9 +8,9 @@ import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import InteractiveBackground from '@/components/shared/InteractiveBackground';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, ListChecks, BookOpen, ThumbsUp, Sparkles, Loader2, Clock, ClipboardCheck, Brain, Layers, Wand2, FileDown, UserCheck } from 'lucide-react';
+import { ArrowLeft, ListChecks, BookOpen, ThumbsUp, Sparkles, Loader2, Clock, ClipboardCheck, Brain, Layers, Wand2, FileDown, UserCheck, Trash2 } from 'lucide-react';
 import type { Activity, VisualItem } from '@/types';
-import { getActivityByIdFromLocalStorage, saveVisualsForActivity, getVisualsForActivity } from '@/lib/localStorageUtils';
+import { getActivityByIdFromLocalStorage, saveVisualsForActivity, getVisualsForActivity, clearVisualsForActivity } from '@/lib/localStorageUtils';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { generateActivityVisuals } from '@/ai/flows/generate-activity-visuals';
@@ -219,6 +219,16 @@ export default function ActivityDetailPage() {
         setIsDownloading(false);
     }
   };
+
+  const handleDeleteVisualContent = () => {
+    if (!activityId) return;
+    clearVisualsForActivity(activityId);
+    setGeneratedVisuals(null);
+    toast({
+        title: "Contenido Eliminado",
+        description: "El apoyo visual generado ha sido eliminado.",
+    });
+  };
   
   if (isLoading) {
     return (
@@ -370,15 +380,23 @@ export default function ActivityDetailPage() {
         {generatedVisuals && generatedVisuals.length > 0 && !isGeneratingContent && (
           <Card className="w-full shadow-2xl mt-8 animate-fade-in">
             <CardHeader>
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-primary/20 rounded-full">
-                    <Wand2 className="h-8 w-8 text-primary" />
+                <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-primary/20 rounded-full">
+                            <Wand2 className="h-8 w-8 text-primary" />
+                        </div>
+                        <div>
+                            <CardTitle className="text-2xl font-headline text-primary">Recursos para la Actividad (Contenido Visual)</CardTitle>
+                            <CardDescription>
+                                Estos son los apoyos visuales generados por IA para los recursos de tu actividad.
+                            </CardDescription>
+                        </div>
+                    </div>
+                    <Button variant="ghost" size="icon" onClick={handleDeleteVisualContent} className="text-muted-foreground hover:text-destructive hover:bg-destructive/10">
+                        <Trash2 className="h-5 w-5" />
+                        <span className="sr-only">Eliminar contenido visual</span>
+                    </Button>
                 </div>
-                <CardTitle className="text-2xl font-headline text-primary">Recursos para la Actividad (Contenido Visual)</CardTitle>
-              </div>
-              <CardDescription>
-                Estos son los apoyos visuales generados por IA para los recursos de tu actividad.
-              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {generatedVisuals.map((item, index) => {

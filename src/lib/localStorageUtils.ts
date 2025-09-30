@@ -111,5 +111,11 @@ export const getVisualsForActivity = (activityId: string): VisualItem[] | null =
   }
   return null;
 };
-    
 
+export const clearVisualsForActivity = (activityId: string): void => {
+    if (typeof window !== 'undefined') {
+        const key = `${VISUAL_CONTENT_KEY_PREFIX}${activityId}`;
+        localStorage.removeItem(key);
+    }
+};
+    
