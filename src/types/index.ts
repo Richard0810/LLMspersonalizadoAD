@@ -230,7 +230,7 @@ export type GeneratedContentType =
 export type GenerateVisualContentFlowOutput = GeneratedContentType;
 
 // SVG Lab Types
-const SvgComponentTypeSchema = z.enum([
+export const SvgComponentTypeSchema = z.enum([
     'carta_pregunta', 
     'carta_accion', 
     'diagrama_ciclo_agua',
@@ -242,7 +242,6 @@ export const SvgGenerationInputSchema = z.object({
   color: z.string().describe('The primary color for the component (hex code).'),
   title: z.string().optional().describe('A custom title for the component.'),
   content: z.string().optional().describe('Custom content for the component (e.g., the question text).'),
-  icon: z.string().optional().describe('An emoji, character, or keyword for a symbol.'),
 });
 
 export const SvgGenerationOutputSchema = z.object({

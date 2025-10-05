@@ -22,5 +22,3 @@ export async function generateSvgAction(
     return { success: false, error: error.message };
   }
 }
-
-    

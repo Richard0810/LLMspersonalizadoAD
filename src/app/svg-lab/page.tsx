@@ -37,7 +37,6 @@ export default function SvgLabPage() {
   const [color, setColor] = useState<SvgGenerationInput['color']>('#28a745');
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [icon, setIcon] = useState('❓');
 
   const [generatedSvg, setGeneratedSvg] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -55,7 +54,6 @@ export default function SvgLabPage() {
       color,
       title,
       content,
-      icon,
     };
     
     const result = await generateSvgAction(input);
@@ -126,10 +124,6 @@ export default function SvgLabPage() {
                  <div className="space-y-2">
                     <Label htmlFor="content">Contenido Personalizado</Label>
                     <Input id="content" value={content} onChange={(e) => setContent(e.target.value)} placeholder="Ej: ¿Qué es la fotosíntesis?" />
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="icon">Icono / Símbolo</Label>
-                    <Input id="icon" value={icon} onChange={(e) => setIcon(e.target.value)} placeholder="Ej: ❓, 🚀, estrella, flecha" />
                 </div>
                 <Button type="submit" disabled={isLoading} className="w-full text-lg py-6">
                   {isLoading ? <Loader2 className="animate-spin" /> : 'Generar SVG'}

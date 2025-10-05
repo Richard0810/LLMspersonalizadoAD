@@ -33,7 +33,7 @@ const generateSvgFromGuideFlow = ai.defineFlow(
       1.  **SVG Structure:** Use '<svg viewBox="0 0 width height" xmlns="http://www.w3.org/2000/svg">...</svg>'.
       2.  **Color:** The main stroke and fill color MUST be the color provided in the 'color' parameter.
       3.  **Output:** You MUST return ONLY the raw SVG code as a valid XML string. Do not include any explanations, markdown, or anything else. The response must start with '<svg' and end with '</svg>'.
-      4.  **Icon Generation:** If the 'icon' parameter is a simple character or emoji, embed it in a <text> element. If it's a keyword (like 'estrella', 'corazon', 'flecha'), you MUST generate a simple SVG <path> or <polygon> to represent it. The generated path/polygon should be filled with the main color and have a subtle opacity (e.g., fill-opacity="0.8").
+      4.  **Automatic Icon Generation:** You MUST automatically generate a simple, relevant icon based on the 'Custom Title'. For example, if the title is 'Pregunta de Ciencias', a good icon would be a beaker (🧪) or an atom. You MUST generate this icon as a simple SVG <path> or <polygon> to represent it. The generated path/polygon should be filled with the main color and have a subtle opacity (e.g., fill-opacity="0.8").
       5.  **Templates:** Adhere strictly to the requested component template.
       6.  **Empty Fields:** If 'Custom Title' or 'Custom Content' are empty or not provided, you MUST leave the corresponding text elements in the SVG empty. Do not use default text.
 
@@ -42,7 +42,6 @@ const generateSvgFromGuideFlow = ai.defineFlow(
       - **Main Color:** ${input.color}
       - **Custom Title:** ${input.title || ''}
       - **Custom Content:** ${input.content || ''}
-      - **Icon/Symbol:** ${input.icon || ''}
 
       **Templates to use:**
 
@@ -70,7 +69,7 @@ const generateSvgFromGuideFlow = ai.defineFlow(
       Use this template with a viewBox="0 0 200 280".
       - The main stroke and header fill color MUST be the custom color.
       - The header text should be the custom title, capitalized. If no title, leave it blank.
-      - For the central icon, if the icon parameter is a keyword like 'flecha', generate a path. If it's a character/emoji, embed it as text. If it is empty, generate nothing in the icon area.
+      - For the central icon, you MUST generate a relevant SVG path/polygon based on the 'title'.
       \`\`\`xml
       <svg viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg">
         <rect x="0" y="0" width="200" height="280" fill="#fff" stroke="${input.color}" stroke-width="4" rx="15"/>
@@ -78,7 +77,7 @@ const generateSvgFromGuideFlow = ai.defineFlow(
         <text x="100" y="40" text-anchor="middle" font-size="16" font-weight="bold" fill="white" font-family="Arial, sans-serif">${input.title?.toUpperCase() || ''}</text>
         
         <g transform="translate(75 70) scale(2.5)">
-            <!-- ICON_AREA -->
+            <!-- ICON_AREA: GENERATE A RELEVANT SVG PATH/POLYGON HERE BASED ON THE TITLE -->
         </g>
 
         <foreignObject x="25" y="170" width="150" height="100">
@@ -150,9 +149,9 @@ const generateSvgFromGuideFlow = ai.defineFlow(
       </svg>
       \`\`\`
 
-      Now, generate the SVG code. For the "carta_accion", you MUST dynamically generate the icon. Replace the "<!-- ICON_AREA -->" comment with the generated SVG code for the icon.
-      For an emoji or character, use: <text text-anchor="middle" y="15" font-size="20">${input.icon}</text>
-      For a keyword, generate a <path> or <polygon>, for example: <path d="..." fill="${input.color}" fill-opacity="0.8"/>
+      Now, generate the SVG code. For the "carta_accion", you MUST dynamically generate the icon inside the "<!-- ICON_AREA -->" section based on the provided title.
+      For example, if the title is 'Avanzar', generate a path for an arrow. If it is 'Detener', generate a path for a hand or a stop sign.
+      The generated path should look like: <path d="..." fill="${input.color}" fill-opacity="0.8"/>
     `;
 
     const { text: svgCode } = await ai.generate({
@@ -170,5 +169,3 @@ const generateSvgFromGuideFlow = ai.defineFlow(
     return { svgCode: cleanedSvgCode };
   }
 );
-
-    
