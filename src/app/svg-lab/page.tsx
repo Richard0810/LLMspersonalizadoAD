@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, AlertCircle, Beaker, Code, Eye } from 'lucide-react';
+import { Loader2, AlertCircle, Beaker, Code, Eye, Download } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { generateSvgAction } from './actions';
 import type { SvgGenerationInput } from '@/types';
@@ -76,6 +76,38 @@ export default function SvgLabPage() {
     }
   };
 
+  const handleDownload = () => {
+    if (!generatedSvg) {
+        toast({
+            title: "No hay SVG para descargar",
+            description: "Primero debes generar un SVG.",
+            variant: "destructive",
+        });
+        return;
+    }
+
+    const blob = new Blob([generatedSvg], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    
+    // Create a filename from the title or use a default
+    const fileName = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'componente'}.svg`;
+    link.download = fileName;
+
+    document.body.appendChild(link);
+    link.click();
+
+    // Clean up
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    toast({
+        title: "Descarga Iniciada",
+        description: `Se ha descargado "${fileName}".`,
+    });
+  };
+
   return (
     <AppShell>
       <div className="container mx-auto py-8 animate-fade-in">
@@ -119,11 +151,11 @@ export default function SvgLabPage() {
                 </div>
                  <div className="space-y-2">
                     <Label htmlFor="title">Título Personalizado</Label>
-                    <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ej: Pregunta de Ciencias" />
+                    <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ej: Avanzar, Pregunta de Ciencias" />
                 </div>
                  <div className="space-y-2">
                     <Label htmlFor="content">Contenido Personalizado</Label>
-                    <Input id="content" value={content} onChange={(e) => setContent(e.target.value)} placeholder="Ej: ¿Qué es la fotosíntesis?" />
+                    <Input id="content" value={content} onChange={(e) => setContent(e.target.value)} placeholder="Ej: Avanza 2 casillas" />
                 </div>
                 <Button type="submit" disabled={isLoading} className="w-full text-lg py-6">
                   {isLoading ? <Loader2 className="animate-spin" /> : 'Generar SVG'}
@@ -134,8 +166,16 @@ export default function SvgLabPage() {
 
           <Card className="md:col-span-2 shadow-lg">
             <CardHeader>
-              <CardTitle>2. Resultado</CardTitle>
-              <CardDescription>Aquí puedes ver la vista previa y el código del SVG generado.</CardDescription>
+              <div className="flex justify-between items-center">
+                  <div>
+                    <CardTitle>2. Resultado</CardTitle>
+                    <CardDescription>Aquí puedes ver la vista previa y el código del SVG generado.</CardDescription>
+                  </div>
+                   <Button onClick={handleDownload} disabled={!generatedSvg || isLoading} variant="outline" size="sm">
+                      <Download className="mr-2 h-4 w-4" />
+                      Descargar
+                   </Button>
+              </div>
             </CardHeader>
             <CardContent>
               {isLoading && (
