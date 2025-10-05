@@ -10,10 +10,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Loader2, AlertCircle, Beaker, Code, Eye, Download } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { generateSvgAction } from './actions';
 import type { SvgGenerationInput } from '@/types';
+import { Canvg } from 'canvg';
 
 const componentTypes = [
   { id: 'carta_pregunta', name: 'Carta de Pregunta' },
@@ -76,36 +78,66 @@ export default function SvgLabPage() {
     }
   };
 
-  const handleDownload = () => {
-    if (!generatedSvg) {
-        toast({
-            title: "No hay SVG para descargar",
-            description: "Primero debes generar un SVG.",
-            variant: "destructive",
-        });
-        return;
-    }
+  const getFileName = (extension: string) => {
+    return `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'componente'}.${extension}`;
+  };
+  
+  const handleSvgDownload = () => {
+    if (!generatedSvg) return;
 
     const blob = new Blob([generatedSvg], { type: 'image/svg+xml' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    
-    // Create a filename from the title or use a default
-    const fileName = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'componente'}.svg`;
-    link.download = fileName;
-
+    link.download = getFileName('svg');
     document.body.appendChild(link);
     link.click();
-
-    // Clean up
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
     
     toast({
         title: "Descarga Iniciada",
-        description: `Se ha descargado "${fileName}".`,
+        description: `Se ha descargado "${getFileName('svg')}".`,
     });
+  };
+
+  const handleRasterDownload = async (format: 'png' | 'jpeg') => {
+      if (!generatedSvg) return;
+
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+          toast({ title: "Error", description: "No se pudo crear el contexto del canvas.", variant: 'destructive' });
+          return;
+      }
+      
+      // Extract width and height from SVG's viewBox
+      const viewBoxMatch = generatedSvg.match(/viewBox="0 0 (\d+) (\d+)"/);
+      const width = viewBoxMatch ? parseInt(viewBoxMatch[1], 10) : 200;
+      const height = viewBoxMatch ? parseInt(viewBoxMatch[2], 10) : 280;
+
+      canvas.width = width * 2; // Render at 2x for better quality
+      canvas.height = height * 2;
+
+      const v = await Canvg.from(ctx, generatedSvg, {
+          // You might not need a preset if you handle dimensions manually
+      });
+      v.resize(canvas.width, canvas.height, 'xMidYMid meet');
+      await v.render();
+      
+      const mimeType = `image/${format}`;
+      const dataUrl = canvas.toDataURL(mimeType, 1.0);
+      const link = document.createElement('a');
+      link.href = dataUrl;
+      link.download = getFileName(format);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast({
+          title: "Descarga Iniciada",
+          description: `Se ha descargado "${getFileName(format)}".`,
+      });
   };
 
   return (
@@ -171,10 +203,19 @@ export default function SvgLabPage() {
                     <CardTitle>2. Resultado</CardTitle>
                     <CardDescription>Aquí puedes ver la vista previa y el código del SVG generado.</CardDescription>
                   </div>
-                   <Button onClick={handleDownload} disabled={!generatedSvg || isLoading} variant="outline" size="sm">
-                      <Download className="mr-2 h-4 w-4" />
-                      Descargar
-                   </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button disabled={!generatedSvg || isLoading}>
+                          <Download className="mr-2 h-4 w-4" />
+                          Descargar
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem onSelect={handleSvgDownload}>Descargar como SVG</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => handleRasterDownload('png')}>Descargar como PNG</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => handleRasterDownload('jpeg')}>Descargar como JPG</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
               </div>
             </CardHeader>
             <CardContent>
@@ -221,3 +262,5 @@ export default function SvgLabPage() {
     </AppShell>
   );
 }
+
+    
