@@ -9,8 +9,6 @@
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
-import { promises as fs } from 'fs';
-import path from 'path';
 import {
   Document,
   Packer,
@@ -175,24 +173,36 @@ const generateActivityDocumentFlow = ai.defineFlow(
     outputSchema: GenerateActivityDocumentOutputSchema,
   },
   async (activity) => {
-    // --- 1. Load logo assets from the filesystem ---
     let logoUnicorBuffer: Buffer;
     let logoEscudoBuffer: Buffer;
     const fallbackImage = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', 'base64'); // 1x1 transparent pixel
 
+    // --- 1. Load logo assets from public URLs ---
     try {
-        const unicorPath = path.join(process.cwd(), 'public', 'logo_unicor.png');
-        logoUnicorBuffer = await fs.readFile(unicorPath);
-    } catch (error) {
-        console.error("Could not read Unicor logo, using fallback.", error);
-        logoUnicorBuffer = fallbackImage;
-    }
+        // Determine the base URL based on the environment
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ||
+                        (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` :
+                        'http://localhost:9002');
+        
+        console.log(`Loading logos from base URL: ${baseUrl}`);
 
-    try {
-        const escudoPath = path.join(process.cwd(), 'public', 'escudo.jpg');
-        logoEscudoBuffer = await fs.readFile(escudoPath);
+        // Download UNICOR logo
+        const unicorResponse = await fetch(`${baseUrl}/logo_unicor.png`);
+        if (!unicorResponse.ok) {
+            throw new Error(`Failed to fetch logo_unicor.png: ${unicorResponse.statusText}`);
+        }
+        logoUnicorBuffer = Buffer.from(await unicorResponse.arrayBuffer());
+
+        // Download school shield
+        const escudoResponse = await fetch(`${baseUrl}/escudo.jpg`);
+        if (!escudoResponse.ok) {
+            throw new Error(`Failed to fetch escudo.jpg: ${escudoResponse.statusText}`);
+        }
+        logoEscudoBuffer = Buffer.from(await escudoResponse.arrayBuffer());
+
     } catch (error) {
-        console.error("Could not read Escudo logo, using fallback.", error);
+        console.error('Error loading logos, using fallbacks:', error);
+        logoUnicorBuffer = fallbackImage;
         logoEscudoBuffer = fallbackImage;
     }
     
@@ -359,5 +369,3 @@ export async function generateActivityDocument(
 ): Promise<z.infer<typeof GenerateActivityDocumentOutputSchema>> {
   return generateActivityDocumentFlow(input);
 }
-
-    
