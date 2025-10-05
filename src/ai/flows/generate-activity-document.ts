@@ -179,10 +179,10 @@ const generateActivityDocumentFlow = ai.defineFlow(
 
     // --- 1. Load logo assets from public URLs ---
     try {
-        // Determine the base URL based on the environment
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ||
-                        (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` :
-                        'http://localhost:9002');
+        // Determine the base URL. Prioritize Vercel's system variable for production.
+        const baseUrl = process.env.VERCEL_URL 
+            ? `https://${process.env.VERCEL_URL}` 
+            : (process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:9002');
         
         console.log(`Loading logos from base URL: ${baseUrl}`);
 
