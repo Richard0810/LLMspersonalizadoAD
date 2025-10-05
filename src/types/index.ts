@@ -239,9 +239,10 @@ const SvgComponentTypeSchema = z.enum([
 
 export const SvgGenerationInputSchema = z.object({
   componentType: SvgComponentTypeSchema.describe('The type of SVG component to generate.'),
-  subject: z.enum(['matematicas', 'ciencias', 'lenguaje', 'historia', 'geografia', 'arte', 'deportes']).describe('The subject, which defines the color scheme.'),
+  color: z.string().describe('The primary color for the component (hex code).'),
   title: z.string().optional().describe('A custom title for the component.'),
   content: z.string().optional().describe('Custom content for the component (e.g., the question text).'),
+  icon: z.string().optional().describe('An emoji, character, or keyword for a symbol.'),
 });
 
 export const SvgGenerationOutputSchema = z.object({
@@ -250,5 +251,3 @@ export const SvgGenerationOutputSchema = z.object({
 
 export type SvgGenerationInput = z.infer<typeof SvgGenerationInputSchema>;
 export type SvgGenerationOutput = z.infer<typeof SvgGenerationOutputSchema>;
-
-    

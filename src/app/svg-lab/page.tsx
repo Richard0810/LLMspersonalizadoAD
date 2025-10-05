@@ -12,10 +12,8 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, AlertCircle, Beaker, Code, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { SvgGenerationInputSchema } from '@/types';
 import { generateSvgAction } from './actions';
 import type { SvgGenerationInput } from '@/types';
-import type { z } from 'zod';
 
 const componentTypes = [
   { id: 'carta_pregunta', name: 'Carta de Pregunta' },
@@ -24,21 +22,22 @@ const componentTypes = [
   { id: 'diagrama_flujo_simple', name: 'Diagrama: Flujo Simple' },
 ];
 
-const subjects = [
-  { id: 'matematicas', name: 'Matemáticas' },
-  { id: 'ciencias', name: 'Ciencias' },
-  { id: 'lenguaje', name: 'Lenguaje' },
-  { id: 'historia', name: 'Historia' },
-  { id: 'geografia', name: 'Geografía' },
-  { id: 'arte', name: 'Arte' },
-  { id: 'deportes', name: 'Deportes' },
+const colors = [
+  { id: '#e74c3c', name: 'Rojo (Matemáticas)' },
+  { id: '#28a745', name: 'Verde (Ciencias)' },
+  { id: '#17a2b8', name: 'Azul (Lenguaje)' },
+  { id: '#ffc107', name: 'Amarillo (Historia)' },
+  { id: '#6f42c1', name: 'Morado (Geografía)' },
+  { id: '#fd7e14', name: 'Naranja (Arte)' },
+  { id: '#20c997', name: 'Menta (Deportes)' },
 ];
 
 export default function SvgLabPage() {
   const [componentType, setComponentType] = useState<SvgGenerationInput['componentType']>('carta_pregunta');
-  const [subject, setSubject] = useState<SvgGenerationInput['subject']>('ciencias');
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
+  const [color, setColor] = useState<SvgGenerationInput['color']>('#28a745');
+  const [title, setTitle] = useState('Pregunta de Ciencias');
+  const [content, setContent] = useState('¿Qué es la fotosíntesis?');
+  const [icon, setIcon] = useState('❓');
 
   const [generatedSvg, setGeneratedSvg] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -53,9 +52,10 @@ export default function SvgLabPage() {
 
     const input: SvgGenerationInput = {
       componentType,
-      subject,
+      color,
       title,
       content,
+      icon,
     };
     
     const result = await generateSvgAction(input);
@@ -111,11 +111,11 @@ export default function SvgLabPage() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="subject">Materia (Color)</Label>
-                  <Select value={subject} onValueChange={(v) => setSubject(v as any)}>
-                    <SelectTrigger id="subject"><SelectValue /></SelectTrigger>
+                  <Label htmlFor="color">Color Principal</Label>
+                  <Select value={color} onValueChange={(v) => setColor(v as any)}>
+                    <SelectTrigger id="color"><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      {subjects.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
+                      {colors.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
@@ -126,6 +126,10 @@ export default function SvgLabPage() {
                  <div className="space-y-2">
                     <Label htmlFor="content">Contenido Personalizado</Label>
                     <Input id="content" value={content} onChange={(e) => setContent(e.target.value)} placeholder="Ej: ¿Qué es la fotosíntesis?" />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="icon">Icono / Símbolo</Label>
+                    <Input id="icon" value={icon} onChange={(e) => setIcon(e.target.value)} placeholder="Ej: ❓, 🚀, estrella, flecha" />
                 </div>
                 <Button type="submit" disabled={isLoading} className="w-full text-lg py-6">
                   {isLoading ? <Loader2 className="animate-spin" /> : 'Generar SVG'}
@@ -183,5 +187,3 @@ export default function SvgLabPage() {
     </AppShell>
   );
 }
-
-    
