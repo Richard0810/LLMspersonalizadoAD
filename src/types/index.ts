@@ -1,5 +1,7 @@
 
 
+import { z } from 'zod';
+
 export interface User {
   username: string;
   uid: string;
@@ -226,5 +228,27 @@ export type GeneratedContentType =
   | GeneratedTimelineDataType;
 
 export type GenerateVisualContentFlowOutput = GeneratedContentType;
+
+// SVG Lab Types
+const SvgComponentTypeSchema = z.enum([
+    'carta_pregunta', 
+    'carta_accion', 
+    'diagrama_ciclo_agua',
+    'diagrama_flujo_simple',
+]);
+
+export const SvgGenerationInputSchema = z.object({
+  componentType: SvgComponentTypeSchema.describe('The type of SVG component to generate.'),
+  subject: z.enum(['matematicas', 'ciencias', 'lenguaje', 'historia', 'geografia', 'arte', 'deportes']).describe('The subject, which defines the color scheme.'),
+  title: z.string().optional().describe('A custom title for the component.'),
+  content: z.string().optional().describe('Custom content for the component (e.g., the question text).'),
+});
+
+export const SvgGenerationOutputSchema = z.object({
+  svgCode: z.string().describe('The generated SVG code as an XML string.'),
+});
+
+export type SvgGenerationInput = z.infer<typeof SvgGenerationInputSchema>;
+export type SvgGenerationOutput = z.infer<typeof SvgGenerationOutputSchema>;
 
     

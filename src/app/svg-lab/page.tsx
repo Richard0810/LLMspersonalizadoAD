@@ -12,11 +12,10 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, AlertCircle, Beaker, Code, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { SvgGenerationInputSchema } from '@/ai/flows/generate-svg-from-guide';
+import { SvgGenerationInputSchema } from '@/types';
 import { generateSvgAction } from './actions';
+import type { SvgGenerationInput } from '@/types';
 import type { z } from 'zod';
-
-type SvgGenerationInput = z.infer<typeof SvgGenerationInputSchema>;
 
 const componentTypes = [
   { id: 'carta_pregunta', name: 'Carta de Pregunta' },
@@ -184,3 +183,5 @@ export default function SvgLabPage() {
     </AppShell>
   );
 }
+
+    

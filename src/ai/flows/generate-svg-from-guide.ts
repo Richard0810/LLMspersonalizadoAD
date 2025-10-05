@@ -10,28 +10,8 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
+import { SvgGenerationInputSchema, SvgGenerationOutputSchema, type SvgGenerationInput, type SvgGenerationOutput } from '@/types';
 
-// Schemas based on the provided guide
-const SvgComponentTypeSchema = z.enum([
-    'carta_pregunta', 
-    'carta_accion', 
-    'diagrama_ciclo_agua',
-    'diagrama_flujo_simple',
-]);
-
-export const SvgGenerationInputSchema = z.object({
-  componentType: SvgComponentTypeSchema.describe('The type of SVG component to generate.'),
-  subject: z.enum(['matematicas', 'ciencias', 'lenguaje', 'historia', 'geografia', 'arte', 'deportes']).describe('The subject, which defines the color scheme.'),
-  title: z.string().optional().describe('A custom title for the component.'),
-  content: z.string().optional().describe('Custom content for the component (e.g., the question text).'),
-});
-
-const SvgGenerationOutputSchema = z.object({
-  svgCode: z.string().describe('The generated SVG code as an XML string.'),
-});
-
-export type SvgGenerationInput = z.infer<typeof SvgGenerationInputSchema>;
-export type SvgGenerationOutput = z.infer<typeof SvgGenerationOutputSchema>;
 
 // The main function to be called from the server action
 export async function generateSvgFromGuide(input: SvgGenerationInput): Promise<SvgGenerationOutput> {
@@ -191,3 +171,5 @@ const generateSvgFromGuideFlow = ai.defineFlow(
     return { svgCode: cleanedSvgCode };
   }
 );
+
+    

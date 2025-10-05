@@ -2,7 +2,7 @@
 'use server';
 
 import { generateSvgFromGuide } from '@/ai/flows/generate-svg-from-guide';
-import type { SvgGenerationInput, SvgGenerationOutput } from '@/ai/flows/generate-svg-from-guide';
+import type { SvgGenerationInput, SvgGenerationOutput } from '@/types';
 
 interface ActionResult {
   success: boolean;
@@ -22,3 +22,5 @@ export async function generateSvgAction(
     return { success: false, error: error.message };
   }
 }
+
+    
