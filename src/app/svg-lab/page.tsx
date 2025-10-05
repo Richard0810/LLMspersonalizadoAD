@@ -4,7 +4,7 @@
 
 import { useState } from 'react';
 import { AppShell } from '@/components/layout/AppShell';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
@@ -15,7 +15,8 @@ import { Loader2, AlertCircle, Beaker, Code, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { generateSvgAction } from './actions';
 import type { SvgGenerationInput } from '@/types';
-import { DownloadButton } from '@/components/visual/DownloadButton';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Canvg } from 'canvg';
 
 const componentTypes = [
   { id: 'carta_pregunta', name: 'Carta de Pregunta' },
@@ -43,7 +44,17 @@ export default function SvgLabPage() {
   const [generatedSvg, setGeneratedSvg] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fileSize, setFileSize] = useState<string>('0 Bytes');
   const { toast } = useToast();
+  
+  const formatBytes = (bytes: number, decimals = 2) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,6 +74,8 @@ export default function SvgLabPage() {
 
     if (result.success && result.data) {
       setGeneratedSvg(result.data.svgCode);
+      const svgBlob = new Blob([result.data.svgCode], { type: 'image/svg+xml' });
+      setFileSize(formatBytes(svgBlob.size));
       toast({
         title: "¡SVG Generado!",
         description: `Tu componente SVG está listo.`
@@ -81,6 +94,60 @@ export default function SvgLabPage() {
   const getFileName = () => {
     return `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'componente'}`;
   };
+  
+  const performDownload = (blob: Blob, format: 'svg' | 'png' | 'jpeg') => {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${getFileName()}.${format}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      toast({
+        title: `¡Descargado como ${format.toUpperCase()}!`,
+        description: `Se ha descargado "${getFileName()}.${format}".`,
+      });
+  };
+
+  const handleDownload = async (format: 'svg' | 'png' | 'jpeg') => {
+      if (!generatedSvg) return;
+
+      try {
+          if (format === 'svg') {
+              const blob = new Blob([generatedSvg], { type: 'image/svg+xml' });
+              performDownload(blob, 'svg');
+          } else {
+              const canvas = document.createElement('canvas');
+              const ctx = canvas.getContext('2d');
+              if (!ctx) throw new Error("No se pudo crear el contexto del canvas.");
+
+              const viewBoxMatch = generatedSvg.match(/viewBox="0 0 (\d+) (\d+)"/);
+              const width = viewBoxMatch ? parseInt(viewBoxMatch[1], 10) : 200;
+              const height = viewBoxMatch ? parseInt(viewBoxMatch[2], 10) : 280;
+              
+              canvas.width = width * 2;
+              canvas.height = height * 2;
+              
+              const v = await Canvg.from(ctx, generatedSvg);
+              v.resize(canvas.width, canvas.height, 'xMidYMid meet');
+              await v.render();
+              
+              const dataUrl = canvas.toDataURL(`image/${format}`, 1.0);
+              const res = await fetch(dataUrl);
+              const blob = await res.blob();
+              performDownload(blob, format);
+          }
+      } catch (error) {
+          console.error("Error al descargar:", error);
+          toast({
+              title: "Error de Descarga",
+              description: error instanceof Error ? error.message : "Ocurrió un error inesperado.",
+              variant: 'destructive'
+          });
+      }
+  };
+
 
   return (
     <AppShell>
@@ -140,12 +207,10 @@ export default function SvgLabPage() {
 
           <Card className="md:col-span-2 shadow-lg flex flex-col">
             <CardHeader>
-              <div>
-                <CardTitle>2. Resultado</CardTitle>
-                <CardDescription>Aquí puedes ver la vista previa y el código del SVG generado.</CardDescription>
-              </div>
+              <CardTitle>2. Resultado</CardTitle>
+              <CardDescription>Aquí puedes ver la vista previa y el código del SVG generado.</CardDescription>
             </CardHeader>
-            <CardContent className="flex-grow">
+            <CardContent className="flex-grow flex flex-col">
               {isLoading && (
                 <div className="flex justify-center items-center h-full">
                   <Loader2 className="h-12 w-12 animate-spin text-primary" />
@@ -159,22 +224,56 @@ export default function SvgLabPage() {
                 </Alert>
               )}
               {generatedSvg && !isLoading && (
-                <Tabs defaultValue="preview" className="w-full h-full flex flex-col">
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="preview"><Eye className="mr-2" />Vista Previa</TabsTrigger>
-                    <TabsTrigger value="code"><Code className="mr-2" />Código SVG</TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="preview" className="mt-4 p-4 border rounded-md bg-muted/30 flex justify-center items-center flex-grow">
-                    <div className="w-full max-w-md" dangerouslySetInnerHTML={{ __html: generatedSvg }} />
-                  </TabsContent>
-                  <TabsContent value="code" className="mt-4 flex-grow">
-                    <pre className="p-4 border rounded-md bg-gray-900 text-green-300 text-xs overflow-auto h-96">
-                      <code>
-                        {generatedSvg}
-                      </code>
-                    </pre>
-                  </TabsContent>
-                </Tabs>
+                <div className="w-full h-full flex flex-col">
+                    <div className="flex justify-between items-center mb-2">
+                        <Tabs defaultValue="preview" className="w-full">
+                            <TabsList>
+                                <TabsTrigger value="preview"><Eye className="mr-2" />Vista Previa</TabsTrigger>
+                                <TabsTrigger value="code"><Code className="mr-2" />Código SVG</TabsTrigger>
+                            </TabsList>
+                        </Tabs>
+
+                         <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                               <button className="Btn">
+                                  <svg
+                                    className="svgIcon"
+                                    viewBox="0 0 384 512"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      d="M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8 224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 306.7L54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"
+                                    ></path>
+                                  </svg>
+                                  <span className="icon2"></span>
+                                  <span className="tooltip">{fileSize}</span>
+                                </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                                <DropdownMenuItem onSelect={() => handleDownload('svg')}>Descargar como SVG</DropdownMenuItem>
+                                <DropdownMenuItem onSelect={() => handleDownload('png')}>Descargar como PNG</DropdownMenuItem>
+                                <DropdownMenuItem onSelect={() => handleDownload('jpeg')}>Descargar como JPG</DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+
+                    </div>
+                  <Tabs defaultValue="preview" className="w-full flex-grow flex flex-col">
+                      <TabsList className="hidden">
+                          <TabsTrigger value="preview">Vista Previa</TabsTrigger>
+                          <TabsTrigger value="code">Código SVG</TabsTrigger>
+                      </TabsList>
+                      <TabsContent value="preview" className="mt-4 p-4 border rounded-md bg-muted/30 flex justify-center items-center flex-grow">
+                        <div className="w-full max-w-md" dangerouslySetInnerHTML={{ __html: generatedSvg }} />
+                      </TabsContent>
+                      <TabsContent value="code" className="mt-4 flex-grow">
+                        <pre className="p-4 border rounded-md bg-gray-900 text-green-300 text-xs overflow-auto h-96">
+                          <code>
+                            {generatedSvg}
+                          </code>
+                        </pre>
+                      </TabsContent>
+                  </Tabs>
+                </div>
               )}
                {!generatedSvg && !isLoading && !error && (
                   <div className="flex flex-col justify-center items-center h-full text-center text-muted-foreground border-2 border-dashed rounded-lg">
@@ -183,14 +282,6 @@ export default function SvgLabPage() {
                   </div>
                )}
             </CardContent>
-             {generatedSvg && (
-                <CardFooter className="p-4 mt-4 bg-muted/50 rounded-b-lg flex justify-center">
-                    <DownloadButton 
-                        svgContent={generatedSvg}
-                        fileName={getFileName()}
-                    />
-                </CardFooter>
-            )}
           </Card>
         </div>
       </div>
