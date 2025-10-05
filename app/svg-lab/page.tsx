@@ -156,6 +156,19 @@ export default function SvgLabPage() {
       }
   };
 
+  const getTitlePlaceholder = () => {
+    if (componentType === 'carta_pregunta') return 'Ej: Pregunta de Ciencias, Reto Matemático';
+    if (componentType === 'carta_accion') return 'Ej: Avanzar, Retroceder';
+    if (componentType === 'diagrama_flujo_simple') return 'Ej: Proceso de registro';
+    return 'Título Personalizado';
+  }
+
+  const getContentPlaceholder = () => {
+    if (componentType === 'carta_pregunta') return 'Ej: ¿Qué son los ecosistemas?';
+    if (componentType === 'carta_accion') return 'Ej: Avanza 2 casillas';
+    return 'Contenido Personalizado';
+  }
+
 
   return (
     <AppShell>
@@ -202,14 +215,14 @@ export default function SvgLabPage() {
                 {(componentType === 'carta_pregunta' || componentType === 'carta_accion' || componentType === 'diagrama_flujo_simple') && (
                   <div className="space-y-2">
                       <Label htmlFor="title">Título Personalizado</Label>
-                      <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ej: Avanzar, Pregunta de Ciencias" />
+                      <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={getTitlePlaceholder()} />
                   </div>
                 )}
                 
                 {(componentType === 'carta_pregunta' || componentType === 'carta_accion') && (
                   <div className="space-y-2">
                       <Label htmlFor="content">Contenido Personalizado</Label>
-                      <Input id="content" value={content} onChange={(e) => setContent(e.target.value)} placeholder="Ej: Avanza 2 casillas" />
+                      <Input id="content" value={content} onChange={(e) => setContent(e.target.value)} placeholder={getContentPlaceholder()} />
                   </div>
                 )}
 

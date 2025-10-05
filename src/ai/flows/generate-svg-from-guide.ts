@@ -33,7 +33,7 @@ const generateSvgFromGuideFlow = ai.defineFlow(
       1.  **SVG Structure:** Use '<svg viewBox="0 0 width height" xmlns="http://www.w3.org/2000/svg">...</svg>'.
       2.  **Color:** The main stroke and fill color MUST be the color provided in the 'color' parameter.
       3.  **Output:** You MUST return ONLY the raw SVG code as a valid XML string. Do not include any explanations, markdown, or anything else. The response must start with '<svg' and end with '</svg>'.
-      4.  **Automatic Icon Generation:** You MUST automatically generate a simple, relevant icon based on the 'Custom Title' and 'Custom Content'. For example, if the title is 'Pregunta de Ciencias', a good icon would be a beaker (🧪) or an atom. If the title is 'Avanzar' and content is 'Avanza 3 pasos', a good icon would be three arrows or a boot with a number 3. You MUST generate this icon as a simple SVG <path> or <polygon> to represent it. The generated path/polygon should be filled with the main color and have a subtle opacity (e.g., fill-opacity="0.8"). The generated icon path must be centered within its group. For 'carta_pregunta', the icon should almost always be a downward-pointing arrow to guide the user's eye to the question.
+      4.  **Automatic Icon Generation:** You MUST automatically generate a simple, relevant icon based on the 'Custom Title' and 'Custom Content'. For example, if the title is 'Pregunta de Ciencias', a good icon would be a beaker (🧪) or an atom. If the title is 'Avanzar' and content is 'Avanza 3 pasos', a good icon would be three arrows or a boot with a number 3. You MUST generate this icon as a simple SVG <path> or <polygon> to represent it. The generated path/polygon should be filled with the main color and have a subtle opacity (e.g., fill-opacity="0.8"). The generated icon path must be centered within its group.
       5.  **Templates:** Adhere strictly to the requested component template.
       6.  **Empty Fields:** If 'Custom Title' or 'Custom Content' are empty or not provided, you MUST leave the corresponding text elements in the SVG empty. Do not use default text.
 
@@ -48,16 +48,16 @@ const generateSvgFromGuideFlow = ai.defineFlow(
       **If Component Type is "carta_pregunta":**
       Use this template with a viewBox="0 0 200 280".
       - The main stroke and header fill color MUST be the custom color.
-      - The header text should be 'PREGUNTA' followed by the custom title. If no title, use 'PREGUNTA'.
+      - The header text should be the custom title, capitalized. If no title, leave it blank.
       - The main content area should contain the custom content. If no content, leave it blank.
       \`\`\`xml
       <svg viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg">
         <rect x="0" y="0" width="200" height="280" fill="#fff" stroke="${input.color}" stroke-width="4" rx="15"/>
         <rect x="15" y="15" width="170" height="40" fill="${input.color}" rx="8"/>
-        <text x="100" y="40" text-anchor="middle" font-size="16" font-weight="bold" fill="white" font-family="Arial, sans-serif">PREGUNTA ${input.title || ''}</text>
+        <text x="100" y="40" text-anchor="middle" font-size="16" font-weight="bold" fill="white" font-family="Arial, sans-serif">${input.title?.toUpperCase() || ''}</text>
         <g transform="translate(100 85) scale(2.5)">
-            <!-- ICON_AREA: Generate a centered path/polygon. For a question card, this should be a downward arrow. -->
-             <path d="M0 -5 L-5 0 L5 0 Z M0 -5 L0 5" transform="translate(0, 10)" stroke-width="3" stroke="${input.color}" fill="${input.color}" />
+            <!-- ICON_AREA: Generate a centered path/polygon based on the title and content. For a question card, this could be a question mark, a magnifying glass, or something related to the subject. -->
+             <path d="M-5,-5 Q0,-15 5,-5 Q10,0 0,5 Q-10,0 -5,-5 M0,8 L0,10" stroke-width="3" stroke="${input.color}" fill="none" />
         </g>
         <foreignObject x="25" y="140" width="150" height="80">
           <p xmlns="http://www.w3.org/1999/xhtml" style="font-family: Arial, sans-serif; font-size: 16px; color: #333; word-wrap: break-word; text-align: center; display: flex; justify-content: center; align-items: center; height: 100%;">
@@ -90,15 +90,6 @@ const generateSvgFromGuideFlow = ai.defineFlow(
       </svg>
       \`\`\`
 
-      **If Component Type is "diagrama_generico":**
-      This is a highly creative task. You MUST generate a complete, unique SVG diagram from scratch based on the user's request.
-      - Analyze the 'Theme' (title) and 'Concepts' (content) provided.
-      - Decide the best visual representation (flowchart, cycle, simple map, etc.).
-      - Use the provided 'Style', 'Colors', 'Format', 'Detail Level', 'Text Labels', and 'Purpose' to guide the design.
-      - The SVG should be well-structured, visually appealing, and accurately represent the user's data.
-      - It MUST be a single SVG XML output.
-      - You MUST dynamically generate all shapes, lines, and text elements.
-      
       Now, generate the SVG code. For the cards, you MUST dynamically generate the icon inside the "<!-- ICON_AREA -->" section based on the provided title and content.
     `;
 
