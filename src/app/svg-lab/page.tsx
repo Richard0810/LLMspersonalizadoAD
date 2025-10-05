@@ -4,7 +4,7 @@
 
 import { useState } from 'react';
 import { AppShell } from '@/components/layout/AppShell';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
@@ -138,24 +138,16 @@ export default function SvgLabPage() {
             </CardContent>
           </Card>
 
-          <Card className="md:col-span-2 shadow-lg">
+          <Card className="md:col-span-2 shadow-lg flex flex-col">
             <CardHeader>
-              <div className="flex justify-between items-center">
-                  <div>
-                    <CardTitle>2. Resultado</CardTitle>
-                    <CardDescription>Aquí puedes ver la vista previa y el código del SVG generado.</CardDescription>
-                  </div>
-                    {generatedSvg && (
-                       <DownloadButton 
-                          svgContent={generatedSvg}
-                          fileName={getFileName()}
-                       />
-                    )}
+              <div>
+                <CardTitle>2. Resultado</CardTitle>
+                <CardDescription>Aquí puedes ver la vista previa y el código del SVG generado.</CardDescription>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex-grow">
               {isLoading && (
-                <div className="flex justify-center items-center h-64">
+                <div className="flex justify-center items-center h-full">
                   <Loader2 className="h-12 w-12 animate-spin text-primary" />
                 </div>
               )}
@@ -167,15 +159,15 @@ export default function SvgLabPage() {
                 </Alert>
               )}
               {generatedSvg && !isLoading && (
-                <Tabs defaultValue="preview" className="w-full">
+                <Tabs defaultValue="preview" className="w-full h-full flex flex-col">
                   <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="preview"><Eye className="mr-2" />Vista Previa</TabsTrigger>
                     <TabsTrigger value="code"><Code className="mr-2" />Código SVG</TabsTrigger>
                   </TabsList>
-                  <TabsContent value="preview" className="mt-4 p-4 border rounded-md bg-muted/30 flex justify-center items-center">
+                  <TabsContent value="preview" className="mt-4 p-4 border rounded-md bg-muted/30 flex justify-center items-center flex-grow">
                     <div className="w-full max-w-md" dangerouslySetInnerHTML={{ __html: generatedSvg }} />
                   </TabsContent>
-                  <TabsContent value="code" className="mt-4">
+                  <TabsContent value="code" className="mt-4 flex-grow">
                     <pre className="p-4 border rounded-md bg-gray-900 text-green-300 text-xs overflow-auto h-96">
                       <code>
                         {generatedSvg}
@@ -185,12 +177,20 @@ export default function SvgLabPage() {
                 </Tabs>
               )}
                {!generatedSvg && !isLoading && !error && (
-                  <div className="flex flex-col justify-center items-center h-64 text-center text-muted-foreground border-2 border-dashed rounded-lg">
+                  <div className="flex flex-col justify-center items-center h-full text-center text-muted-foreground border-2 border-dashed rounded-lg">
                       <Beaker className="h-12 w-12 mb-2" />
                       <p>El resultado de tu experimento aparecerá aquí.</p>
                   </div>
                )}
             </CardContent>
+             {generatedSvg && (
+                <CardFooter className="p-4 mt-4 bg-muted/50 rounded-b-lg flex justify-center">
+                    <DownloadButton 
+                        svgContent={generatedSvg}
+                        fileName={getFileName()}
+                    />
+                </CardFooter>
+            )}
           </Card>
         </div>
       </div>

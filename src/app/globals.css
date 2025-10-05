@@ -156,12 +156,12 @@
 }
 
 .dl-label .dl-title {
-  font-size: 17px;
+  font-size: 14px;
+  font-weight: 500;
   color: hsl(var(--foreground));
   transition: all 0.4s ease;
   position: absolute;
   right: 18px;
-  bottom: 18px;
   text-align: center;
   white-space: nowrap;
 }
@@ -221,7 +221,7 @@
 }
 
 .dl-label.is-downloading {
-  width: 57px;
+  width: 180px; /* Increased width for progress text */
 }
 
 .dl-label.is-downloading::before {
@@ -244,6 +244,12 @@
 }
 
 .dl-label.is-downloading .dl-title.downloading {
+  opacity: 1;
+  visibility: visible;
+  font-size: 12px;
+}
+
+.dl-label.is-downloading .dl-title.initial {
   opacity: 0;
   visibility: hidden;
 }

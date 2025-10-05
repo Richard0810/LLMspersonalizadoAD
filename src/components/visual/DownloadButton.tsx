@@ -18,12 +18,18 @@ type DownloadFormat = 'svg' | 'png' | 'jpeg';
 export function DownloadButton({ svgContent, fileName }: DownloadButtonProps) {
     const [downloadState, setDownloadState] = useState<DownloadState>('idle');
     const [fileSize, setFileSize] = useState<string | null>(null);
+    const [progress, setProgress] = useState(0);
     const { toast } = useToast();
+    const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
     // Reset state when svgContent changes
     useEffect(() => {
         setDownloadState('idle');
         setFileSize(null);
+        setProgress(0);
+        if (progressIntervalRef.current) {
+            clearInterval(progressIntervalRef.current);
+        }
     }, [svgContent]);
     
     const formatBytes = (bytes: number, decimals = 2) => {
@@ -48,6 +54,19 @@ export function DownloadButton({ svgContent, fileName }: DownloadButtonProps) {
 
     const handleDownload = async (format: DownloadFormat) => {
         setDownloadState('downloading');
+        setProgress(0);
+        setFileSize(null);
+        
+        // Start progress interval
+        progressIntervalRef.current = setInterval(() => {
+            setProgress(prev => {
+                if (prev >= 99) {
+                    if(progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+                    return 99;
+                }
+                return prev + 1;
+            });
+        }, 30); // 30ms * 100 = 3000ms (3s)
 
         try {
             let blob: Blob;
@@ -76,6 +95,8 @@ export function DownloadButton({ svgContent, fileName }: DownloadButtonProps) {
             }
 
             setFileSize(formatBytes(blob.size));
+            if(progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+            setProgress(100);
 
             // Simulate download progress for animation
             setTimeout(() => {
@@ -87,11 +108,15 @@ export function DownloadButton({ svgContent, fileName }: DownloadButtonProps) {
                 });
 
                 // Reset after completion animation
-                setTimeout(() => setDownloadState('idle'), 2000);
+                setTimeout(() => {
+                    setDownloadState('idle');
+                    setProgress(0);
+                }, 2000);
 
-            }, 3000); // 3s for animation
+            }, 500); // Shorter delay after blob is ready
 
         } catch (error) {
+            if(progressIntervalRef.current) clearInterval(progressIntervalRef.current);
             console.error("Error al descargar:", error);
             toast({
                 title: "Error de Descarga",
@@ -99,6 +124,7 @@ export function DownloadButton({ svgContent, fileName }: DownloadButtonProps) {
                 variant: 'destructive'
             });
             setDownloadState('idle');
+            setProgress(0);
         }
     };
     
@@ -118,11 +144,13 @@ export function DownloadButton({ svgContent, fileName }: DownloadButtonProps) {
                             </svg>
                             <div className="dl-square"></div>
                         </div>
-                        {downloadState === 'downloading' && fileSize && (
-                            <p className="dl-title downloading">{fileSize}</p>
+                        {downloadState === 'downloading' && (
+                            <p className="dl-title downloading">
+                                {progress}% {fileSize ? `(${fileSize})` : ''}
+                            </p>
                         )}
-                         <p className="dl-title downloading">Descargar</p>
-                        <p className="dl-title completed">Listo!</p>
+                         <p className="dl-title initial">Descargar</p>
+                        <p className="dl-title completed">¡Listo!</p>
                     </label>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
@@ -134,4 +162,3 @@ export function DownloadButton({ svgContent, fileName }: DownloadButtonProps) {
         </div>
     );
 }
-
