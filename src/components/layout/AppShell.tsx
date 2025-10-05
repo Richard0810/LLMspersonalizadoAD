@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/sidebar';
 import { AppHeader } from './AppHeader';
 import type { LessonParams } from '@/types';
-import { BookOpen, BookOpenCheck, GraduationCap, ImageIcon, Palette } from 'lucide-react';
+import { BookOpen, BookOpenCheck, GraduationCap, ImageIcon, Palette, Beaker } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ProtectedRoute from '../auth/ProtectedRoute';
 
@@ -80,6 +80,16 @@ export const AppShell: React.FC<AppShellProps> = ({
                     <a>
                       <Palette />
                       <span>Generación Visual</span>
+                    </a>
+                  </SidebarMenuButton>
+                </Link>
+              </SidebarMenuItem>
+               <SidebarMenuItem>
+                <Link href="/svg-lab" legacyBehavior passHref>
+                  <SidebarMenuButton asChild isActive={pathname === '/svg-lab'}>
+                    <a>
+                      <Beaker />
+                      <span>Laboratorio SVG</span>
                     </a>
                   </SidebarMenuButton>
                 </Link>
