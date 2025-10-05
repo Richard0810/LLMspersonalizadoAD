@@ -33,7 +33,7 @@ const generateSvgFromGuideFlow = ai.defineFlow(
       1.  **SVG Structure:** Use '<svg viewBox="0 0 width height" xmlns="http://www.w3.org/2000/svg">...</svg>'.
       2.  **Color:** The main stroke and fill color MUST be the color provided in the 'color' parameter.
       3.  **Output:** You MUST return ONLY the raw SVG code as a valid XML string. Do not include any explanations, markdown, or anything else. The response must start with '<svg' and end with '</svg>'.
-      4.  **Icon Generation:** If the 'icon' parameter is a simple character or emoji, embed it in a <text> element. If it's a keyword (like 'estrella', 'corazon', 'flecha'), you MUST generate a simple SVG <path> or <polygon> to represent it.
+      4.  **Icon Generation:** If the 'icon' parameter is a simple character or emoji, embed it in a <text> element. If it's a keyword (like 'estrella', 'corazon', 'flecha'), you MUST generate a simple SVG <path> or <polygon> to represent it. The generated path/polygon should be filled with the main color and have a subtle opacity (e.g., fill-opacity="0.8").
       5.  **Templates:** Adhere strictly to the requested component template.
 
       **Generation Request:**
@@ -53,15 +53,15 @@ const generateSvgFromGuideFlow = ai.defineFlow(
       - Use font-family="Arial, sans-serif".
       \`\`\`xml
       <svg viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg">
-        <rect x="0" y="0" width="200" height="280" fill="#fff" stroke="[MAIN_COLOR]" stroke-width="4" rx="15"/>
-        <rect x="15" y="15" width="170" height="40" fill="[MAIN_COLOR]" rx="8"/>
-        <text x="100" y="40" text-anchor="middle" font-size="16" font-weight="bold" fill="white" font-family="Arial, sans-serif">[CUSTOM_TITLE_UPPERCASE]</text>
+        <rect x="0" y="0" width="200" height="280" fill="#fff" stroke="${input.color}" stroke-width="4" rx="15"/>
+        <rect x="15" y="15" width="170" height="40" fill="${input.color}" rx="8"/>
+        <text x="100" y="40" text-anchor="middle" font-size="16" font-weight="bold" fill="white" font-family="Arial, sans-serif">${input.title?.toUpperCase() || 'PREGUNTA'}</text>
         <foreignObject x="25" y="70" width="150" height="150">
           <p xmlns="http://www.w3.org/1999/xhtml" style="font-family: Arial, sans-serif; font-size: 14px; color: #333; word-wrap: break-word;">
-            [CUSTOM_CONTENT]
+            ${input.content || 'Contenido de la pregunta...'}
           </p>
         </foreignObject>
-        <rect x="15" y="245" width="170" height="25" fill="[MAIN_COLOR]" rx="5"/>
+        <rect x="15" y="245" width="170" height="25" fill="${input.color}" rx="5"/>
         <text x="100" y="262" text-anchor="middle" font-size="12" font-weight="bold" fill="white" font-family="Arial, sans-serif">Respuesta</text>
       </svg>
       \`\`\`
@@ -73,21 +73,15 @@ const generateSvgFromGuideFlow = ai.defineFlow(
       - For the central icon, if the icon parameter is a keyword like 'flecha', generate a path. If it's a character/emoji, embed it as text.
       \`\`\`xml
       <svg viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg">
-        <rect x="0" y="0" width="200" height="280" fill="#fff" stroke="[MAIN_COLOR]" stroke-width="4" rx="15"/>
-        <rect x="15" y="15" width="170" height="40" fill="[MAIN_COLOR]" rx="8"/>
-        <text x="100" y="40" text-anchor="middle" font-size="16" font-weight="bold" fill="white" font-family="Arial, sans-serif">[CUSTOM_TITLE_UPPERCASE]</text>
+        <rect x="0" y="0" width="200" height="280" fill="#fff" stroke="${input.color}" stroke-width="4" rx="15"/>
+        <rect x="15" y="15" width="170" height="40" fill="${input.color}" rx="8"/>
+        <text x="100" y="40" text-anchor="middle" font-size="16" font-weight="bold" fill="white" font-family="Arial, sans-serif">${input.title?.toUpperCase() || 'ACCIÓN'}</text>
         
-        <!-- Icon Area - Generate dynamically -->
-        <g transform="translate(100, 110)">
-          <!-- Example for a keyword 'estrella' -->
-          <!-- <path d="M0 -30 L8 -8 L30 0 L8 8 L0 30 L-8 8 L-30 0 L-8 -8 Z" fill="[MAIN_COLOR]" fill-opacity="0.8"/> -->
-          <!-- Example for an emoji '🚀' -->
-           <text text-anchor="middle" y="10" font-size="40">[ICON_EMOJI]</text>
-        </g>
+        <!-- ICON_AREA -->
 
         <foreignObject x="25" y="170" width="150" height="100">
             <p xmlns="http://www.w3.org/1999/xhtml" style="font-family: Arial, sans-serif; font-size: 14px; color: #333; text-align: center;">
-              [CUSTOM_CONTENT]
+              ${input.content || 'Realiza la acción descrita.'}
             </p>
         </foreignObject>
       </svg>
@@ -105,22 +99,22 @@ const generateSvgFromGuideFlow = ai.defineFlow(
           <circle cx="350" cy="50" r="30" fill="#ffeb3b" />
 
           <g id="evaporation">
-              <path d="M100,230 C 110 200, 120 180, 130 160" stroke="[MAIN_COLOR]" stroke-opacity="0.7" stroke-width="2" fill="none" stroke-dasharray="4 4" />
-              <path d="M120,240 C 130 210, 140 190, 150 170" stroke="[MAIN_COLOR]" stroke-opacity="0.7" stroke-width="2" fill="none" stroke-dasharray="4 4" />
-              <text x="70" y="200" font-family="Arial, sans-serif" font-size="12" fill="[MAIN_COLOR]" transform="rotate(-30, 70, 200)">Evaporación</text>
+              <path d="M100,230 C 110 200, 120 180, 130 160" stroke="${input.color}" stroke-opacity="0.7" stroke-width="2" fill="none" stroke-dasharray="4 4" />
+              <path d="M120,240 C 130 210, 140 190, 150 170" stroke="${input.color}" stroke-opacity="0.7" stroke-width="2" fill="none" stroke-dasharray="4 4" />
+              <text x="70" y="200" font-family="Arial, sans-serif" font-size="12" fill="${input.color}" transform="rotate(-30, 70, 200)">Evaporación</text>
           </g>
           
           <g id="condensation">
               <ellipse cx="200" cy="100" rx="40" ry="25" fill="#fff" />
               <ellipse cx="230" cy="95" rx="30" ry="20" fill="#fff" />
-              <text x="190" y="80" font-family="Arial, sans-serif" font-size="12" fill="[MAIN_COLOR]">Condensación</text>
+              <text x="190" y="80" font-family="Arial, sans-serif" font-size="12" fill="${input.color}">Condensación</text>
           </g>
           
           <g id="precipitation">
               <line x1="210" y1="120" x2="205" y2="140" stroke="#2196f3" stroke-width="2" />
               <line x1="220" y1="125" x2="215" y2="145" stroke="#2196f3" stroke-width="2" />
               <line x1="230" y1="120" x2="225" y2="140" stroke="#2196f3" stroke-width="2" />
-              <text x="230" y="140" font-family="Arial, sans-serif" font-size="12" fill="[MAIN_COLOR]">Precipitación</text>
+              <text x="230" y="140" font-family="Arial, sans-serif" font-size="12" fill="${input.color}">Precipitación</text>
           </g>
 
           <polygon points="300,240 380,150 400,240" fill="#8d6e63" />
@@ -134,27 +128,29 @@ const generateSvgFromGuideFlow = ai.defineFlow(
               <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#333"/></marker>
           </defs>
           <rect x="0" y="0" width="400" height="300" fill="#f8f9fa" />
-          <text x="200" y="25" text-anchor="middle" font-size="16" font-weight="bold" font-family="Arial, sans-serif">[CUSTOM_TITLE]</text>
+          <text x="200" y="25" text-anchor="middle" font-size="16" font-weight="bold" font-family="Arial, sans-serif">${input.title}</text>
 
-          <ellipse cx="200" cy="70" rx="50" ry="20" fill="[MAIN_COLOR]" fill-opacity="0.2" stroke="[MAIN_COLOR]" stroke-width="2" />
+          <ellipse cx="200" cy="70" rx="50" ry="20" fill="${input.color}" fill-opacity="0.2" stroke="${input.color}" stroke-width="2" />
           <text x="200" y="75" text-anchor="middle" font-family="Arial, sans-serif" font-size="12">Inicio</text>
           
           <line x1="200" y1="90" x2="200" y2="120" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
           
-          <rect x="140" y="120" width="120" height="40" fill="[MAIN_COLOR]" fill-opacity="0.2" stroke="[MAIN_COLOR]" stroke-width="2" rx="5" />
+          <rect x="140" y="120" width="120" height="40" fill="${input.color}" fill-opacity="0.2" stroke="${input.color}" stroke-width="2" rx="5" />
           <text x="200" y="145" text-anchor="middle" font-family="Arial, sans-serif" font-size="12">Primer Paso</text>
 
           <line x1="200" y1="160" x2="200" y2="190" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
 
-          <polygon points="200,190 150,215 200,240 250,215" fill="[MAIN_COLOR]" fill-opacity="0.2" stroke="[MAIN_COLOR]" stroke-width="2" />
+          <polygon points="200,190 150,215 200,240 250,215" fill="${input.color}" fill-opacity="0.2" stroke="${input.color}" stroke-width="2" />
           <text x="200" y="220" text-anchor="middle" font-family="Arial, sans-serif" font-size="12">¿Decisión?</text>
 
-          <ellipse cx="200" cy="270" rx="50" ry="20" fill="[MAIN_COLOR]" fill-opacity="0.2" stroke="[MAIN_COLOR]" stroke-width="2" />
+          <ellipse cx="200" cy="270" rx="50" ry="20" fill="${input.color}" fill-opacity="0.2" stroke="${input.color}" stroke-width="2" />
           <text x="200" y="275" text-anchor="middle" font-family="Arial, sans-serif" font-size="12">Fin</text>
       </svg>
       \`\`\`
 
-      Now, generate the SVG code for the requested component.
+      Now, generate the SVG code. For the "carta_accion", you MUST dynamically generate the icon. Replace the "<!-- ICON_AREA -->" comment with the generated SVG code for the icon inside a <g> tag.
+      For an emoji or character, use: <g transform="translate(100, 110)"><text text-anchor="middle" y="15" font-size="50">${input.icon}</text></g>
+      For a keyword, generate a <path> or <polygon> inside the <g> tag, for example: <g transform="translate(100, 110)"><path d="..." fill="${input.color}" fill-opacity="0.8"/></g>
     `;
 
     const { text: svgCode } = await ai.generate({
@@ -172,3 +168,5 @@ const generateSvgFromGuideFlow = ai.defineFlow(
     return { svgCode: cleanedSvgCode };
   }
 );
+
+    
