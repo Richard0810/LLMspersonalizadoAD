@@ -35,8 +35,8 @@ const colors = [
 export default function SvgLabPage() {
   const [componentType, setComponentType] = useState<SvgGenerationInput['componentType']>('carta_pregunta');
   const [color, setColor] = useState<SvgGenerationInput['color']>('#28a745');
-  const [title, setTitle] = useState('Pregunta de Ciencias');
-  const [content, setContent] = useState('¿Qué es la fotosíntesis?');
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
   const [icon, setIcon] = useState('❓');
 
   const [generatedSvg, setGeneratedSvg] = useState<string | null>(null);
