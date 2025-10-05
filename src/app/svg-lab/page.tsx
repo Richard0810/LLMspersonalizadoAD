@@ -23,13 +23,13 @@ const componentTypes = [
 ];
 
 const colors = [
-  { id: '#e74c3c', name: 'Rojo (Matemáticas)' },
-  { id: '#28a745', name: 'Verde (Ciencias)' },
-  { id: '#17a2b8', name: 'Azul (Lenguaje)' },
-  { id: '#ffc107', name: 'Amarillo (Historia)' },
-  { id: '#6f42c1', name: 'Morado (Geografía)' },
-  { id: '#fd7e14', name: 'Naranja (Arte)' },
-  { id: '#20c997', name: 'Menta (Deportes)' },
+  { id: '#e74c3c', name: 'Rojo' },
+  { id: '#28a745', name: 'Verde' },
+  { id: '#17a2b8', name: 'Azul' },
+  { id: '#ffc107', name: 'Amarillo' },
+  { id: '#6f42c1', name: 'Morado' },
+  { id: '#fd7e14', name: 'Naranja' },
+  { id: '#20c997', name: 'Menta' },
 ];
 
 export default function SvgLabPage() {
