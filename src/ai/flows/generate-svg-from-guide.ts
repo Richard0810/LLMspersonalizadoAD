@@ -35,30 +35,30 @@ const generateSvgFromGuideFlow = ai.defineFlow(
       3.  **Output:** You MUST return ONLY the raw SVG code as a valid XML string. Do not include any explanations, markdown, or anything else. The response must start with '<svg' and end with '</svg>'.
       4.  **Icon Generation:** If the 'icon' parameter is a simple character or emoji, embed it in a <text> element. If it's a keyword (like 'estrella', 'corazon', 'flecha'), you MUST generate a simple SVG <path> or <polygon> to represent it. The generated path/polygon should be filled with the main color and have a subtle opacity (e.g., fill-opacity="0.8").
       5.  **Templates:** Adhere strictly to the requested component template.
+      6.  **Empty Fields:** If 'Custom Title' or 'Custom Content' are empty or not provided, you MUST leave the corresponding text elements in the SVG empty. Do not use default text.
 
       **Generation Request:**
       - **Component Type:** ${input.componentType}
       - **Main Color:** ${input.color}
-      - **Custom Title:** ${input.title || 'Título por Defecto'}
-      - **Custom Content:** ${input.content || 'Contenido de ejemplo...'}
-      - **Icon/Symbol:** ${input.icon || '❓'}
+      - **Custom Title:** ${input.title || ''}
+      - **Custom Content:** ${input.content || ''}
+      - **Icon/Symbol:** ${input.icon || ''}
 
       **Templates to use:**
 
       **If Component Type is "carta_pregunta":**
       Use this template with a viewBox="0 0 200 280".
       - The main stroke and header fill color MUST be the custom color.
-      - The header text should be the custom title, capitalized.
-      - The main content area should contain the custom content.
-      - Use font-family="Arial, sans-serif".
+      - The header text should be the custom title, capitalized. If no title, leave it blank.
+      - The main content area should contain the custom content. If no content, leave it blank.
       \`\`\`xml
       <svg viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg">
         <rect x="0" y="0" width="200" height="280" fill="#fff" stroke="${input.color}" stroke-width="4" rx="15"/>
         <rect x="15" y="15" width="170" height="40" fill="${input.color}" rx="8"/>
-        <text x="100" y="40" text-anchor="middle" font-size="16" font-weight="bold" fill="white" font-family="Arial, sans-serif">${input.title?.toUpperCase() || 'PREGUNTA'}</text>
+        <text x="100" y="40" text-anchor="middle" font-size="16" font-weight="bold" fill="white" font-family="Arial, sans-serif">${input.title?.toUpperCase() || ''}</text>
         <foreignObject x="25" y="70" width="150" height="150">
           <p xmlns="http://www.w3.org/1999/xhtml" style="font-family: Arial, sans-serif; font-size: 14px; color: #333; word-wrap: break-word;">
-            ${input.content || 'Contenido de la pregunta...'}
+            ${input.content || ''}
           </p>
         </foreignObject>
         <rect x="15" y="245" width="170" height="25" fill="${input.color}" rx="5"/>
@@ -69,19 +69,21 @@ const generateSvgFromGuideFlow = ai.defineFlow(
       **If Component Type is "carta_accion":**
       Use this template with a viewBox="0 0 200 280".
       - The main stroke and header fill color MUST be the custom color.
-      - The header text should be the custom title, capitalized.
-      - For the central icon, if the icon parameter is a keyword like 'flecha', generate a path. If it's a character/emoji, embed it as text.
+      - The header text should be the custom title, capitalized. If no title, leave it blank.
+      - For the central icon, if the icon parameter is a keyword like 'flecha', generate a path. If it's a character/emoji, embed it as text. If it is empty, generate nothing in the icon area.
       \`\`\`xml
       <svg viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg">
         <rect x="0" y="0" width="200" height="280" fill="#fff" stroke="${input.color}" stroke-width="4" rx="15"/>
         <rect x="15" y="15" width="170" height="40" fill="${input.color}" rx="8"/>
-        <text x="100" y="40" text-anchor="middle" font-size="16" font-weight="bold" fill="white" font-family="Arial, sans-serif">${input.title?.toUpperCase() || 'ACCIÓN'}</text>
+        <text x="100" y="40" text-anchor="middle" font-size="16" font-weight="bold" fill="white" font-family="Arial, sans-serif">${input.title?.toUpperCase() || ''}</text>
         
-        <!-- ICON_AREA -->
+        <g transform="translate(75 70) scale(2.5)">
+            <!-- ICON_AREA -->
+        </g>
 
         <foreignObject x="25" y="170" width="150" height="100">
             <p xmlns="http://www.w3.org/1999/xhtml" style="font-family: Arial, sans-serif; font-size: 14px; color: #333; text-align: center;">
-              ${input.content || 'Realiza la acción descrita.'}
+              ${input.content || ''}
             </p>
         </foreignObject>
       </svg>
@@ -128,7 +130,7 @@ const generateSvgFromGuideFlow = ai.defineFlow(
               <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#333"/></marker>
           </defs>
           <rect x="0" y="0" width="400" height="300" fill="#f8f9fa" />
-          <text x="200" y="25" text-anchor="middle" font-size="16" font-weight="bold" font-family="Arial, sans-serif">${input.title}</text>
+          <text x="200" y="25" text-anchor="middle" font-size="16" font-weight="bold" font-family="Arial, sans-serif">${input.title || ''}</text>
 
           <ellipse cx="200" cy="70" rx="50" ry="20" fill="${input.color}" fill-opacity="0.2" stroke="${input.color}" stroke-width="2" />
           <text x="200" y="75" text-anchor="middle" font-family="Arial, sans-serif" font-size="12">Inicio</text>
@@ -148,9 +150,9 @@ const generateSvgFromGuideFlow = ai.defineFlow(
       </svg>
       \`\`\`
 
-      Now, generate the SVG code. For the "carta_accion", you MUST dynamically generate the icon. Replace the "<!-- ICON_AREA -->" comment with the generated SVG code for the icon inside a <g> tag.
-      For an emoji or character, use: <g transform="translate(100, 110)"><text text-anchor="middle" y="15" font-size="50">${input.icon}</text></g>
-      For a keyword, generate a <path> or <polygon> inside the <g> tag, for example: <g transform="translate(100, 110)"><path d="..." fill="${input.color}" fill-opacity="0.8"/></g>
+      Now, generate the SVG code. For the "carta_accion", you MUST dynamically generate the icon. Replace the "<!-- ICON_AREA -->" comment with the generated SVG code for the icon.
+      For an emoji or character, use: <text text-anchor="middle" y="15" font-size="20">${input.icon}</text>
+      For a keyword, generate a <path> or <polygon>, for example: <path d="..." fill="${input.color}" fill-opacity="0.8"/>
     `;
 
     const { text: svgCode } = await ai.generate({
