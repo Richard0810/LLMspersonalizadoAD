@@ -56,6 +56,13 @@ export default function SvgLabPage() {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
   };
 
+  const handleComponentTypeChange = (value: SvgGenerationInput['componentType']) => {
+    setComponentType(value);
+    // Reset fields when type changes to avoid confusion
+    setTitle('');
+    setContent('');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -92,7 +99,7 @@ export default function SvgLabPage() {
   };
 
   const getFileName = () => {
-    return `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'componente'}`;
+    return `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase() || componentType || 'componente'}`;
   };
   
   const performDownload = (blob: Blob, format: 'svg' | 'png' | 'jpeg') => {
@@ -126,6 +133,7 @@ export default function SvgLabPage() {
               const width = viewBoxMatch ? parseInt(viewBoxMatch[1], 10) : 200;
               const height = viewBoxMatch ? parseInt(viewBoxMatch[2], 10) : 280;
               
+              // Aumentar resolución para mejor calidad
               canvas.width = width * 2;
               canvas.height = height * 2;
               
@@ -147,6 +155,19 @@ export default function SvgLabPage() {
           });
       }
   };
+
+  const getTitlePlaceholder = () => {
+    if (componentType === 'carta_pregunta') return 'Ej: 1, 2, A, B...';
+    if (componentType === 'carta_accion') return 'Ej: Avanzar, Retroceder';
+    if (componentType === 'diagrama_flujo_simple') return 'Ej: Proceso de registro';
+    return 'Título Personalizado';
+  }
+
+  const getContentPlaceholder = () => {
+    if (componentType === 'carta_pregunta') return 'Ej: ¿Qué son los ecosistemas?';
+    if (componentType === 'carta_accion') return 'Ej: Avanza 2 casillas';
+    return 'Contenido Personalizado';
+  }
 
 
   return (
@@ -174,7 +195,7 @@ export default function SvgLabPage() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
                   <Label htmlFor="componentType">Tipo de Componente</Label>
-                  <Select value={componentType} onValueChange={(v) => setComponentType(v as any)}>
+                  <Select value={componentType} onValueChange={handleComponentTypeChange}>
                     <SelectTrigger id="componentType"><SelectValue /></SelectTrigger>
                     <SelectContent>
                       {componentTypes.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
@@ -190,14 +211,21 @@ export default function SvgLabPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                 <div className="space-y-2">
-                    <Label htmlFor="title">Título Personalizado</Label>
-                    <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ej: Avanzar, Pregunta de Ciencias" />
-                </div>
-                 <div className="space-y-2">
-                    <Label htmlFor="content">Contenido Personalizado</Label>
-                    <Input id="content" value={content} onChange={(e) => setContent(e.target.value)} placeholder="Ej: Avanza 2 casillas" />
-                </div>
+                
+                {(componentType === 'carta_pregunta' || componentType === 'carta_accion' || componentType === 'diagrama_flujo_simple') && (
+                  <div className="space-y-2">
+                      <Label htmlFor="title">Título Personalizado</Label>
+                      <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={getTitlePlaceholder()} />
+                  </div>
+                )}
+                
+                {(componentType === 'carta_pregunta' || componentType === 'carta_accion') && (
+                  <div className="space-y-2">
+                      <Label htmlFor="content">Contenido Personalizado</Label>
+                      <Input id="content" value={content} onChange={(e) => setContent(e.target.value)} placeholder={getContentPlaceholder()} />
+                  </div>
+                )}
+
                 <Button type="submit" disabled={isLoading} className="w-full text-lg py-6">
                   {isLoading ? <Loader2 className="animate-spin" /> : 'Generar SVG'}
                 </Button>

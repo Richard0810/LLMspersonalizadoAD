@@ -33,7 +33,7 @@ const generateSvgFromGuideFlow = ai.defineFlow(
       1.  **SVG Structure:** Use '<svg viewBox="0 0 width height" xmlns="http://www.w3.org/2000/svg">...</svg>'.
       2.  **Color:** The main stroke and fill color MUST be the color provided in the 'color' parameter.
       3.  **Output:** You MUST return ONLY the raw SVG code as a valid XML string. Do not include any explanations, markdown, or anything else. The response must start with '<svg' and end with '</svg>'.
-      4.  **Automatic Icon Generation:** You MUST automatically generate a simple, relevant icon based on the 'Custom Title' and 'Custom Content'. For example, if the title is 'Pregunta de Ciencias', a good icon would be a beaker (🧪) or an atom. If the title is 'Avanzar' and content is 'Avanza 3 pasos', a good icon would be three arrows or a boot with a number 3. You MUST generate this icon as a simple SVG <path> or <polygon> to represent it. The generated path/polygon should be filled with the main color and have a subtle opacity (e.g., fill-opacity="0.8"). The generated icon path must be centered within its group.
+      4.  **Automatic Icon Generation:** You MUST automatically generate a simple, relevant icon based on the 'Custom Title' and 'Custom Content'. For example, if the title is 'Pregunta de Ciencias', a good icon would be a beaker (🧪) or an atom. If the title is 'Avanzar' and content is 'Avanza 3 pasos', a good icon would be three arrows or a boot with a number 3. You MUST generate this icon as a simple SVG <path> or <polygon> to represent it. The generated path/polygon should be filled with the main color and have a subtle opacity (e.g., fill-opacity="0.8"). The generated icon path must be centered within its group. For 'carta_pregunta', the icon should almost always be a downward-pointing arrow to guide the user's eye to the question.
       5.  **Templates:** Adhere strictly to the requested component template.
       6.  **Empty Fields:** If 'Custom Title' or 'Custom Content' are empty or not provided, you MUST leave the corresponding text elements in the SVG empty. Do not use default text.
 
@@ -48,18 +48,19 @@ const generateSvgFromGuideFlow = ai.defineFlow(
       **If Component Type is "carta_pregunta":**
       Use this template with a viewBox="0 0 200 280".
       - The main stroke and header fill color MUST be the custom color.
-      - The header text should be the custom title, capitalized. If no title, leave it blank.
+      - The header text should be 'PREGUNTA' followed by the custom title. If no title, use 'PREGUNTA'.
       - The main content area should contain the custom content. If no content, leave it blank.
       \`\`\`xml
       <svg viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg">
         <rect x="0" y="0" width="200" height="280" fill="#fff" stroke="${input.color}" stroke-width="4" rx="15"/>
         <rect x="15" y="15" width="170" height="40" fill="${input.color}" rx="8"/>
-        <text x="100" y="40" text-anchor="middle" font-size="16" font-weight="bold" fill="white" font-family="Arial, sans-serif">${input.title?.toUpperCase() || ''}</text>
-        <g transform="translate(100 120) scale(2.5)">
-            <!-- ICON_AREA: Generate a centered path/polygon based on the title and content. -->
+        <text x="100" y="40" text-anchor="middle" font-size="16" font-weight="bold" fill="white" font-family="Arial, sans-serif">PREGUNTA ${input.title || ''}</text>
+        <g transform="translate(100 85) scale(2.5)">
+            <!-- ICON_AREA: Generate a centered path/polygon. For a question card, this should be a downward arrow. -->
+             <path d="M0 -5 L-5 0 L5 0 Z M0 -5 L0 5" transform="translate(0, 10)" stroke-width="3" stroke="${input.color}" fill="${input.color}" />
         </g>
-        <foreignObject x="25" y="180" width="150" height="60">
-          <p xmlns="http://www.w3.org/1999/xhtml" style="font-family: Arial, sans-serif; font-size: 14px; color: #333; word-wrap: break-word; text-align: center;">
+        <foreignObject x="25" y="140" width="150" height="80">
+          <p xmlns="http://www.w3.org/1999/xhtml" style="font-family: Arial, sans-serif; font-size: 16px; color: #333; word-wrap: break-word; text-align: center; display: flex; justify-content: center; align-items: center; height: 100%;">
             ${input.content || ''}
           </p>
         </foreignObject>
@@ -72,87 +73,33 @@ const generateSvgFromGuideFlow = ai.defineFlow(
       Use this template with a viewBox="0 0 200 280".
       - The main stroke and header fill color MUST be the custom color.
       - The header text should be the custom title, capitalized. If no title, leave it blank.
-      - For the central icon, you MUST generate a relevant SVG path/polygon based on the 'title' and 'content'.
+      - For the central icon, you MUST generate a relevant SVG path/polygon based on the 'title' and 'content' to represent the action.
       \`\`\`xml
       <svg viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg">
         <rect x="0" y="0" width="200" height="280" fill="#fff" stroke="${input.color}" stroke-width="4" rx="15"/>
         <rect x="15" y="15" width="170" height="40" fill="${input.color}" rx="8"/>
         <text x="100" y="40" text-anchor="middle" font-size="16" font-weight="bold" fill="white" font-family="Arial, sans-serif">${input.title?.toUpperCase() || ''}</text>
         
-        <g transform="translate(100 120) scale(4)">
+        <g transform="translate(100 85) scale(3)">
             <!-- ICON_AREA: Generate a centered path/polygon based on the title and content. E.g., for an arrow: <path d="M-5 -10 L0 -15 L5 -10 M0 -15 L0 5" stroke="${input.color}" stroke-width="2" fill="none"/> -->
         </g>
 
-        <text x="100" y="210" text-anchor="middle" font-size="16" font-weight="bold" fill="#333" font-family="Arial, sans-serif">
+        <text x="100" y="180" text-anchor="middle" font-size="16" font-weight="bold" fill="#333" font-family="Arial, sans-serif">
             ${input.content || ''}
         </text>
       </svg>
       \`\`\`
+
+      **If Component Type is "diagrama_generico":**
+      This is a highly creative task. You MUST generate a complete, unique SVG diagram from scratch based on the user's request.
+      - Analyze the 'Theme' (title) and 'Concepts' (content) provided.
+      - Decide the best visual representation (flowchart, cycle, simple map, etc.).
+      - Use the provided 'Style', 'Colors', 'Format', 'Detail Level', 'Text Labels', and 'Purpose' to guide the design.
+      - The SVG should be well-structured, visually appealing, and accurately represent the user's data.
+      - It MUST be a single SVG XML output.
+      - You MUST dynamically generate all shapes, lines, and text elements.
       
-      **If Component Type is "diagrama_ciclo_agua":**
-      Generate a simple water cycle diagram with a viewBox="0 0 400 300". Use the provided color for accents. Ignore custom title and content.
-       \`\`\`xml
-      <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
-          <rect x="0" y="0" width="400" height="300" fill="#e0f7fa" />
-          
-          <path d="M0 250 C 100 230, 200 260, 400 240 L 400 300 L 0 300 Z" fill="#4dd0e1" />
-          <text x="50" y="270" font-family="Arial, sans-serif" font-size="14" fill="#006064">OCÉANO</text>
-
-          <circle cx="350" cy="50" r="30" fill="#ffeb3b" />
-
-          <g id="evaporation">
-              <path d="M100,230 C 110 200, 120 180, 130 160" stroke="${input.color}" stroke-opacity="0.7" stroke-width="2" fill="none" stroke-dasharray="4 4" />
-              <path d="M120,240 C 130 210, 140 190, 150 170" stroke="${input.color}" stroke-opacity="0.7" stroke-width="2" fill="none" stroke-dasharray="4 4" />
-              <text x="70" y="200" font-family="Arial, sans-serif" font-size="12" fill="${input.color}" transform="rotate(-30, 70, 200)">Evaporación</text>
-          </g>
-          
-          <g id="condensation">
-              <ellipse cx="200" cy="100" rx="40" ry="25" fill="#fff" />
-              <ellipse cx="230" cy="95" rx="30" ry="20" fill="#fff" />
-              <text x="190" y="80" font-family="Arial, sans-serif" font-size="12" fill="${input.color}">Condensación</text>
-          </g>
-          
-          <g id="precipitation">
-              <line x1="210" y1="120" x2="205" y2="140" stroke="#2196f3" stroke-width="2" />
-              <line x1="220" y1="125" x2="215" y2="145" stroke="#2196f3" stroke-width="2" />
-              <line x1="230" y1="120" x2="225" y2="140" stroke="#2196f3" stroke-width="2" />
-              <text x="230" y="140" font-family="Arial, sans-serif" font-size="12" fill="${input.color}">Precipitación</text>
-          </g>
-
-          <polygon points="300,240 380,150 400,240" fill="#8d6e63" />
-      </svg>
-      \`\`\`
-       **If Component Type is "diagrama_flujo_simple":**
-      Generate a simple flowchart with a viewBox="0 0 400 300". Use the custom color for the shapes. Use the custom title.
-      \`\`\`xml
-       <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-              <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#333"/></marker>
-          </defs>
-          <rect x="0" y="0" width="400" height="300" fill="#f8f9fa" />
-          <text x="200" y="25" text-anchor="middle" font-size="16" font-weight="bold" font-family="Arial, sans-serif">${input.title || ''}</text>
-
-          <ellipse cx="200" cy="70" rx="50" ry="20" fill="${input.color}" fill-opacity="0.2" stroke="${input.color}" stroke-width="2" />
-          <text x="200" y="75" text-anchor="middle" font-family="Arial, sans-serif" font-size="12">Inicio</text>
-          
-          <line x1="200" y1="90" x2="200" y2="120" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
-          
-          <rect x="140" y="120" width="120" height="40" fill="${input.color}" fill-opacity="0.2" stroke="${input.color}" stroke-width="2" rx="5" />
-          <text x="200" y="145" text-anchor="middle" font-family="Arial, sans-serif" font-size="12">Primer Paso</text>
-
-          <line x1="200" y1="160" x2="200" y2="190" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
-
-          <polygon points="200,190 150,215 200,240 250,215" fill="${input.color}" fill-opacity="0.2" stroke="${input.color}" stroke-width="2" />
-          <text x="200" y="220" text-anchor="middle" font-family="Arial, sans-serif" font-size="12">¿Decisión?</text>
-
-          <ellipse cx="200" cy="270" rx="50" ry="20" fill="${input.color}" fill-opacity="0.2" stroke="${input.color}" stroke-width="2" />
-          <text x="200" y="275" text-anchor="middle" font-family="Arial, sans-serif" font-size="12">Fin</text>
-      </svg>
-      \`\`\`
-
-      Now, generate the SVG code. For the "carta_accion" and "carta_pregunta", you MUST dynamically generate the icon inside the "<!-- ICON_AREA -->" section based on the provided title and content.
-      For example, if the title is 'Avanzar', generate a path for an arrow. If it is 'Detener', generate a path for a hand or a stop sign.
-      The generated path should look like: <path d="..." fill="${input.color}" fill-opacity="0.8"/>
+      Now, generate the SVG code. For the cards, you MUST dynamically generate the icon inside the "<!-- ICON_AREA -->" section based on the provided title and content.
     `;
 
     const { text: svgCode } = await ai.generate({
