@@ -33,15 +33,15 @@ const generateSvgFromGuideFlow = ai.defineFlow(
       1.  **SVG Structure:** Use '<svg viewBox="0 0 width height" xmlns="http://www.w3.org/2000/svg">...</svg>'.
       2.  **Color:** The main stroke and fill color MUST be the color provided in the 'color' parameter.
       3.  **Output:** You MUST return ONLY the raw SVG code as a valid XML string. Do not include any explanations, markdown, or anything else. The response must start with '<svg' and end with '</svg>'.
-      4.  **Automatic Icon Generation:** You MUST automatically generate a simple, relevant icon based on the 'Custom Title' and 'Custom Content'. For example, if the title is 'Pregunta de Ciencias', a good icon would be a beaker (🧪) or an atom. If the title is 'Avanzar' and content is 'Avanza 3 pasos', a good icon would be three arrows or a boot with a number 3. You MUST generate this icon as a simple SVG <path> or <polygon> to represent it. The generated path/polygon should be filled with the main color and have a subtle opacity (e.g., fill-opacity="0.8"). The generated icon path must be centered within its group.
+      4.  **Automatic Icon Generation:** For cards, you MUST automatically generate a simple, relevant icon based on the 'title' and 'content'. For example, if the title is 'Pregunta de Ciencias', a good icon would be a beaker (🧪) or an atom. If the title is 'Avanzar' and content is 'Avanza 3 pasos', a good icon would be three arrows or a boot with a number 3. You MUST generate this icon as a simple SVG <path> or <polygon> to represent it. The generated path/polygon should be filled with the main color and have a subtle opacity (e.g., fill-opacity="0.8"). The generated icon path must be centered within its group.
       5.  **Templates:** Adhere strictly to the requested component template.
-      6.  **Empty Fields:** If 'Custom Title' or 'Custom Content' are empty or not provided, you MUST leave the corresponding text elements in the SVG empty. Do not use default text.
+      6.  **Empty Fields:** If 'title' or 'content' are empty or not provided, you MUST leave the corresponding text elements in the SVG empty. Do not use default text.
 
       **Generation Request:**
       - **Component Type:** ${input.componentType}
       - **Main Color:** ${input.color}
-      - **Custom Title:** ${input.title || ''}
-      - **Custom Content:** ${input.content || ''}
+      - **Custom Title / Tema:** ${input.title || ''}
+      - **Custom Content / Conceptos:** ${input.content || ''}
 
       **Templates to use:**
 
@@ -90,7 +90,18 @@ const generateSvgFromGuideFlow = ai.defineFlow(
       </svg>
       \`\`\`
 
-      Now, generate the SVG code. For the cards, you MUST dynamically generate the icon inside the "<!-- ICON_AREA -->" section based on the provided title and content.
+      **If Component Type is "diagrama_generico":**
+      - This is the most creative task. DO NOT use a fixed template.
+      - You MUST generate a complete, custom SVG from scratch with a viewBox="0 0 400 300".
+      - Analyze the 'Tema del Diagrama' (title) and 'Conceptos o Pasos Clave' (content).
+      - Based on the content, decide the best type of diagram (flowchart, cycle, simple map).
+      - Draw SVG shapes (<rect>, <circle>, <ellipse>, <path>) for nodes and steps.
+      - Use SVG <text> elements to label the shapes with the provided concepts/steps.
+      - Use SVG <path> or <line> elements with markers (arrows) to connect the shapes logically.
+      - The entire diagram must be visually coherent and use the provided 'Main Color'.
+      - For example, if content is "Inicio, Procesar, Decidir, Fin", create a flowchart with a start shape, two rectangles, a diamond, and an end shape, connected by arrows.
+
+      Now, generate the SVG code. For the cards, dynamically generate the icon inside "<!-- ICON_AREA -->". For the generic diagram, build the entire SVG.
     `;
 
     const { text: svgCode } = await ai.generate({
@@ -108,3 +119,5 @@ const generateSvgFromGuideFlow = ai.defineFlow(
     return { svgCode: cleanedSvgCode };
   }
 );
+
+    

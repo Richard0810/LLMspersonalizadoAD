@@ -233,8 +233,7 @@ export type GenerateVisualContentFlowOutput = GeneratedContentType;
 export const SvgComponentTypeSchema = z.enum([
     'carta_pregunta', 
     'carta_accion', 
-    'diagrama_ciclo_agua',
-    'diagrama_flujo_simple',
+    'diagrama_generico',
 ]);
 
 export const SvgGenerationInputSchema = z.object({
@@ -250,3 +249,5 @@ export const SvgGenerationOutputSchema = z.object({
 
 export type SvgGenerationInput = z.infer<typeof SvgGenerationInputSchema>;
 export type SvgGenerationOutput = z.infer<typeof SvgGenerationOutputSchema>;
+
+    

@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState } from 'react';
@@ -21,8 +20,7 @@ import { Canvg } from 'canvg';
 const componentTypes = [
   { id: 'carta_pregunta', name: 'Carta de Pregunta' },
   { id: 'carta_accion', name: 'Carta de Acción' },
-  { id: 'diagrama_ciclo_agua', name: 'Diagrama: Ciclo del Agua' },
-  { id: 'diagrama_flujo_simple', name: 'Diagrama: Flujo Simple' },
+  { id: 'diagrama_generico', name: 'Diagrama Genérico' },
 ];
 
 const colors = [
@@ -130,8 +128,8 @@ export default function SvgLabPage() {
               if (!ctx) throw new Error("No se pudo crear el contexto del canvas.");
 
               const viewBoxMatch = generatedSvg.match(/viewBox="0 0 (\d+) (\d+)"/);
-              const width = viewBoxMatch ? parseInt(viewBoxMatch[1], 10) : 200;
-              const height = viewBoxMatch ? parseInt(viewBoxMatch[2], 10) : 280;
+              const width = viewBoxMatch ? parseInt(viewBoxMatch[1], 10) : 400; // Default wider for diagrams
+              const height = viewBoxMatch ? parseInt(viewBoxMatch[2], 10) : 300;
               
               // Aumentar resolución para mejor calidad
               canvas.width = width * 2;
@@ -157,15 +155,16 @@ export default function SvgLabPage() {
   };
 
   const getTitlePlaceholder = () => {
-    if (componentType === 'carta_pregunta') return 'Ej: 1, 2, A, B...';
+    if (componentType === 'carta_pregunta') return 'Ej: Pregunta de Ciencias';
     if (componentType === 'carta_accion') return 'Ej: Avanzar, Retroceder';
-    if (componentType === 'diagrama_flujo_simple') return 'Ej: Proceso de registro';
+    if (componentType === 'diagrama_generico') return 'Ej: Tema del Diagrama';
     return 'Título Personalizado';
   }
 
   const getContentPlaceholder = () => {
     if (componentType === 'carta_pregunta') return 'Ej: ¿Qué son los ecosistemas?';
     if (componentType === 'carta_accion') return 'Ej: Avanza 2 casillas';
+    if (componentType === 'diagrama_generico') return 'Ej: Conceptos o pasos clave, separados por comas';
     return 'Contenido Personalizado';
   }
 
@@ -212,19 +211,19 @@ export default function SvgLabPage() {
                   </Select>
                 </div>
                 
-                {(componentType === 'carta_pregunta' || componentType === 'carta_accion' || componentType === 'diagrama_flujo_simple') && (
-                  <div className="space-y-2">
-                      <Label htmlFor="title">Título Personalizado</Label>
-                      <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={getTitlePlaceholder()} />
-                  </div>
-                )}
+                <div className="space-y-2">
+                    <Label htmlFor="title">
+                        {componentType === 'diagrama_generico' ? 'Tema del Diagrama' : 'Título Personalizado'}
+                    </Label>
+                    <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={getTitlePlaceholder()} />
+                </div>
                 
-                {(componentType === 'carta_pregunta' || componentType === 'carta_accion') && (
-                  <div className="space-y-2">
-                      <Label htmlFor="content">Contenido Personalizado</Label>
-                      <Input id="content" value={content} onChange={(e) => setContent(e.target.value)} placeholder={getContentPlaceholder()} />
-                  </div>
-                )}
+                <div className="space-y-2">
+                    <Label htmlFor="content">
+                        {componentType === 'diagrama_generico' ? 'Conceptos o Pasos Clave' : 'Contenido Personalizado'}
+                    </Label>
+                    <Input id="content" value={content} onChange={(e) => setContent(e.target.value)} placeholder={getContentPlaceholder()} />
+                </div>
 
                 <Button type="submit" disabled={isLoading} className="w-full text-lg py-6">
                   {isLoading ? <Loader2 className="animate-spin" /> : 'Generar SVG'}
@@ -316,3 +315,5 @@ export default function SvgLabPage() {
     </AppShell>
   );
 }
+
+    
