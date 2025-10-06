@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -20,7 +19,8 @@ import { Canvg } from 'canvg';
 const componentTypes = [
   { id: 'carta_pregunta', name: 'Carta de Pregunta' },
   { id: 'carta_accion', name: 'Carta de Acción' },
-  { id: 'diagrama_generico', name: 'Diagrama Genérico' },
+  { id: 'diagrama_ciclo_agua', name: 'Diagrama: Ciclo del Agua' },
+  { id: 'diagrama_flujo_simple', name: 'Diagrama: Flujo Simple' },
 ];
 
 const colors = [
@@ -128,8 +128,8 @@ export default function SvgLabPage() {
               if (!ctx) throw new Error("No se pudo crear el contexto del canvas.");
 
               const viewBoxMatch = generatedSvg.match(/viewBox="0 0 (\d+) (\d+)"/);
-              const width = viewBoxMatch ? parseInt(viewBoxMatch[1], 10) : 400; // Default wider for diagrams
-              const height = viewBoxMatch ? parseInt(viewBoxMatch[2], 10) : 300;
+              const width = viewBoxMatch ? parseInt(viewBoxMatch[1], 10) : 200;
+              const height = viewBoxMatch ? parseInt(viewBoxMatch[2], 10) : 280;
               
               // Aumentar resolución para mejor calidad
               canvas.width = width * 2;
@@ -155,16 +155,15 @@ export default function SvgLabPage() {
   };
 
   const getTitlePlaceholder = () => {
-    if (componentType === 'carta_pregunta') return 'Ej: Pregunta de Ciencias';
+    if (componentType === 'carta_pregunta') return 'Ej: Pregunta de Ciencias, Reto Matemático';
     if (componentType === 'carta_accion') return 'Ej: Avanzar, Retroceder';
-    if (componentType === 'diagrama_generico') return 'Ej: Tema del Diagrama';
+    if (componentType === 'diagrama_flujo_simple') return 'Ej: Proceso de registro';
     return 'Título Personalizado';
   }
 
   const getContentPlaceholder = () => {
     if (componentType === 'carta_pregunta') return 'Ej: ¿Qué son los ecosistemas?';
     if (componentType === 'carta_accion') return 'Ej: Avanza 2 casillas';
-    if (componentType === 'diagrama_generico') return 'Ej: Conceptos o pasos clave, separados por comas';
     return 'Contenido Personalizado';
   }
 
@@ -211,19 +210,19 @@ export default function SvgLabPage() {
                   </Select>
                 </div>
                 
-                <div className="space-y-2">
-                    <Label htmlFor="title">
-                        {componentType === 'diagrama_generico' ? 'Tema del Diagrama' : 'Título Personalizado'}
-                    </Label>
-                    <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={getTitlePlaceholder()} />
-                </div>
+                {(componentType === 'carta_pregunta' || componentType === 'carta_accion' || componentType === 'diagrama_flujo_simple') && (
+                  <div className="space-y-2">
+                      <Label htmlFor="title">Título Personalizado</Label>
+                      <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={getTitlePlaceholder()} />
+                  </div>
+                )}
                 
-                <div className="space-y-2">
-                    <Label htmlFor="content">
-                        {componentType === 'diagrama_generico' ? 'Conceptos o Pasos Clave' : 'Contenido Personalizado'}
-                    </Label>
-                    <Input id="content" value={content} onChange={(e) => setContent(e.target.value)} placeholder={getContentPlaceholder()} />
-                </div>
+                {(componentType === 'carta_pregunta' || componentType === 'carta_accion') && (
+                  <div className="space-y-2">
+                      <Label htmlFor="content">Contenido Personalizado</Label>
+                      <Input id="content" value={content} onChange={(e) => setContent(e.target.value)} placeholder={getContentPlaceholder()} />
+                  </div>
+                )}
 
                 <Button type="submit" disabled={isLoading} className="w-full text-lg py-6">
                   {isLoading ? <Loader2 className="animate-spin" /> : 'Generar SVG'}
@@ -251,14 +250,12 @@ export default function SvgLabPage() {
                 </Alert>
               )}
               {generatedSvg && !isLoading && (
-                <div className="w-full h-full flex flex-col">
+                <Tabs defaultValue="preview" className="w-full h-full flex flex-col">
                     <div className="flex justify-between items-center mb-2">
-                        <Tabs defaultValue="preview" className="w-full">
-                            <TabsList>
-                                <TabsTrigger value="preview"><Eye className="mr-2" />Vista Previa</TabsTrigger>
-                                <TabsTrigger value="code"><Code className="mr-2" />Código SVG</TabsTrigger>
-                            </TabsList>
-                        </Tabs>
+                        <TabsList>
+                            <TabsTrigger value="preview"><Eye className="mr-2" />Vista Previa</TabsTrigger>
+                            <TabsTrigger value="code"><Code className="mr-2" />Código SVG</TabsTrigger>
+                        </TabsList>
 
                          <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -284,23 +281,17 @@ export default function SvgLabPage() {
                         </DropdownMenu>
 
                     </div>
-                  <Tabs defaultValue="preview" className="w-full flex-grow flex flex-col">
-                      <TabsList className="hidden">
-                          <TabsTrigger value="preview">Vista Previa</TabsTrigger>
-                          <TabsTrigger value="code">Código SVG</TabsTrigger>
-                      </TabsList>
-                      <TabsContent value="preview" className="mt-4 p-4 border rounded-md bg-muted/30 flex justify-center items-center flex-grow">
-                        <div className="w-full max-w-md" dangerouslySetInnerHTML={{ __html: generatedSvg }} />
-                      </TabsContent>
-                      <TabsContent value="code" className="mt-4 flex-grow">
-                        <pre className="p-4 border rounded-md bg-gray-900 text-green-300 text-xs overflow-auto h-96">
-                          <code>
-                            {generatedSvg}
-                          </code>
-                        </pre>
-                      </TabsContent>
-                  </Tabs>
-                </div>
+                    <TabsContent value="preview" className="mt-4 p-4 border rounded-md bg-muted/30 flex justify-center items-center flex-grow">
+                      <div className="w-full max-w-md" dangerouslySetInnerHTML={{ __html: generatedSvg }} />
+                    </TabsContent>
+                    <TabsContent value="code" className="mt-4 flex-grow">
+                      <pre className="p-4 border rounded-md bg-gray-900 text-green-300 text-xs overflow-auto h-96">
+                        <code>
+                          {generatedSvg}
+                        </code>
+                      </pre>
+                    </TabsContent>
+                </Tabs>
               )}
                {!generatedSvg && !isLoading && !error && (
                   <div className="flex flex-col justify-center items-center h-full text-center text-muted-foreground border-2 border-dashed rounded-lg">
@@ -315,5 +306,3 @@ export default function SvgLabPage() {
     </AppShell>
   );
 }
-
-    
