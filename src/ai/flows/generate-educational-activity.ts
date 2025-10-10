@@ -1,4 +1,3 @@
-
 'use server';
 
 /**
@@ -113,5 +112,3 @@ const generateEducationalActivitiesFlow = ai.defineFlow(
     return output!;
   }
 );
-
-    

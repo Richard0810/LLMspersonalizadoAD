@@ -29,23 +29,19 @@ const ActivityResourcesInputSchema = z.object({
  */
 async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: string, altText: string } | null> {
     const fullPrompt = `Educational illustration, simple, clean, minimalist, whiteboard drawing style for a teacher's guide: ${prompt}`;
-    
+    const altText = `Guía visual para: ${prompt.substring(0, 100)}`; // Simple and reliable alt text
+
     try {
-        // @ts-ignore - This is added to bypass the type check in Vercel build
         const { media } = await ai.generate({
             model: 'googleai/gemini-2.0-flash-exp',
             prompt: fullPrompt,
             config: {
-                responseModalities: ['TEXT', 'IMAGE'],
+                responseModalities: ['TEXT', 'IMAGE'], // CRITICAL: This is required to get an image
             },
         });
         
         if (media && media.url) {
-            const { text: altText } = await ai.generate({
-                model: 'googleai/gemini-2.0-flash',
-                prompt: `Genera un texto alternativo (alt text) conciso para una imagen que muestra lo siguiente: "${prompt}". El alt text debe ser descriptivo y no exceder los 150 caracteres.`,
-            });
-            return { imageUrl: media.url, altText: altText || `Guía visual para: ${prompt.substring(0, 100)}` };
+            return { imageUrl: media.url, altText };
         }
         
         console.warn(`AI generation did not return a valid image media object for prompt: "${prompt}"`);
@@ -165,3 +161,4 @@ const generateActivityVisualsFlow = ai.defineFlow(
 );
  
     
+
