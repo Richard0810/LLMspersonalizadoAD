@@ -8,3 +8,4 @@ import '@/ai/flows/generate-visual-content.ts';
 import '@/ai/flows/generate-activity-document.ts';
 import '@/ai/flows/generate-activity-visuals.ts';
 import '@/ai/flows/generate-svg-code.ts';
+

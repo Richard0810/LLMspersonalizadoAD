@@ -82,7 +82,8 @@ export interface VisualItem {
 export enum VisualCategory {
   IMAGE_GENERATION = "image_generation",
   INFO_ORGANIZATION = "info_organization",
-  CONCEPT_ILLUSTRATION = "concept_illustration"
+  CONCEPT_ILLUSTRATION = "concept_illustration",
+  SVG_COMPONENT = "svg_component"
 }
 
 export enum VisualFormat {
@@ -101,6 +102,11 @@ export enum VisualFormat {
   // Concept Illustration
   PHOTO_REALISTIC = "photo_realistic",
   ILLUSTRATION_CONCEPT = "illustration_concept",
+  
+  // SVG Component
+  SVG_CARTA_PREGUNTA = "svg_carta_pregunta",
+  SVG_CARTA_ACCION = "svg_carta_accion",
+  SVG_TABLA_PERSONALIZADA = "svg_tabla_personalizada",
 }
 
 // Input parameter types
@@ -134,11 +140,23 @@ export interface ConceptIllustParams {
   specificElements?: string;
 }
 
+export const SvgGenerationInputSchema = z.object({
+  componentType: z.nativeEnum(VisualFormat),
+  color: z.string(),
+  title: z.string().optional(),
+  content: z.string().optional(),
+  numRows: z.number().optional(),
+  numCols: z.number().optional(),
+  headers: z.string().optional(),
+});
+export type SvgGenerationInput = z.infer<typeof SvgGenerationInputSchema>;
+
+
 export interface GenerateVisualContentFlowInput {
   category: VisualCategory;
   format: VisualFormat;
   translatedFormatName: string;
-  params: ImageGenerationParams | InfoOrgParams | ConceptIllustParams;
+  params: ImageGenerationParams | InfoOrgParams | ConceptIllustParams | SvgGenerationInput;
   isPreview?: boolean;
 }
 
@@ -153,6 +171,11 @@ export interface GeneratedHtmlType {
   type: 'html';
   content: string;
   title?: string;
+}
+
+export interface GeneratedSvgType {
+    type: 'svg';
+    svgCode: string;
 }
 
 export interface GeneratedConceptMapDataType {
@@ -223,21 +246,11 @@ export type GeneratedContentType =
   | GeneratedFlowchartDataType
   | GeneratedVennDiagramDataType
   | GeneratedComparisonTableDataType
-  | GeneratedTimelineDataType;
+  | GeneratedTimelineDataType
+  | GeneratedSvgType;
 
 export type GenerateVisualContentFlowOutput = GeneratedContentType;
 
-// SVG Lab Types
-export const SvgGenerationInputSchema = z.object({
-  componentType: z.enum(['carta_pregunta', 'carta_accion', 'tabla_personalizada']),
-  color: z.string(),
-  title: z.string().optional(),
-  content: z.string().optional(),
-  numRows: z.number().optional(),
-  numCols: z.number().optional(),
-  headers: z.string().optional(),
-});
-export type SvgGenerationInput = z.infer<typeof SvgGenerationInputSchema>;
 
 export const SvgGenerationOutputSchema = z.object({
   svgCode: z.string(),
