@@ -34,7 +34,8 @@ const colors = [
 
 export default function SvgLabPage() {
   const [componentType, setComponentType] = useState<SvgGenerationInput['componentType']>('carta_pregunta');
-  const [color, setColor] = useState<SvgGenerationInput['color']>('#28a745');
+  const [selectedColor, setSelectedColor] = useState<string>('#28a745');
+  const [customColor, setCustomColor] = useState<string>('#28a745');
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [numRows, setNumRows] = useState(3);
@@ -47,6 +48,8 @@ export default function SvgLabPage() {
   const [fileSize, setFileSize] = useState<string>('0 Bytes');
   const { toast } = useToast();
   
+  const finalColor = selectedColor === 'custom' ? customColor : selectedColor;
+
   const formatBytes = (bytes: number, decimals = 2) => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
@@ -73,7 +76,7 @@ export default function SvgLabPage() {
 
     const input: SvgGenerationInput = {
       componentType,
-      color,
+      color: finalColor,
       title,
       content,
       numRows: componentType === 'tabla_personalizada' ? numRows : undefined,
@@ -206,14 +209,45 @@ export default function SvgLabPage() {
                     </SelectContent>
                   </Select>
                 </div>
+                
                 <div className="space-y-2">
                   <Label htmlFor="color">Color Principal</Label>
-                  <Select value={color} onValueChange={(v) => setColor(v as any)}>
-                    <SelectTrigger id="color"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {colors.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
+                  <div className="flex gap-2">
+                    <Select value={selectedColor} onValueChange={setSelectedColor}>
+                      <SelectTrigger id="color">
+                        <SelectValue>
+                            <div className="flex items-center gap-2">
+                                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: finalColor }} />
+                                {selectedColor === 'custom' ? 'Personalizado' : colors.find(c => c.id === selectedColor)?.name}
+                            </div>
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {colors.map(c => (
+                          <SelectItem key={c.id} value={c.id}>
+                            <div className="flex items-center gap-2">
+                                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: c.id }} />
+                                {c.name}
+                            </div>
+                          </SelectItem>
+                        ))}
+                         <SelectItem value="custom">
+                            <div className="flex items-center gap-2">
+                                <div className="w-4 h-4 rounded-full bg-gradient-to-r from-red-500 via-green-500 to-blue-500" />
+                                Personalizado...
+                            </div>
+                         </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {selectedColor === 'custom' && (
+                       <Input 
+                         type="color" 
+                         value={customColor}
+                         onChange={(e) => setCustomColor(e.target.value)}
+                         className="p-1 h-10 w-16"
+                       />
+                    )}
+                  </div>
                 </div>
                 
                 <div className="space-y-2">
@@ -297,7 +331,7 @@ export default function SvgLabPage() {
 
                     </div>
                     <TabsContent value="preview" className="mt-4 p-4 border rounded-md bg-muted/30 flex justify-center items-center flex-grow">
-                      <div className="w-full max-w-md" style={{ color: color }} dangerouslySetInnerHTML={{ __html: generatedSvg }} />
+                      <div className="w-full max-w-md" style={{ color: finalColor }} dangerouslySetInnerHTML={{ __html: generatedSvg }} />
                     </TabsContent>
                     <TabsContent value="code" className="mt-4 flex-grow">
                       <pre className="p-4 border rounded-md bg-gray-900 text-green-300 text-xs overflow-auto h-96">
