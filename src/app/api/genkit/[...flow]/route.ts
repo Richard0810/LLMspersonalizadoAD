@@ -7,11 +7,6 @@
  */
 
 import { createNextApiHandler } from '@genkit-ai/next';
-import '@/ai/flows/consult-ai-on-lesson';
-import '@/ai/flows/generate-educational-activity';
-import '@/ai/flows/generate-visual-content';
-import '@/ai/flows/generate-activity-document';
-import '@/ai/flows/generate-activity-visuals';
-import '@/ai/flows/generate-svg-code';
+import '@/ai/dev';
 
 export const { GET, POST } = createNextApiHandler();
