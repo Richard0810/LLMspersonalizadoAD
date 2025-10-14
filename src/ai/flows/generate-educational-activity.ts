@@ -53,10 +53,10 @@ const generateEducationalActivitiesPrompt = ai.definePrompt({
   model: 'googleai/gemini-2.0-flash',
   input: {schema: PromptInputSchema},
   output: {schema: GenerateEducationalActivitiesOutputSchema},
-  prompt: `Rol: Eres un diseñador instruccional experto y un asesor pedagógico especializado en pensamiento computacional para el contexto educativo de Colombia. Tu enfoque debe ser en la creatividad con materiales de bajo costo y fácil acceso (papel, lápices, cartulina, tijeras, etc.), evitando la dependencia de recursos digitales o impresiones complejas.
+  prompt: `Rol: Eres un diseñador instruccional experto, un genio de la gamificación y un asesor pedagógico especializado en pensamiento computacional para el contexto educativo de Colombia. Tu superpoder es la creatividad con materiales de bajo costo y fácil acceso (papel, cartulina, lápices, tijeras, tapas de botella, piedras, etc.). Tu misión es transformar conceptos abstractos en artefactos físicos y juegos de mesa tangibles.
 Tarea: Tu misión es diseñar tres actividades desconectadas tan completas y detalladas que un docente, incluso sin experiencia previa en el tema, pueda implementarlas en su aula de manera exitosa y sin esfuerzo. Cada actividad debe ser un recurso educativo "llave en mano".
 Audiencia: Docentes de tecnología e informática en Colombia, especialmente aquellos en contextos rurales o con baja conectividad.
-Tono: Didáctico, claro, práctico, motivador y adaptable por los docentes.
+Tono: Didáctico, claro, práctico, lúdico, motivador y adaptable por los docentes.
 
 **Instrucción Principal:**
 Genera tres actividades desconectadas distintas y muy detalladas, basadas en la siguiente información. **Todo el contenido debe estar en español.**
@@ -73,7 +73,7 @@ Genera tres actividades desconectadas distintas y muy detalladas, basadas en la 
 
 **Formato de Salida Requerido para cada actividad (Debes ser MUY RIGUROSO con esta estructura):**
 Asegúrate de que cada actividad generada cumpla estrictamente con lo siguiente:
-- **title:** Un nombre creativo y descriptivo para la actividad.
+- **title:** Un nombre creativo, lúdico y descriptivo para la actividad.
 - **objective:** Un objetivo de aprendizaje claro, medible y específico, que esté en coherencia con los lineamientos del Ministerio de Educación Nacional (MEN) de Colombia para el grado especificado.
 - **computationalConcept:** Menciona explícitamente el concepto o conceptos de pensamiento computacional que se trabajan (Descomposición, Abstracción, Algoritmos, Reconocimiento de patrones, etc.).
 - **materials:** Una lista de materiales simples y accesibles (no electrónicos), descritos con suficiente detalle. **Cada material debe estar en una nueva línea.**
@@ -85,7 +85,7 @@ Asegúrate de que cada actividad generada cumpla estrictamente con lo siguiente:
     - **Gestión del tiempo:** Ofrece una estimación de tiempo para cada bloque de la actividad.
     - **Ejemplos prácticos:** Incluye ejemplos concretos que el docente pueda usar o dibujar en el tablero.
     - **Cada paso numerado debe estar en una nueva línea.**
-- **activityResources:** Describe de manera exhaustiva y como una lista los recursos específicos y tangibles que el docente debe crear o dibujar. No des ejemplos, proporciona el contenido final. Para tablas, define las columnas y filas exactas. Para tarjetas de acción, describe cada una: su título, acción (ej: 'Avanzar'), descripción y un símbolo sugerido. **Cada recurso debe estar en una nueva línea.**
+- **activityResources:** ¡Aquí es donde tu creatividad brilla! Describe de manera exhaustiva y como una lista los recursos específicos y tangibles que el docente debe crear o dibujar. **Piensa más allá de las 'tarjetas'**. Tu prioridad es inventar elementos interactivos como **tableros de juego, diales con flechas, fichas personalizadas, modelos de papel para armar, semáforos de cartulina, o cualquier otro artefacto físico** que haga la actividad más memorable. Si propones tarjetas, deben ser muy justificadas. Describe el contenido final de cada recurso, no des ejemplos. Para tablas, define columnas y filas. **Cada recurso debe estar en una nueva línea.**
 - **reflectionQuestion:** El contenido debe tener dos partes. Primero, una explicación detallada y clara que demuestre cómo la actividad evidencia el concepto de pensamiento computacional, conectando las acciones específicas del ejercicio con la teoría. Segundo, a continuación de la explicación, debe incluir preguntas para guiar la reflexión y la metacognición de los estudiantes. **Cada pregunta debe estar en una nueva línea y comenzar con un guion (-).**
 - **evaluationCriteria:** Describe las evidencias de aprendizaje o los criterios que el docente puede observar para evaluar si los estudiantes alcanzaron el objetivo. **Cada criterio debe estar en una nueva línea.**
 
