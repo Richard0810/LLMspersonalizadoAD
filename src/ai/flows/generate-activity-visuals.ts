@@ -32,7 +32,6 @@ async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: stri
     const altText = `Guía visual para: ${prompt.substring(0, 100)}`; // Simple and reliable alt text
 
     try {
-        // @ts-ignore - This is added to bypass the type check in Vercel build
         const { media } = await ai.generate({
             model: 'googleai/gemini-2.0-flash-exp',
             prompt: fullPrompt,
@@ -56,7 +55,8 @@ async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: stri
 
 
 export async function generateActivityVisuals(input: string): Promise<VisualItem[]> {
-  return generateActivityVisualsFlow({ resources: input });
+  // We use ai.run() to avoid importing the flow directly, which can cause bundling issues in Next.js
+  return await ai.run('generateActivityVisualsFlow', { resources: input });
 }
 
 
@@ -116,7 +116,7 @@ Analyze the following activity resources and provide the output in the required 
 `
 });
 
-const generateActivityVisualsFlow = ai.defineFlow(
+ai.defineFlow(
   {
     name: 'generateActivityVisualsFlow',
     inputSchema: ActivityResourcesInputSchema,
@@ -154,7 +154,5 @@ const generateActivityVisualsFlow = ai.defineFlow(
     return finalVisualItems;
   }
 );
- 
-    
 
-  
+    
