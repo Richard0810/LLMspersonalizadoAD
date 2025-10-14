@@ -14,8 +14,10 @@ import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { generateActivityVisuals } from '@/ai/flows/generate-activity-visuals';
 import { generateActivityDocument } from '@/ai/flows/generate-activity-document';
+import { generateVisualsDocument } from '@/ai/flows/generate-visuals-document';
 import Image from 'next/image';
 import WordIcon from '@/components/icons/WordIcon';
+import { saveAs } from 'file-saver';
 
 const createMarkup = (text: string) => {
     if (!text) return { __html: '' };
@@ -118,6 +120,7 @@ export default function ActivityDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isGeneratingContent, setIsGeneratingContent] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isDownloadingVisuals, setIsDownloadingVisuals] = useState(false);
   const [generatedVisuals, setGeneratedVisuals] = useState<VisualItem[] | null>(null);
   const activityId = Array.isArray(params.id) ? params.id[0] : params.id as string;
 
@@ -192,15 +195,8 @@ export default function ActivityDetailPage() {
         const byteArray = new Uint8Array(byteNumbers);
         const blob = new Blob([byteArray], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
 
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
         const fileName = `${activity.title.replace(/[^a-zA-Z0-9_ ]/g, '') || 'Actividad'}.docx`;
-        link.download = fileName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
+        saveAs(blob, fileName);
 
         toast({
             title: "¡Descarga Exitosa!",
@@ -216,6 +212,48 @@ export default function ActivityDetailPage() {
         });
     } finally {
         setIsDownloading(false);
+    }
+  };
+
+  const handleDownloadVisuals = async () => {
+    if (!generatedVisuals) return;
+    setIsDownloadingVisuals(true);
+    toast({
+        title: "Preparando Descarga...",
+        description: "El documento de Word para los apoyos visuales se está generando. Esto puede tardar.",
+    });
+
+    try {
+        const result = await generateVisualsDocument(generatedVisuals);
+        
+        if (!result.docxBase64) {
+            throw new Error("El servidor no devolvió un archivo para los visuales.");
+        }
+
+        const byteCharacters = atob(result.docxBase64);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+
+        const fileName = `${activity?.title.replace(/[^a-zA-Z0-9_ ]/g, '') || 'Recursos'}_Apoyo_Visual.docx`;
+        saveAs(blob, fileName);
+
+        toast({
+            title: "¡Descarga Exitosa!",
+            description: `Se ha descargado "${fileName}".`,
+        });
+    } catch (error) {
+        console.error("Error al descargar el documento de visuales:", error);
+        toast({
+            title: "Error de Descarga",
+            description: `No se pudo generar el documento de apoyos visuales. ${error instanceof Error ? error.message : 'Error desconocido.'}`,
+            variant: "destructive",
+        });
+    } finally {
+        setIsDownloadingVisuals(false);
     }
   };
 
@@ -352,7 +390,7 @@ export default function ActivityDetailPage() {
               {isGeneratingContent ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Sparkles className="mr-2 h-5 w-5" />}
               {isGeneratingContent ? 'Generando...' : 'Crear Apoyo Visual'}
             </Button>
-            <Button onClick={handleDownload} disabled={isDownloading || isGeneratingContent} variant="secondary" className="text-lg py-3 px-6 text-primary hover:text-primary/90">
+            <Button onClick={handleDownload} disabled={isDownloading || isGeneratingContent || isDownloadingVisuals} variant="secondary" className="text-lg py-3 px-6 text-primary hover:text-primary/90">
               {isDownloading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <WordIcon className="mr-2 h-5 w-5" />}
               {isDownloading ? 'Generando DOCX...' : 'Descargar (DOCX)'}
             </Button>
@@ -379,7 +417,7 @@ export default function ActivityDetailPage() {
         {generatedVisuals && generatedVisuals.length > 0 && !isGeneratingContent && (
           <Card className="w-full shadow-2xl mt-8 animate-fade-in">
             <CardHeader>
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-start flex-wrap gap-4">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-primary/20 rounded-full">
                             <Wand2 className="h-8 w-8 text-primary" />
@@ -387,14 +425,25 @@ export default function ActivityDetailPage() {
                         <div>
                             <CardTitle className="text-2xl font-headline text-primary">Recursos para la Actividad (Contenido Visual)</CardTitle>
                             <CardDescription>
-                                Estos son los apoyos visuales generados por IA para los recursos de tu actividad.
+                                Estos son los apoyos visuales generados por IA para tu actividad.
                             </CardDescription>
                         </div>
                     </div>
-                    <Button variant="ghost" size="icon" onClick={handleDeleteVisualContent} className="text-muted-foreground hover:text-destructive hover:bg-destructive/10">
-                        <Trash2 className="h-5 w-5" />
-                        <span className="sr-only">Eliminar contenido visual</span>
-                    </Button>
+                    <div className="flex items-center gap-2">
+                         <Button 
+                            onClick={handleDownloadVisuals} 
+                            disabled={isDownloadingVisuals || isDownloading} 
+                            variant="secondary" 
+                            className="text-primary hover:text-primary/90"
+                          >
+                            {isDownloadingVisuals ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <WordIcon className="mr-2 h-5 w-5" />}
+                            {isDownloadingVisuals ? 'Generando...' : 'Descargar Apoyo Visual (DOCX)'}
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={handleDeleteVisualContent} className="text-muted-foreground hover:text-destructive hover:bg-destructive/10">
+                            <Trash2 className="h-5 w-5" />
+                            <span className="sr-only">Eliminar contenido visual</span>
+                        </Button>
+                    </div>
                 </div>
             </CardHeader>
             <CardContent className="space-y-6">

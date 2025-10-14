@@ -83,7 +83,6 @@ export enum VisualCategory {
   IMAGE_GENERATION = "image_generation",
   INFO_ORGANIZATION = "info_organization",
   CONCEPT_ILLUSTRATION = "concept_illustration",
-  SVG_COMPONENT = "svg_component"
 }
 
 export enum VisualFormat {
@@ -102,11 +101,6 @@ export enum VisualFormat {
   // Concept Illustration
   PHOTO_REALISTIC = "photo_realistic",
   ILLUSTRATION_CONCEPT = "illustration_concept",
-  
-  // SVG Component
-  SVG_CARTA_PREGUNTA = "svg_carta_pregunta",
-  SVG_CARTA_ACCION = "svg_carta_accion",
-  SVG_TABLA_PERSONALIZADA = "svg_tabla_personalizada",
 }
 
 // Input parameter types
@@ -141,7 +135,7 @@ export interface ConceptIllustParams {
 }
 
 export const SvgGenerationInputSchema = z.object({
-  componentType: z.nativeEnum(VisualFormat),
+  componentType: z.enum(['svg_carta_pregunta', 'svg_carta_accion', 'svg_tabla_personalizada']),
   color: z.string(),
   title: z.string().optional(),
   content: z.string().optional(),
