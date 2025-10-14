@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { AppShell } from '@/components/layout/AppShell';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, AlertCircle, Beaker, Code, Eye } from 'lucide-react';
+import { Loader2, AlertCircle, Beaker, Code, Eye, Palette } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { generateSvgAction } from './actions';
 import type { SvgGenerationInput } from '@/types';
@@ -34,8 +34,7 @@ const colors = [
 
 export default function SvgLabPage() {
   const [componentType, setComponentType] = useState<SvgGenerationInput['componentType']>('carta_pregunta');
-  const [selectedColor, setSelectedColor] = useState<string>('#28a745');
-  const [customColor, setCustomColor] = useState<string>('#28a745');
+  const [color, setColor] = useState<string>('#28a745');
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [numRows, setNumRows] = useState(3);
@@ -48,7 +47,7 @@ export default function SvgLabPage() {
   const [fileSize, setFileSize] = useState<string>('0 Bytes');
   const { toast } = useToast();
   
-  const finalColor = selectedColor === 'custom' ? customColor : selectedColor;
+  const customColorInputRef = useRef<HTMLInputElement>(null);
 
   const formatBytes = (bytes: number, decimals = 2) => {
     if (bytes === 0) return '0 Bytes';
@@ -76,7 +75,7 @@ export default function SvgLabPage() {
 
     const input: SvgGenerationInput = {
       componentType,
-      color: finalColor,
+      color,
       title,
       content,
       numRows: componentType === 'tabla_personalizada' ? numRows : undefined,
@@ -176,7 +175,6 @@ export default function SvgLabPage() {
     return 'Contenido Personalizado';
   }
 
-
   return (
     <AppShell>
       <div className="container mx-auto py-8 animate-fade-in">
@@ -213,12 +211,12 @@ export default function SvgLabPage() {
                 <div className="space-y-2">
                   <Label htmlFor="color">Color Principal</Label>
                   <div className="flex gap-2">
-                    <Select value={selectedColor} onValueChange={setSelectedColor}>
+                    <Select value={color} onValueChange={setColor}>
                       <SelectTrigger id="color">
                         <SelectValue>
                             <div className="flex items-center gap-2">
-                                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: finalColor }} />
-                                {selectedColor === 'custom' ? 'Personalizado' : colors.find(c => c.id === selectedColor)?.name}
+                                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: color }} />
+                                {colors.find(c => c.id === color)?.name || 'Personalizado'}
                             </div>
                         </SelectValue>
                       </SelectTrigger>
@@ -231,22 +229,25 @@ export default function SvgLabPage() {
                             </div>
                           </SelectItem>
                         ))}
-                         <SelectItem value="custom">
-                            <div className="flex items-center gap-2">
-                                <div className="w-4 h-4 rounded-full bg-gradient-to-r from-red-500 via-green-500 to-blue-500" />
-                                Personalizado...
-                            </div>
-                         </SelectItem>
                       </SelectContent>
                     </Select>
-                    {selectedColor === 'custom' && (
-                       <Input 
-                         type="color" 
-                         value={customColor}
-                         onChange={(e) => setCustomColor(e.target.value)}
-                         className="p-1 h-10 w-16"
-                       />
-                    )}
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={() => customColorInputRef.current?.click()}
+                      className="p-2 h-10 w-16"
+                    >
+                      <Palette className="h-5 w-5" />
+                    </Button>
+                    <Input 
+                      ref={customColorInputRef}
+                      type="color" 
+                      value={color}
+                      onChange={(e) => setColor(e.target.value)}
+                      className="absolute -z-10 opacity-0"
+                      aria-hidden="true"
+                      tabIndex={-1}
+                    />
                   </div>
                 </div>
                 
@@ -280,7 +281,6 @@ export default function SvgLabPage() {
                        </div>
                    </div>
                 )}
-
 
                 <Button type="submit" disabled={isLoading} className="w-full text-lg py-6">
                   {isLoading ? <Loader2 className="animate-spin" /> : 'Generar SVG'}
@@ -331,7 +331,7 @@ export default function SvgLabPage() {
 
                     </div>
                     <TabsContent value="preview" className="mt-4 p-4 border rounded-md bg-muted/30 flex justify-center items-center flex-grow">
-                      <div className="w-full max-w-md" style={{ color: finalColor }} dangerouslySetInnerHTML={{ __html: generatedSvg }} />
+                      <div className="w-full max-w-md" style={{ color: color }} dangerouslySetInnerHTML={{ __html: generatedSvg }} />
                     </TabsContent>
                     <TabsContent value="code" className="mt-4 flex-grow">
                       <pre className="p-4 border rounded-md bg-gray-900 text-green-300 text-xs overflow-auto h-96">
