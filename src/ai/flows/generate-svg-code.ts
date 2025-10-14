@@ -30,11 +30,12 @@ const generateSvgFromGuideFlow = ai.defineFlow(
       
       **Guide Rules:**
       1.  **SVG Structure:** Use '<svg viewBox="0 0 width height" xmlns="http://www.w3.org/2000/svg">...</svg>'.
-      2.  **Color:** The main stroke and fill color MUST be the color provided in the 'color' parameter.
+      2.  **Color:** The main stroke and header fill color MUST be the color provided in the 'color' parameter.
       3.  **Output:** You MUST return ONLY the raw SVG code as a valid XML string. Do not include any explanations, markdown, or anything else. The response must start with '<svg' and end with '</svg>'.
       4.  **Automatic Icon Generation:** For cards, you MUST automatically generate a simple, relevant icon based on the 'title' and 'content'. For example, if the title is 'Pregunta de Ciencias', a good icon would be a beaker (🧪) or an atom. If the title is 'Avanzar' and content is 'Avanza 3 pasos', a good icon would be three arrows or a boot with a number 3. You MUST generate this icon as a simple SVG <path> or <polygon> to represent it. The generated path/polygon should be filled with the main color and have a subtle opacity (e.g., fill-opacity="0.8"). The generated icon path must be centered within its group.
       5.  **Templates:** Adhere strictly to the requested component template.
       6.  **Empty Fields:** If 'title' or 'content' are empty or not provided, you MUST leave the corresponding text elements in the SVG empty. Do not use default text.
+      7.  **Multi-line Text (CRITICAL):** The <foreignObject> tag is NOT allowed. For the main content text element, if the text is long, you MUST simulate line breaks by using multiple <tspan> elements inside the <text> tag. Each <tspan> should have an x="100" and a 'dy' attribute (e.g., dy="1.2em") to create the line spacing.
 
       **Generation Request:**
       - **Component Type:** ${input.componentType}
@@ -48,22 +49,20 @@ const generateSvgFromGuideFlow = ai.defineFlow(
       Use this template with a viewBox="0 0 200 280".
       - The main stroke and header fill color MUST be the custom color.
       - The header text should be the custom title, capitalized. If no title, leave it blank.
-      - The main content area should contain the custom content. If no content, leave it blank.
+      - The main content area must use <text> and <tspan> for wrapping, not <foreignObject>.
       \`\`\`xml
       <svg viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg">
         <rect x="0" y="0" width="200" height="280" fill="#fff" stroke="${input.color}" stroke-width="4" rx="15"/>
         <rect x="15" y="15" width="170" height="40" fill="${input.color}" rx="8"/>
-        <text x="100" y="40" text-anchor="middle" font-size="16" font-weight="bold" fill="white" font-family="Arial, sans-serif">${input.title?.toUpperCase() || ''}</text>
+        <text x="100" y="40" text-anchor="middle" dominant-baseline="middle" font-size="16" font-weight="bold" fill="white" font-family="Arial, sans-serif">${input.title?.toUpperCase() || ''}</text>
         <g transform="translate(100 85) scale(2.5)">
             <!-- ICON_AREA: Generate a centered path/polygon based on the title and content. For a question card, this could be a question mark, a magnifying glass, or something related to the subject. -->
         </g>
-        <foreignObject x="25" y="140" width="150" height="80">
-          <p xmlns="http://www.w3.org/1999/xhtml" style="font-family: Arial, sans-serif; font-size: 16px; color: #333; word-wrap: break-word; text-align: center; display: flex; justify-content: center; align-items: center; height: 100%;">
-            ${input.content || ''}
-          </p>
-        </foreignObject>
+        <text x="100" y="155" text-anchor="middle" font-family="Arial, sans-serif" font-size="16px" fill="#333">
+            <!-- CONTENT_AREA: Use <tspan x="100" dy="1.2em"> for each line of wrapped text. -->
+        </text>
         <rect x="15" y="245" width="170" height="25" fill="${input.color}" rx="5"/>
-        <text x="100" y="262" text-anchor="middle" font-size="12" font-weight="bold" fill="white" font-family="Arial, sans-serif">Respuesta</text>
+        <text x="100" y="262" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="bold" fill="white" font-family="Arial, sans-serif">Respuesta</text>
       </svg>
       \`\`\`
 
@@ -76,14 +75,14 @@ const generateSvgFromGuideFlow = ai.defineFlow(
       <svg viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg">
         <rect x="0" y="0" width="200" height="280" fill="#fff" stroke="${input.color}" stroke-width="4" rx="15"/>
         <rect x="15" y="15" width="170" height="40" fill="${input.color}" rx="8"/>
-        <text x="100" y="40" text-anchor="middle" font-size="16" font-weight="bold" fill="white" font-family="Arial, sans-serif">${input.title?.toUpperCase() || ''}</text>
+        <text x="100" y="40" text-anchor="middle" dominant-baseline="middle" font-size="16" font-weight="bold" fill="white" font-family="Arial, sans-serif">${input.title?.toUpperCase() || ''}</text>
         
-        <g transform="translate(100 85) scale(3)">
+        <g transform="translate(100 100) scale(3)">
             <!-- ICON_AREA: Generate a centered path/polygon based on the title and content. E.g., for an arrow: <path d="M-5 -10 L0 -15 L5 -10 M0 -15 L0 5" stroke="${input.color}" stroke-width="2" fill="none"/> -->
         </g>
 
-        <text x="100" y="180" text-anchor="middle" font-size="16" font-weight="bold" fill="#333" font-family="Arial, sans-serif">
-            ${input.content || ''}
+        <text x="100" y="180" text-anchor="middle" font-family="Arial, sans-serif" font-size="16px" fill="#333">
+            <!-- CONTENT_AREA: Use <tspan x="100" dy="1.2em"> for each line of wrapped text. -->
         </text>
       </svg>
       \`\`\`
@@ -99,11 +98,12 @@ const generateSvgFromGuideFlow = ai.defineFlow(
       - The entire diagram must be visually coherent and use the provided 'Main Color'.
       - For example, if content is "Inicio, Procesar, Decidir, Fin", create a flowchart with a start shape, two rectangles, a diamond, and an end shape, connected by arrows.
 
-      Now, generate the SVG code. For the cards, dynamically generate the icon inside "<!-- ICON_AREA -->". For the generic diagram, build the entire SVG.
+      Now, generate the SVG code. For the cards, dynamically generate the icon inside "<!-- ICON_AREA -->" and the content inside "<!-- CONTENT_AREA -->". For the generic diagram, build the entire SVG.
     `;
 
+    // A call to the model to generate the SVG code. Note: the actual implementation might vary.
     const { text: svgCode } = await ai.generate({
-      model: 'googleai/gemini-2.0-flash',
+      model: 'googleai/gemini-2.0-flash', // Example model
       prompt,
     });
     
@@ -112,8 +112,40 @@ const generateSvgFromGuideFlow = ai.defineFlow(
     }
     
     // Clean the output to ensure it's only the SVG code
+    // The model sometimes wraps the output in ```xml ... ```, so we remove it.
     const cleanedSvgCode = svgCode.replace(/```xml|```/g, '').trim();
 
-    return { svgCode: cleanedSvgCode };
+    // Now, we need to populate the content into the template.
+    // This is a simplified approach; a more robust solution might involve parsing the XML.
+    
+    let finalSvg = cleanedSvgCode;
+
+    if (input.componentType === 'carta_pregunta' || input.componentType === 'carta_accion') {
+        const contentLines = (input.content || '').split(' ');
+        let tspans = '';
+        let currentLine = '';
+        
+        for (const word of contentLines) {
+            if ((currentLine + word).length > 20) { // Simple line break logic
+                tspans += `<tspan x="100" dy="1.2em">${currentLine}</tspan>`;
+                currentLine = word + ' ';
+            } else {
+                currentLine += word + ' ';
+            }
+        }
+        if (currentLine) {
+            tspans += `<tspan x="100" dy="1.2em">${currentLine.trim()}</tspan>`;
+        }
+        
+        // Remove the first dy if there's content to avoid initial jump
+        if (tspans) {
+           finalSvg = finalSvg.replace('<!-- CONTENT_AREA: Use <tspan x="100" dy="1.2em"> for each line of wrapped text. -->', tspans.replace(' dy="1.2em"', ''));
+        }
+    }
+
+
+    return { svgCode: finalSvg };
   }
 );
+
+    
