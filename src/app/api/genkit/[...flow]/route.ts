@@ -1,3 +1,4 @@
+
 /**
  * @fileoverview This file creates a Next.js API route handler for Genkit flows.
  *
@@ -11,5 +12,6 @@ import '@/ai/flows/generate-educational-activity';
 import '@/ai/flows/generate-visual-content';
 import '@/ai/flows/generate-activity-document';
 import '@/ai/flows/generate-activity-visuals';
+import '@/ai/flows/generate-svg-code';
 
 export const { GET, POST } = createNextApiHandler();
