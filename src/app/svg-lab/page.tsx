@@ -19,8 +19,7 @@ import { Canvg } from 'canvg';
 const componentTypes = [
   { id: 'carta_pregunta', name: 'Carta de Pregunta' },
   { id: 'carta_accion', name: 'Carta de Acción' },
-  { id: 'diagrama_ciclo_agua', name: 'Diagrama: Ciclo del Agua' },
-  { id: 'diagrama_flujo_simple', name: 'Diagrama: Flujo Simple' },
+  { id: 'tabla_personalizada', name: 'Tabla Personalizada' },
 ];
 
 const colors = [
@@ -38,6 +37,9 @@ export default function SvgLabPage() {
   const [color, setColor] = useState<SvgGenerationInput['color']>('#28a745');
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [numRows, setNumRows] = useState(3);
+  const [numCols, setNumCols] = useState(3);
+  const [headers, setHeaders] = useState('');
 
   const [generatedSvg, setGeneratedSvg] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -56,9 +58,11 @@ export default function SvgLabPage() {
 
   const handleComponentTypeChange = (value: SvgGenerationInput['componentType']) => {
     setComponentType(value);
-    // Reset fields when type changes to avoid confusion
     setTitle('');
     setContent('');
+    setNumRows(3);
+    setNumCols(3);
+    setHeaders('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -72,6 +76,9 @@ export default function SvgLabPage() {
       color,
       title,
       content,
+      numRows: componentType === 'tabla_personalizada' ? numRows : undefined,
+      numCols: componentType === 'tabla_personalizada' ? numCols : undefined,
+      headers: componentType === 'tabla_personalizada' ? headers : undefined,
     };
     
     const result = await generateSvgAction(input);
@@ -127,11 +134,10 @@ export default function SvgLabPage() {
               const ctx = canvas.getContext('2d');
               if (!ctx) throw new Error("No se pudo crear el contexto del canvas.");
 
-              const viewBoxMatch = generatedSvg.match(/viewBox="0 0 (\d+) (\d+)"/);
-              const width = viewBoxMatch ? parseInt(viewBoxMatch[1], 10) : 200;
-              const height = viewBoxMatch ? parseInt(viewBoxMatch[2], 10) : 280;
+              const viewBoxMatch = generatedSvg.match(/viewBox="0 0 (\d+\.?\d*) (\d+\.?\d*)"/);
+              const width = viewBoxMatch ? parseFloat(viewBoxMatch[1]) : 400;
+              const height = viewBoxMatch ? parseFloat(viewBoxMatch[2]) : 300;
               
-              // Aumentar resolución para mejor calidad
               canvas.width = width * 2;
               canvas.height = height * 2;
               
@@ -157,7 +163,7 @@ export default function SvgLabPage() {
   const getTitlePlaceholder = () => {
     if (componentType === 'carta_pregunta') return 'Ej: Pregunta de Ciencias, Reto Matemático';
     if (componentType === 'carta_accion') return 'Ej: Avanzar, Retroceder';
-    if (componentType === 'diagrama_flujo_simple') return 'Ej: Proceso de registro';
+    if (componentType === 'tabla_personalizada') return 'Ej: Tabla de Puntuaciones';
     return 'Título Personalizado';
   }
 
@@ -210,19 +216,37 @@ export default function SvgLabPage() {
                   </Select>
                 </div>
                 
-                {(componentType === 'carta_pregunta' || componentType === 'carta_accion' || componentType === 'diagrama_flujo_simple') && (
-                  <div className="space-y-2">
-                      <Label htmlFor="title">Título Personalizado</Label>
-                      <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={getTitlePlaceholder()} />
-                  </div>
-                )}
+                <div className="space-y-2">
+                    <Label htmlFor="title">Título</Label>
+                    <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={getTitlePlaceholder()} />
+                </div>
                 
                 {(componentType === 'carta_pregunta' || componentType === 'carta_accion') && (
                   <div className="space-y-2">
-                      <Label htmlFor="content">Contenido Personalizado</Label>
+                      <Label htmlFor="content">Contenido</Label>
                       <Input id="content" value={content} onChange={(e) => setContent(e.target.value)} placeholder={getContentPlaceholder()} />
                   </div>
                 )}
+
+                {componentType === 'tabla_personalizada' && (
+                   <div className="space-y-4 pt-4 border-t">
+                       <div className="grid grid-cols-2 gap-4">
+                           <div className="space-y-2">
+                               <Label htmlFor="numRows">Filas</Label>
+                               <Input id="numRows" type="number" min="1" value={numRows} onChange={(e) => setNumRows(parseInt(e.target.value, 10))} />
+                           </div>
+                           <div className="space-y-2">
+                               <Label htmlFor="numCols">Columnas</Label>
+                               <Input id="numCols" type="number" min="1" value={numCols} onChange={(e) => setNumCols(parseInt(e.target.value, 10))} />
+                           </div>
+                       </div>
+                       <div className="space-y-2">
+                           <Label htmlFor="headers">Encabezados (separados por comas)</Label>
+                           <Input id="headers" value={headers} onChange={(e) => setHeaders(e.target.value)} placeholder="Ej: Nombre, Puntos, Nivel" />
+                       </div>
+                   </div>
+                )}
+
 
                 <Button type="submit" disabled={isLoading} className="w-full text-lg py-6">
                   {isLoading ? <Loader2 className="animate-spin" /> : 'Generar SVG'}
