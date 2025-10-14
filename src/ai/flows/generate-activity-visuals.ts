@@ -67,30 +67,25 @@ const analysisPrompt = ai.definePrompt({
     prompt: `You are an expert UI/UX designer and Art Director specializing in educational materials.
 Your task is to analyze a list of activity resources and, for EACH item, generate a rich visual representation.
 
-**CRITICAL RULES:**
-1.  You MUST process EACH item from the input string, which is separated by newlines.
-2.  If an item is a main header for sub-items (e.g., "Tarjetas de 'Instrucción':" followed by "Título: INSTRUCCIÓN..."), you MUST process each sub-item individually.
-3.  For each item/sub-item, you MUST generate a corresponding object in the output array. This object MUST contain:
-    *   'text': The original, unmodified text of the resource item.
-    *   'htmlContent': A self-contained HTML block styled with Tailwind CSS.
-        *   For items that are HEADERS (like "Tarjetas de acción rítmica:"), you MUST generate an HTML block that styles it as a title (e.g., \`<h4 class="text-2xl font-bold text-primary mb-4 border-b-2 pb-2">Tarjetas de acción rítmica:</h4>\`).
-        *   For items that are visual components (like cards), generate the full card HTML.
-        *   If the resource is simple text that doesn't need a visual component (like "Un lápiz" or a coded message), this MUST be null.
-    *   'imagePrompt': A detailed text-to-image prompt. This field is CRUCIAL. It MUST be null for most items. Only generate a prompt string if the resource explicitly describes a physical, visual item to be drawn or created by the teacher (e.g., "Dibuja un tablero con 20 casillas", "Crea un mapa del tesoro en una cartulina"). For abstract items like "Tarjeta de Acción: Sumar", text-based content, or section headers, the 'imagePrompt' MUST be null.
+**CRITICAL RULES (NON-NEGOTIABLE):**
+1.  **Process EVERY Item:** You MUST process EACH item from the input string, which is separated by newlines.
+2.  **Generate One Component per Item:** For each resource, you must decide to generate EITHER 'htmlContent' OR 'imagePrompt', but NEVER both. If 'htmlContent' is generated, 'imagePrompt' MUST be null.
+3.  **HTML for Structured Data:** If a resource describes structured content (like a card with title/action, a table with columns, or a list of instructions), you MUST generate 'htmlContent' for it. For example, "Plantilla... dividida en dos columnas: 'Instrucción' y 'Repeticiones'" MUST be generated as an HTML table.
+4.  **Image Prompts for Drawings ONLY:** Only generate an 'imagePrompt' if the resource explicitly describes a physical, visual item to be DRAWN or CREATED BY HAND (e.g., "Dibuja un tablero con 20 casillas", "Crea un mapa del tesoro en una cartulina").
+5.  **Headers as HTML:** If an item is a header for sub-items (e.g., "Tarjetas de acción rítmica:"), you MUST generate an 'htmlContent' block that styles it as a title (e.g., \`<h4 class="text-2xl font-bold ...">...</h4>\`). 'imagePrompt' MUST be null.
+6.  **Simple Items = Null:** For simple resources that don't need a visual component (e.g., "Un lápiz", "Tijeras", "Una moneda"), BOTH 'htmlContent' and 'imagePrompt' MUST be null.
 
 **HTML & STYLING REQUIREMENTS ('htmlContent'):**
-*   The output MUST be a single, self-contained block of HTML, starting with a \`<div>\` for cards or \`<h4>\` for headers.
 *   Use Tailwind CSS classes ONLY. DO NOT use inline \`<style>\` tags.
 *   **Card Design**: Create a vertical card. Use classes like \`border\`, \`rounded-lg\`, \`shadow-lg\`, \`w-full\`, \`max-w-xs\`, \`mx-auto\`, \`bg-card\`, \`font-sans\`, \`overflow-hidden\`.
-*   **Visual Hierarchy**:
-    *   **Header**: The card must start with a header div with a background color (\`bg-primary\`, \`p-3\`).
-    *   **Main Title**: Inside the header, use an \`h3\` with \`text-xl\`, \`font-bold\`, \`text-primary-foreground\`, \`text-center\`, \`uppercase\`.
-    *   **Content Body**: The main content area should have padding (\`p-6\`).
-    *   **Symbol/Icon**: This is the visual anchor. Place it after the header. It must be in a \`div\`, centered (\`text-center\`), and large (\`text-6xl\`). Give it some space (\`my-4\`). Use unicode characters for symbols where possible.
-    *   **Separator**: After the icon, add a horizontal rule (\`<hr class="border-border">\`).
-    *   **Text Details**: The text content (Action, Description) should be in a div with spacing (\`mt-4 space-y-2\`). Labels like "Acción:" MUST be wrapped in \`<strong>\` tags and have a distinct color (\`text-foreground\`). The rest of the text should use \`text-muted-foreground\`.
-*   **For tables**: If the resource describes a "tabla", you MUST generate a valid HTML \`<table>\` with Tailwind classes (\`w-full\`, \`border-collapse\`), and style the header (\`bg-gray-100\`).
-*   **CRITICAL EXAMPLE**: For a card like "Título: PALMADA, Acción: Dar una palmada., Descripción: Golpear las palmas de las manos., Símbolo: 👏", the HTML MUST look like this:
+    *   **Header**: A div with a background color (\`bg-primary\`, \`p-3\`).
+    *   **Main Title**: Inside, an \`h3\` with \`text-xl\`, \`font-bold\`, \`text-primary-foreground\`, \`text-center\`, \`uppercase\`.
+    *   **Content Body**: Main content area with padding (\`p-6\`).
+    *   **Symbol/Icon**: Centered (\`text-center\`), large (\`text-6xl\`), with space (\`my-4\`). Use unicode characters.
+    *   **Separator**: A horizontal rule (\`<hr class="border-border">\`).
+    *   **Text Details**: Labels like "Acción:" MUST be in \`<strong>\` tags.
+*   **For tables**: If a resource describes a "tabla" or "columnas", you MUST generate a valid HTML \`<table>\` with Tailwind classes (\`w-full\`, \`border-collapse\`), and style the header (\`bg-gray-100\`).
+*   **CRITICAL EXAMPLE FOR CARD**: For "Título: PALMADA, Acción: Dar una palmada., Símbolo: 👏", the HTML MUST look like this:
     \`\`\`html
     <div class="border rounded-lg shadow-lg w-full max-w-xs mx-auto bg-card font-sans overflow-hidden">
       <div class="bg-primary p-3">
@@ -101,24 +96,23 @@ Your task is to analyze a list of activity resources and, for EACH item, generat
         <hr class="border-border">
         <div class="mt-4 space-y-2 text-sm">
           <p><strong class="text-foreground">Acción:</strong> <span class="text-muted-foreground">Dar una palmada.</span></p>
-          <p><strong class="text-foreground">Descripción:</strong> <span class="text-muted-foreground">Golpear las palmas de las manos.</span></p>
         </div>
       </div>
     </div>
     \`\`\`
-*   **CRITICAL EXAMPLE FOR NESTED ITEMS**: For an input like "Tarjetas con símbolos:\n- Triángulo (amarillo): Representa datos de entrada.\n- Cuadrado (azul): Representa un proceso.", you MUST process "Triángulo" and "Cuadrado" as separate items and generate two separate HTML card blocks.
+*   **CRITICAL EXAMPLE FOR TABLE**: For "Plantilla... dividida en dos columnas: 'Instrucción' y 'Repeticiones'.", generate an HTML table. 'imagePrompt' MUST be null.
 
 **IMAGE PROMPT REQUIREMENTS ('imagePrompt'):**
-*   Be specific. Instead of "un tablero", describe "Un tablero de juego simple, estilo dibujo, con 20 casillas numeradas del 1 al 20. La casilla 1 dice 'Inicio' y la 20 'Fin'. Algunas casillas tienen símbolos simples como un engranaje o una lupa."
-*   If the resource is a simple card like "Tarjeta de Acción: Avanzar" or just text, the 'imagePrompt' MUST be null.
+*   Be specific. Instead of "un tablero", describe "Un tablero de juego simple, estilo dibujo, con 20 casillas numeradas. La casilla 1 dice 'Inicio' y la 20 'Fin'."
+*   If you generate an 'imagePrompt', 'htmlContent' MUST be null.
 
-Analyze the following activity resources and provide the output in the required JSON array format.
+Analyze the following activity resources and provide the output in the required JSON array format, following all rules.
 
 ---
 **Activity Resources:**
 {{{resources}}}
 ---
-`,
+`
 });
 
 const generateActivityVisualsFlow = ai.defineFlow(
