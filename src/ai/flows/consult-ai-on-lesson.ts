@@ -28,7 +28,7 @@ const ConsultAIOnLessonOutputSchema = z.object({
 export type ConsultAIOnLessonOutput = z.infer<typeof ConsultAIOnLessonOutputSchema>;
 
 export async function consultAIOnLesson(input: ConsultAIOnLessonInput): Promise<ConsultAIOnLessonOutput> {
-  return consultAIOnLessonFlow(input);
+  return ai.run('consultAIOnLessonFlow', input);
 }
 
 const prompt = ai.definePrompt({
@@ -49,7 +49,7 @@ Grade: {{{grade}}}
 Question: {{{question}}}`,
 });
 
-const consultAIOnLessonFlow = ai.defineFlow(
+ai.defineFlow(
   {
     name: 'consultAIOnLessonFlow',
     inputSchema: ConsultAIOnLessonInputSchema,

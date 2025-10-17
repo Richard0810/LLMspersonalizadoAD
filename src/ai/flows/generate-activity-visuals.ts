@@ -57,7 +57,7 @@ async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: stri
 
 export async function generateActivityVisuals(input: string): Promise<VisualItem[]> {
   // We use ai.run() to avoid importing the flow directly, which can cause bundling issues in Next.js
-  return await ai.run('generateActivityVisualsFlow', { resources: input });
+  return await ai.run('generateActivityVisualsFlow', input);
 }
 
 
@@ -120,12 +120,12 @@ Analyze the following activity resources and provide the output in the required 
 ai.defineFlow(
   {
     name: 'generateActivityVisualsFlow',
-    inputSchema: ActivityResourcesInputSchema,
+    inputSchema: z.string(),
     outputSchema: z.array(z.custom<VisualItem>()),
   },
   async (input) => {
     // Step 1: Analyze the resources to decide what to generate (HTML and/or image prompts)
-    const { output: analysisResult } = await analysisPrompt(input);
+    const { output: analysisResult } = await analysisPrompt({ resources: input });
     
     if (!analysisResult) {
       throw new Error("AI analysis failed to produce a visual plan for the resources.");
@@ -155,5 +155,3 @@ ai.defineFlow(
     return finalVisualItems;
   }
 );
-
-    
