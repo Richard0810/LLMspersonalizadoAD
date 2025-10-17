@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -40,7 +41,8 @@ export type GenerateEducationalActivitiesOutput = z.infer<typeof GenerateEducati
 export async function generateEducationalActivities(
   input: GenerateEducationalActivitiesInput
 ): Promise<GenerateEducationalActivitiesOutput> {
-  return generateEducationalActivitiesFlow(input);
+  // We use ai.run() to avoid importing the flow directly, which can cause bundling issues in Next.js
+  return await ai.run('generateEducationalActivitiesFlow', input);
 }
 
 // We add the `isAllConcepts` to the input schema for the prompt, but it's not part of the external-facing schema.
@@ -93,7 +95,7 @@ La salida debe ser un JSON array con tres objetos, donde cada objeto representa 
   `,
 });
 
-const generateEducationalActivitiesFlow = ai.defineFlow(
+ai.defineFlow(
   {
     name: 'generateEducationalActivitiesFlow',
     inputSchema: GenerateEducationalActivitiesInputSchema,
