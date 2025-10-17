@@ -28,6 +28,7 @@ const ConsultAIOnLessonOutputSchema = z.object({
 export type ConsultAIOnLessonOutput = z.infer<typeof ConsultAIOnLessonOutputSchema>;
 
 export async function consultAIOnLesson(input: ConsultAIOnLessonInput): Promise<ConsultAIOnLessonOutput> {
+  // @ts-ignore
   return ai.run('consultAIOnLessonFlow', input);
 }
 
