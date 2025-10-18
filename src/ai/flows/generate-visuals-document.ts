@@ -34,27 +34,33 @@ const GenerateVisualsDocumentOutputSchema = z.object({
 });
 
 /**
- * A more robust HTML to plain text converter.
- * It handles newlines from block elements and cleans up the output.
- * @param html The HTML string to convert.
- * @returns A plain text string.
+ * Parses a string with markdown-style bolding into an array of TextRun objects for docx.
+ * This handles simple cases and ensures text is always valid.
+ * @param text The input string.
+ * @returns An array of TextRun objects.
  */
-const htmlToText = (html: string | null): string => {
-    if (!html) return '';
-    // Replace block-level tags with a newline, then strip all other tags.
-    return html
-        .replace(/<br\s*\/?>/gi, '\n')
-        .replace(/<p.*?>/gi, '\n')
-        .replace(/<h[1-6].*?>/gi, '\n')
-        .replace(/<div.*?>/gi, '\n')
-        .replace(/<li.*?>/gi, '\n* ')
-        .replace(/<\/div>|<\/p>|<\/h[1-6]>|<\/li>/gi, '')
-        .replace(/<[^>]+>/g, '') // Remove remaining tags
-        .replace(/&nbsp;/g, ' ')
-        .replace(/\n\s*\n/g, '\n') // Collapse multiple newlines
-        .trim();
+const createTextRunsFromText = (text: string | null): TextRun[] => {
+    if (!text) return [];
+    
+    // Simple split for demonstration. For real markdown, a more complex parser is needed.
+    const parts = text.split(/(\*\*.*?\*\*)/g).filter(Boolean);
+    
+    return parts.map(part => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+            return new TextRun({
+                text: part.slice(2, -2),
+                bold: true,
+                font: 'Arial',
+                size: 22, // 11pt
+            });
+        }
+        return new TextRun({
+            text: part,
+            font: 'Arial',
+            size: 22, // 11pt
+        });
+    });
 };
-
 
 const generateVisualsDocumentFlow = ai.defineFlow(
   {
@@ -163,18 +169,21 @@ const generateVisualsDocumentFlow = ai.defineFlow(
 
     // --- 3. Process each visual item robustly ---
     for (const item of visualItems) {
-        if (!item.htmlContent && !item.imageUrl) {
-            continue; // Skip empty items
+        // We only process items that have some content to render.
+        if (!item.text && !item.imageUrl) {
+            continue; 
         }
 
-        // Add the original resource text as a subtitle
-        documentChildren.push(
-            new Paragraph({
-                children: [new TextRun({ text: item.text, bold: true, italics: true, color: "555555" })],
-                style: "section-title",
-                spacing: { before: 400, after: 200 }
-            })
-        );
+        // Add the original resource text as a subtitle. This is safer than parsing HTML.
+        if (item.text) {
+             documentChildren.push(
+                new Paragraph({
+                    children: createTextRunsFromText(item.text),
+                    style: "section-title",
+                    spacing: { before: 400, after: 200 }
+                })
+            );
+        }
         
         // If there's an image, fetch and embed it safely
         if (item.imageUrl && typeof item.imageUrl === 'string' && item.imageUrl.startsWith('data:image/')) {
@@ -206,17 +215,6 @@ const generateVisualsDocumentFlow = ai.defineFlow(
             } catch (error) {
                 console.error("Failed to process image data URI:", item.imageUrl, error);
                 documentChildren.push(new Paragraph({ text: "[Error al incrustar la imagen. El formato de datos podría ser inválido.]", style: "section-title" }));
-            }
-        }
-        
-        // If there's HTML content, convert it to simple text paragraphs
-        if (item.htmlContent) {
-            const textFromHtml = htmlToText(item.htmlContent);
-            const lines = textFromHtml.split('\n').filter(line => line.trim() !== '');
-            if (lines.length > 0) {
-                 lines.forEach(line => {
-                    documentChildren.push(new Paragraph({ text: line, spacing: { after: 120 } }));
-                });
             }
         }
         
