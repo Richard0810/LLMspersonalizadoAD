@@ -10,7 +10,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Loader2, AlertCircle, ArrowLeft, Palette } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { generateVisualContentAction } from './actions';
 import OutputDisplay from '@/components/visual/OutputDisplay';
 import { Button } from '@/components/ui/button';
 
@@ -90,23 +89,47 @@ export default function VisualGeneratorPage() {
       params: { ...params },
     };
 
-    const result = await generateVisualContentAction(flowInput);
-    setIsLoading(false);
+    try {
+      const response = await fetch('/api/generate-visual-content', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ input: flowInput }),
+      });
 
-    if (result && result.success && result.data) {
-      setGeneratedContent(result.data);
-      toast({
-        title: "¡Contenido Visual Generado!",
-        description: `Tu ${translatedFormatName} está listo.`
-      });
-    } else {
-      const errorMessage = result?.error || "Ocurrió un error desconocido durante la generación.";
-      setError(errorMessage);
-      toast({
-        title: "Error de Generación",
-        description: errorMessage,
-        variant: "destructive"
-      });
+      if (!response.ok) {
+        let errorBody;
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+            errorBody = await response.json();
+        } else {
+            errorBody = await response.text();
+        }
+        throw new Error(typeof errorBody === 'object' ? JSON.stringify(errorBody) : errorBody);
+      }
+
+      const result = await response.json();
+
+      if (result.success && result.data) {
+          setGeneratedContent(result.data);
+          toast({
+            title: "¡Contenido Visual Generado!",
+            description: `Tu ${translatedFormatName} está listo.`
+          });
+      } else {
+          throw new Error(result.error || "La respuesta de la API no fue exitosa.");
+      }
+    } catch (e: any) {
+        const errorMessage = e instanceof Error ? e.message : "Ocurrió un error desconocido durante la generación.";
+        setError(errorMessage);
+        toast({
+          title: "Error de Generación",
+          description: errorMessage,
+          variant: "destructive"
+        });
+    } finally {
+        setIsLoading(false);
     }
   }, [selectedCategory, selectedFormat, toast]);
 

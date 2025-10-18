@@ -7,7 +7,7 @@
  *
  * - consultAIOnLesson - A function that handles the question answering process.
  * - ConsultAIOnLessonInput - The input type for the consultAIOnLesson function.
- * - ConsultAIOnLessonOutput - The return type for the consultAIOnLesson function.
+ * - ConsultAIOnLessonOutput - The return type for the consultAIOnelon function.
  */
 
 import {ai} from '@/ai/genkit';
@@ -28,7 +28,8 @@ const ConsultAIOnLessonOutputSchema = z.object({
 export type ConsultAIOnLessonOutput = z.infer<typeof ConsultAIOnLessonOutputSchema>;
 
 export async function consultAIOnLesson(input: ConsultAIOnLessonInput): Promise<ConsultAIOnLessonOutput> {
-  return consultAIOnLessonFlow(input);
+  // @ts-ignore
+  return await consultAIOnLessonFlow(input);
 }
 
 const prompt = ai.definePrompt({
@@ -60,3 +61,5 @@ const consultAIOnLessonFlow = ai.defineFlow(
     return output!;
   }
 );
+
+    

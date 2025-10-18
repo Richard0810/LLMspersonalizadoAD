@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useRef } from 'react';
@@ -11,7 +12,6 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, AlertCircle, Beaker, Code, Eye, Palette } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { generateSvgAction } from './actions';
 import type { SvgGenerationInput } from '@/types';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Canvg } from 'canvg';
@@ -83,25 +83,41 @@ export default function SvgLabPage() {
       headers: componentType === 'tabla_personalizada' ? headers : undefined,
     };
     
-    const result = await generateSvgAction(input);
-    setIsLoading(false);
+    try {
+        const response = await fetch('/api/generate-svg-code', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ input }),
+        });
+        
+        const result = await response.json();
 
-    if (result.success && result.data) {
-      setGeneratedSvg(result.data.svgCode);
-      const svgBlob = new Blob([result.data.svgCode], { type: 'image/svg+xml' });
-      setFileSize(formatBytes(svgBlob.size));
-      toast({
-        title: "¡SVG Generado!",
-        description: `Tu componente SVG está listo.`
-      });
-    } else {
-      const errorMessage = result.error || "Ocurrió un error desconocido durante la generación.";
-      setError(errorMessage);
-      toast({
-        title: "Error de Generación",
-        description: errorMessage,
-        variant: "destructive"
-      });
+        if (!response.ok) {
+            throw new Error(result.error || 'Ocurrió un error en el servidor.');
+        }
+        
+        if (result.success && result.data?.svgCode) {
+            setGeneratedSvg(result.data.svgCode);
+            const svgBlob = new Blob([result.data.svgCode], { type: 'image/svg+xml' });
+            setFileSize(formatBytes(svgBlob.size));
+            toast({
+                title: "¡SVG Generado!",
+                description: `Tu componente SVG está listo.`
+            });
+        } else {
+            throw new Error(result.error || "La respuesta de la API no fue exitosa.");
+        }
+
+    } catch (e: any) {
+        const errorMessage = e instanceof Error ? e.message : "Ocurrió un error desconocido durante la generación.";
+        setError(errorMessage);
+        toast({
+            title: "Error de Generación",
+            description: errorMessage,
+            variant: "destructive"
+        });
+    } finally {
+        setIsLoading(false);
     }
   };
 
@@ -355,3 +371,5 @@ export default function SvgLabPage() {
     </AppShell>
   );
 }
+
+    

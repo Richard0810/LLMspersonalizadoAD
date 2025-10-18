@@ -213,7 +213,6 @@ async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: stri
     const altText = prompt.substring(0, 150); // Use the prompt as a simple, reliable alt text.
 
     try {
-        // @ts-ignore - This is added to bypass the type check in Vercel build
         const { media } = await ai.generate({
             model: 'googleai/gemini-2.0-flash-exp', // Using model from bitacora
             prompt: fullPrompt,
@@ -226,15 +225,16 @@ async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: stri
             return { imageUrl: media.url, altText };
         }
         
-        // If media or media.url is missing, return a null URL to be handled by the frontend.
+        // If media or media.url is missing, return an empty but valid object to avoid crashes.
         console.warn(`AI generation did not return a valid image media object for prompt: "${prompt}"`);
-        return { imageUrl: '', altText };
+        return { imageUrl: '', altText: 'La generación de imagen no devolvió un resultado.' };
 
     } catch (error) {
-        console.warn(`AI image generation failed for prompt: "${prompt}". Error:`, error);
+        console.error(`AI image generation failed for prompt: "${prompt}". Error:`, error);
+        // Return an empty but valid object on failure to make the flow more resilient.
         return {
-            imageUrl: '', // Return empty string on failure
-            altText,
+            imageUrl: '',
+            altText: `Error al generar la guía visual para: ${altText}`,
         };
     }
 };
@@ -269,6 +269,10 @@ const generateVisualContentFlow = ai.defineFlow(
         const fullPrompt = buildImagePrompt(imgParams);
         
         const { imageUrl, altText } = await generateImageAndAltText(fullPrompt);
+
+        if (!imageUrl) {
+            throw new Error(`La generación de la imagen falló. ${altText}`);
+        }
 
         return {
             type: 'image',
@@ -519,3 +523,5 @@ Genera el código HTML completo y profesional AHORA.`;
     throw new Error(`The combination of category '${category}' and format '${format}' is not implemented or failed to produce output.`);
   }
 );
+
+    
