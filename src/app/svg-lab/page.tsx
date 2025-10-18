@@ -86,7 +86,7 @@ export default function SvgLabPage() {
       const response = await fetch('/api/genkit/flows/generateSvgFromGuideFlow', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(input),
+        body: JSON.stringify({ input }),
       });
 
       if (!response.ok) {

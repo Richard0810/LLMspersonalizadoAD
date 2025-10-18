@@ -147,7 +147,7 @@ export default function ActivityDetailPage() {
       const response = await fetch('/api/genkit/flows/generateActivityVisualsFlow', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(activity.activityResources),
+        body: JSON.stringify({ input: activity.activityResources }),
       });
 
       if (!response.ok) {
@@ -191,7 +191,7 @@ export default function ActivityDetailPage() {
         const response = await fetch('/api/genkit/flows/generateActivityDocumentFlow', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(activity),
+          body: JSON.stringify({ input: activity }),
         });
 
         if (!response.ok) {
@@ -245,7 +245,7 @@ export default function ActivityDetailPage() {
         const response = await fetch('/api/genkit/flows/generateVisualsDocumentFlow', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(generatedVisuals),
+          body: JSON.stringify({ input: generatedVisuals }),
         });
 
         if (!response.ok) {

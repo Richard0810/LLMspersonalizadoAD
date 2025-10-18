@@ -94,7 +94,7 @@ export default function VisualGeneratorPage() {
           headers: {
               'Content-Type': 'application/json',
           },
-          body: JSON.stringify(flowInput),
+          body: JSON.stringify({ input: flowInput }),
       });
 
       if (!response.ok) {

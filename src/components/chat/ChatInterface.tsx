@@ -70,7 +70,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialParams, onResetSet
     externalOnResetSetup();
   }
 
-  const handleGenerateActivities = async (params: LessonParams) => {
+  const handleGenerateActivities = useCallback(async (params: LessonParams) => {
     setIsLoadingAi(true);
     addMessage({ id: 'loading-gen', sender: 'ai', type: 'loading', timestamp: Date.now(), isLoading: true });
 
@@ -85,7 +85,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialParams, onResetSet
       const response = await fetch('/api/genkit/flows/generateEducationalActivitiesFlow', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(generateInput),
+        body: JSON.stringify({ input: generateInput }),
       });
 
       if (!response.ok) {
@@ -125,7 +125,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialParams, onResetSet
     } finally {
       setIsLoadingAi(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     const savedChat = getChatHistoryFromLocalStorage();
@@ -170,7 +170,7 @@ Generando actividades iniciales...`,
       const response = await fetch('/api/genkit/flows/consultAIOnLessonFlow', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(consultInput),
+        body: JSON.stringify({ input: consultInput }),
       });
 
       if (!response.ok) {
