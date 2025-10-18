@@ -98,7 +98,7 @@ const generateVisualsDocumentFlow = ai.defineFlow(
         ],
     });
 
-    const documentChildren: (Paragraph | ImageRun | Table)[] = [
+    const documentChildren: (Paragraph | Table)[] = [
         headerTable,
         new Paragraph({ text: "Recursos y Apoyos Visuales para la Actividad", heading: HeadingLevel.TITLE, alignment: AlignmentType.CENTER, spacing: { after: 480, before: 480 } }),
     ];
@@ -119,11 +119,11 @@ const generateVisualsDocumentFlow = ai.defineFlow(
         );
         
         // If there's an image, fetch and embed it
-        if (item.imageUrl) {
+        if (item.imageUrl && typeof item.imageUrl === 'string' && item.imageUrl.startsWith('data:image/')) {
             try {
-                // Assuming imageUrl is a data URI
-                const base64Data = item.imageUrl.split(',')[1];
-                if (base64Data) {
+                const parts = item.imageUrl.split(',');
+                if (parts.length > 1 && parts[1]) {
+                    const base64Data = parts[1];
                     const imageBuffer = Buffer.from(base64Data, 'base64');
                     documentChildren.push(
                         new Paragraph({
@@ -140,11 +140,17 @@ const generateVisualsDocumentFlow = ai.defineFlow(
                             spacing: { after: 200 }
                         })
                     );
+                } else {
+                    // If splitting fails, add a placeholder
+                     documentChildren.push(new Paragraph({ text: "[Error: formato de imagen inválido]", style: "section-title" }));
                 }
             } catch (error) {
                 console.error("Failed to process image data URI:", error);
                 documentChildren.push(new Paragraph({ text: "[Error al incrustar la imagen]", style: "section-title" }));
             }
+        } else if (item.imageUrl) {
+            // Handle case where imageUrl is present but not a valid data URI
+            documentChildren.push(new Paragraph({ text: "[Imagen no disponible o en formato incorrecto]", style: "section-title" }));
         }
         
         // If there's HTML content, convert it to simple text paragraphs
