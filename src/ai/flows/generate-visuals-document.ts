@@ -33,15 +33,25 @@ const GenerateVisualsDocumentOutputSchema = z.object({
   docxBase64: z.string().describe('The generated DOCX file as a Base64 encoded string.'),
 });
 
-// A simple regex-based HTML to text converter.
+/**
+ * A more robust HTML to plain text converter.
+ * It handles newlines from block elements and cleans up the output.
+ * @param html The HTML string to convert.
+ * @returns A plain text string.
+ */
 const htmlToText = (html: string | null): string => {
     if (!html) return '';
+    // Replace block-level tags with a newline, then strip all other tags.
     return html
-        .replace(/<style([\s\S]*?)<\/style>/gi, '')
-        .replace(/<script([\s\S]*?)<\/script>/gi, '')
-        .replace(/<[^>]+>/g, '\n') // Replace tags with newlines
+        .replace(/<br\s*\/?>/gi, '\n')
+        .replace(/<p.*?>/gi, '\n')
+        .replace(/<h[1-6].*?>/gi, '\n')
+        .replace(/<div.*?>/gi, '\n')
+        .replace(/<li.*?>/gi, '\n* ')
+        .replace(/<\/div>|<\/p>|<\/h[1-6]>|<\/li>/gi, '')
+        .replace(/<[^>]+>/g, '') // Remove remaining tags
         .replace(/&nbsp;/g, ' ')
-        .replace(/\n\s*\n/g, '\n') // Replace multiple newlines with a single one
+        .replace(/\n\s*\n/g, '\n') // Collapse multiple newlines
         .trim();
 };
 
@@ -74,7 +84,7 @@ const generateVisualsDocumentFlow = ai.defineFlow(
         logoEscudoBuffer = fallbackImage;
     }
     
-    // --- 2. Create Header Table ---
+    // --- 2. Create Header Table (Consistent with the other document generator) ---
     const invisibleBorderStyle = {
         top: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
         bottom: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
@@ -151,7 +161,7 @@ const generateVisualsDocumentFlow = ai.defineFlow(
         new Paragraph({ text: "Recursos y Apoyos Visuales para la Actividad", heading: HeadingLevel.TITLE, alignment: AlignmentType.CENTER, spacing: { after: 480, before: 480 } }),
     ];
 
-    // --- 3. Process each visual item ---
+    // --- 3. Process each visual item robustly ---
     for (const item of visualItems) {
         if (!item.htmlContent && !item.imageUrl) {
             continue; // Skip empty items
@@ -166,50 +176,51 @@ const generateVisualsDocumentFlow = ai.defineFlow(
             })
         );
         
-        // If there's an image, fetch and embed it
+        // If there's an image, fetch and embed it safely
         if (item.imageUrl && typeof item.imageUrl === 'string' && item.imageUrl.startsWith('data:image/')) {
             try {
-                const parts = item.imageUrl.split(',');
-                if (parts.length > 1 && parts[1]) {
-                    const base64Data = parts[1];
-                    const imageBuffer = Buffer.from(base64Data, 'base64');
-                    documentChildren.push(
-                        new Paragraph({
-                            alignment: AlignmentType.CENTER,
-                            children: [
-                                new ImageRun({
-                                    data: imageBuffer,
-                                    transformation: {
-                                        width: 400,
-                                        height: 300,
-                                    },
-                                }),
-                            ],
-                            spacing: { after: 200 }
-                        })
-                    );
-                } else {
-                    // If splitting fails, add a placeholder
-                     documentChildren.push(new Paragraph({ text: "[Error: formato de imagen inválido]", style: "section-title" }));
+                // Find the comma that separates metadata from base64 data
+                const commaIndex = item.imageUrl.indexOf(',');
+                if (commaIndex === -1 || commaIndex + 1 >= item.imageUrl.length) {
+                    throw new Error("Invalid Data URI format: missing comma or data.");
                 }
+
+                const base64Data = item.imageUrl.substring(commaIndex + 1);
+                const imageBuffer = Buffer.from(base64Data, 'base64');
+                
+                documentChildren.push(
+                    new Paragraph({
+                        alignment: AlignmentType.CENTER,
+                        children: [
+                            new ImageRun({
+                                data: imageBuffer,
+                                transformation: {
+                                    width: 400,
+                                    height: 300,
+                                },
+                            }),
+                        ],
+                        spacing: { after: 200 }
+                    })
+                );
             } catch (error) {
-                console.error("Failed to process image data URI:", error);
-                documentChildren.push(new Paragraph({ text: "[Error al incrustar la imagen]", style: "section-title" }));
+                console.error("Failed to process image data URI:", item.imageUrl, error);
+                documentChildren.push(new Paragraph({ text: "[Error al incrustar la imagen. El formato de datos podría ser inválido.]", style: "section-title" }));
             }
-        } else if (item.imageUrl) {
-            // Handle case where imageUrl is present but not a valid data URI
-            documentChildren.push(new Paragraph({ text: "[Imagen no disponible o en formato incorrecto]", style: "section-title" }));
         }
         
         // If there's HTML content, convert it to simple text paragraphs
         if (item.htmlContent) {
             const textFromHtml = htmlToText(item.htmlContent);
             const lines = textFromHtml.split('\n').filter(line => line.trim() !== '');
-            lines.forEach(line => {
-                documentChildren.push(new Paragraph({ text: line, spacing: { after: 120 } }));
-            });
+            if (lines.length > 0) {
+                 lines.forEach(line => {
+                    documentChildren.push(new Paragraph({ text: line, spacing: { after: 120 } }));
+                });
+            }
         }
         
+        // Add a separator between items
         documentChildren.push(new Paragraph({ text: '', spacing: { after: 200 }}));
     }
 
@@ -225,7 +236,7 @@ const generateVisualsDocumentFlow = ai.defineFlow(
                 name: "Section Title",
                 basedOn: "Normal",
                 next: "Normal",
-                run: { size: 24, bold: true, color: "229954" },
+                run: { size: 24, bold: true, color: "2E7D32" },
                 paragraph: { spacing: { before: 240, after: 120 } },
             },
         ],
