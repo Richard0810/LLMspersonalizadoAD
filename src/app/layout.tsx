@@ -1,16 +1,11 @@
-
-'use client';
-
 import type { Metadata } from 'next';
-import { AuthProvider } from '@/contexts/AuthContext';
-import { Toaster } from '@/components/ui/toaster';
 import './globals.css';
+import { ClientProvider } from '@/components/layout/ClientProvider';
 
-// Metadata can still be exported from a client component layout
-// export const metadata: Metadata = {
-//   title: 'EduSpark AI',
-//   description: 'Genera actividades educativas con IA',
-// };
+export const metadata: Metadata = {
+  title: 'EduSpark AI',
+  description: 'Genera actividades educativas con IA',
+};
 
 export default function RootLayout({
   children,
@@ -20,8 +15,6 @@ export default function RootLayout({
   return (
     <html lang="es" className="min-h-screen">
       <head>
-        <title>EduSpark AI</title>
-        <meta name="description" content="Genera actividades educativas con IA" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -29,10 +22,7 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased min-h-screen flex flex-col">
-        <AuthProvider>
-          {children}
-          <Toaster />
-        </AuthProvider>
+        <ClientProvider>{children}</ClientProvider>
       </body>
     </html>
   );
