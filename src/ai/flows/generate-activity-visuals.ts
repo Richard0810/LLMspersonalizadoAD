@@ -32,8 +32,7 @@ async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: stri
     const altText = `Guía visual para: ${prompt.substring(0, 100)}`; // Simple and reliable alt text
 
     try {
-        // @ts-ignore - This is added to bypass the type check in Vercel/Firebase build
-        const { media } = await ai.generate({
+        const response = await ai.generate({
             model: 'googleai/gemini-2.0-flash-exp',
             prompt: fullPrompt,
             config: {
@@ -41,6 +40,8 @@ async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: stri
             },
         });
         
+        const media = response.media();
+
         if (media && media.url) {
             return { imageUrl: media.url, altText };
         }
