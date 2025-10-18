@@ -1,14 +1,34 @@
 # Bitácora Técnica: Módulo de Generación de Contenido Visual
 
-Este documento sirve como "fuente de la verdad" y guía de solución de problemas para el módulo de generación de contenido visual. Si se presentan errores como `NOT_FOUND: Model ... not found` o `Image generation failed to return media`, esta bitácora contiene la lógica y los parámetros correctos que deben ser implementados.
+Este documento sirve como "fuente de la verdad" y guía de solución de problemas para el módulo de generación de contenido visual. Si se presentan errores como `NOT_FOUND: Model ... not found`, `Image generation failed to return media` o un error de JSON inválido, esta bitácora contiene la lógica y los parámetros correctos que deben ser implementados.
 
-## I. Arquitectura General
+## I. Arquitectura General (Modelo Tradicional API)
 
-El módulo funciona en base a una interacción Frontend -> Backend (Genkit)
-1.  **Frontend (`/visual/page.tsx`):** El usuario selecciona una categoría y formato, llena un formulario.
-2.  **Server Action (`/visual/actions.ts`):** La acción se dispara, validando la entrada del usuario.
-3.  **Flujo de Genkit (`/ai/flows/generate-visual-content.ts`):** La Server Action invoca el flujo principal de Genkit, que contiene la lógica de IA.
-4.  **Respuesta al Frontend:** El resultado (imagen, JSON, HTML) se devuelve al frontend para ser renderizado por `OutputDisplay.tsx`.
+El módulo funciona en base a una interacción Frontend -> Backend (Genkit) a través de rutas de API explícitas, lo cual ha demostrado ser el enfoque más estable.
+
+1.  **Frontend (`/visual/page.tsx` o `/svg-lab/page.tsx`)**:
+    *   El usuario llena un formulario con los parámetros deseados.
+    *   Al enviar, el cliente construye un objeto `input` con los datos.
+    *   Se realiza una llamada `fetch` con el método `POST` a una ruta de API específica (ej: `/api/generate-visual-content` o `/api/generate-svg-code`).
+    *   El `body` de la solicitud `fetch` es el objeto `input` convertido a una cadena JSON (`JSON.stringify({ input })`).
+
+2.  **Ruta de API (`/app/api/.../route.ts`)**:
+    *   Un archivo `route.ts` dedicado recibe la solicitud `POST`.
+    *   Extrae el objeto `input` del cuerpo de la solicitud (`await req.json()`).
+    *   Importa y llama a la función del flujo de Genkit correspondiente, pasándole el `input`.
+    *   Espera la respuesta del flujo.
+    *   Devuelve la respuesta final al frontend usando `NextResponse.json()`.
+
+3.  **Flujo de Genkit (`/ai/flows/...`):**
+    *   El flujo (ej: `generateVisualContentFlow`) contiene toda la lógica de IA.
+    *   Recibe el `input` desde la ruta de API.
+    *   Llama a los modelos de Genkit (`ai.generate`) con los prompts adecuados.
+    *   Devuelve el resultado final (URL de imagen, objeto JSON, código HTML/SVG).
+
+4.  **Respuesta al Frontend:**
+    *   El `fetch` en el cliente recibe la respuesta JSON.
+    *   Si la respuesta es exitosa, el contenido se muestra en la interfaz.
+    *   Si la ruta de API falla, el `fetch` puede recibir una página de error HTML, causando un error de tipo `Unexpected token '<', "<!DOCTYPE "... is not valid JSON`. Esto indica un problema en el backend (ruta no encontrada, error interno del servidor, etc.).
 
 ## II. Lógica del Flujo de IA y Modelos Correctos (¡LA PARTE MÁS IMPORTANTE!)
 
@@ -35,7 +55,7 @@ const { media } = await ai.generate({
 });
 ```
 
-### 2. Para Generación de Texto (Resúmenes para diagramas, `alt text`, etc.)
+### 2. Para Generación de Texto (Resúmenes para diagramas, `alt text`, código SVG)
 
 - **Modelo a Utilizar:** Se debe usar el nombre completo y explícito del modelo de texto.
   - **Correcto:** `model: 'googleai/gemini-2.0-flash'`
@@ -46,7 +66,6 @@ const { media } = await ai.generate({
 const { text: altText } = await ai.generate({
     model: 'googleai/gemini-2.0-flash',
     prompt: 'Genera un texto alternativo (alt text) para esta imagen.',
-    input: { media: { url: media.url } }, // Se le pasa la imagen generada
 });
 ```
 
@@ -59,7 +78,7 @@ La generación de diagramas es un proceso robusto de **dos pasos** para asegurar
 
 - **Paso 2: Convertir a JSON Estructurado**:
   - El resumen del Paso 1 se inyecta en un segundo **prompt muy estricto y detallado**.
-  - Este segundo prompt le ordena a la IA que convierta el texto del resumen en una estructura JSON específica para el diagrama solicitado (mapa mental, tabla, etc.).
+  - Este segundo prompt le ordena a la IA que convierta el texto del resumen en una estructura JSON específica para el diagrama solicitado (mapa mental, tabla, etc.), usando `output: { schema: ... }`.
   - El prompt incluye reglas explícitas sobre el número de nodos, el formato de los IDs, la necesidad de generar coordenadas de posición (`top`, `left`), y exige que la salida sea **únicamente el objeto JSON válido**.
 
 Esta estrategia de dos pasos es crucial para obtener datos consistentes que el frontend pueda renderizar correctamente.
