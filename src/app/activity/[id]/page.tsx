@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState, type ReactNode } from 'react';
@@ -12,9 +11,6 @@ import type { Activity, VisualItem } from '@/types';
 import { getActivityByIdFromLocalStorage, saveVisualsForActivity, getVisualsForActivity, clearVisualsForActivity } from '@/lib/localStorageUtils';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
-import { generateActivityVisuals } from '@/ai/flows/generate-activity-visuals';
-import { generateActivityDocument } from '@/ai/flows/generate-activity-document';
-import { generateVisualsDocument } from '@/ai/flows/generate-visuals-document';
 import Image from 'next/image';
 import WordIcon from '@/components/icons/WordIcon';
 import { saveAs } from 'file-saver';
@@ -148,7 +144,18 @@ export default function ActivityDetailPage() {
     });
 
     try {
-      const visualResult = await generateActivityVisuals(activity.activityResources);
+      const response = await fetch('/api/genkit/flows/generateActivityVisualsFlow', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(activity.activityResources),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'La respuesta del servidor no fue exitosa.');
+      }
+      
+      const visualResult = await response.json();
       
       setGeneratedVisuals(visualResult);
       saveVisualsForActivity(activity.id, visualResult); // Save to localStorage
@@ -181,7 +188,18 @@ export default function ActivityDetailPage() {
     });
 
     try {
-        const result = await generateActivityDocument(activity);
+        const response = await fetch('/api/genkit/flows/generateActivityDocumentFlow', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(activity),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'La respuesta del servidor no fue exitosa para generar el documento.');
+        }
+        
+        const result = await response.json();
         
         if (!result.docxBase64) {
             throw new Error("El servidor no devolvió un archivo.");
@@ -224,7 +242,18 @@ export default function ActivityDetailPage() {
     });
 
     try {
-        const result = await generateVisualsDocument(generatedVisuals);
+        const response = await fetch('/api/genkit/flows/generateVisualsDocumentFlow', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(generatedVisuals),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'La respuesta del servidor no fue exitosa para generar el documento de visuales.');
+        }
+
+        const result = await response.json();
         
         if (!result.docxBase64) {
             throw new Error("El servidor no devolvió un archivo para los visuales.");

@@ -89,16 +89,15 @@ export default function SvgLabPage() {
         body: JSON.stringify(input),
       });
 
-      const result = await response.json();
-
       if (!response.ok) {
-        throw new Error(result.error || 'Ocurrió un error en el servidor');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Ocurrió un error en el servidor');
       }
       
-      const data = result as SvgGenerationOutput;
-
-      setGeneratedSvg(data.svgCode);
-      const svgBlob = new Blob([data.svgCode], { type: 'image/svg+xml' });
+      const result: SvgGenerationOutput = await response.json();
+      
+      setGeneratedSvg(result.svgCode);
+      const svgBlob = new Blob([result.svgCode], { type: 'image/svg+xml' });
       setFileSize(formatBytes(svgBlob.size));
       toast({
         title: "¡SVG Generado!",

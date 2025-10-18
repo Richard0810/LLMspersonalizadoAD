@@ -97,11 +97,12 @@ export default function VisualGeneratorPage() {
           body: JSON.stringify(flowInput),
       });
 
-      const result = await response.json();
-      
       if (!response.ok) {
-        throw new Error(result.error || 'Ocurrió un error en el servidor');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Ocurrió un error en el servidor');
       }
+      
+      const result = await response.json();
 
       setGeneratedContent(result);
       toast({

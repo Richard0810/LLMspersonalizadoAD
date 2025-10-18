@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
@@ -8,9 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useAuth } from '@/hooks/useAuth';
-import { generateEducationalActivities, GenerateEducationalActivitiesInput } from '@/ai/flows/generate-educational-activity';
-import { consultAIOnLesson, ConsultAIOnLessonInput } from '@/ai/flows/consult-ai-on-lesson';
-import type { ChatMessage, Activity, LessonParams } from '@/types';
+import type { ChatMessage, Activity, LessonParams, GenerateEducationalActivitiesInput, ConsultAIOnLessonInput, GenerateEducationalActivitiesOutput } from '@/types';
 import ChatMessageItem from './ChatMessageItem';
 import { 
   addActivitiesToHistoryLocalStorage, 
@@ -84,7 +81,20 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialParams, onResetSet
         subjectArea: params.subjectArea,
         gradeLevel: params.gradeLevel,
       };
-      const generatedActivities = await generateEducationalActivities(generateInput);
+      
+      const response = await fetch('/api/genkit/flows/generateEducationalActivitiesFlow', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(generateInput),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'La respuesta del servidor no fue exitosa.');
+      }
+
+      const generatedActivities: GenerateEducationalActivitiesOutput = await response.json();
+
       const activitiesWithIds: Activity[] = generatedActivities.map((act, index) => ({
         ...act,
         id: `${Date.now()}-${index}` 
@@ -157,12 +167,24 @@ Generando actividades iniciales...`,
     };
 
     try {
-      const response = await consultAIOnLesson(consultInput);
+      const response = await fetch('/api/genkit/flows/consultAIOnLessonFlow', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(consultInput),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'La respuesta del servidor no fue exitosa.');
+      }
+      
+      const responseData = await response.json();
+
       setMessages(prev => prev.filter(m => m.id !== 'loading-consult'));
       addMessage({
         id: Date.now().toString(),
         sender: 'ai',
-        text: response.answer,
+        text: responseData.answer,
         timestamp: Date.now(),
         type: 'text',
       });
