@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useCallback } from 'react';
@@ -10,7 +9,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Loader2, AlertCircle, ArrowLeft, Palette } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { generateVisualContentAction } from './actions';
 import OutputDisplay from '@/components/visual/OutputDisplay';
 import { Button } from '@/components/ui/button';
 
@@ -90,23 +88,37 @@ export default function VisualGeneratorPage() {
       params: { ...params },
     };
 
-    const result = await generateVisualContentAction(flowInput);
-    setIsLoading(false);
+    try {
+      const response = await fetch('/api/genkit/flows/generateVisualContentFlow', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(flowInput),
+      });
 
-    if (result && result.success && result.data) {
-      setGeneratedContent(result.data);
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.error || 'Ocurrió un error en el servidor');
+      }
+
+      setGeneratedContent(result);
       toast({
         title: "¡Contenido Visual Generado!",
         description: `Tu ${translatedFormatName} está listo.`
       });
-    } else {
-      const errorMessage = result?.error || "Ocurrió un error desconocido durante la generación.";
-      setError(errorMessage);
-      toast({
-        title: "Error de Generación",
-        description: errorMessage,
-        variant: "destructive"
-      });
+
+    } catch(err: any) {
+        const errorMessage = err.message || "Ocurrió un error desconocido durante la generación.";
+        setError(errorMessage);
+        toast({
+          title: "Error de Generación",
+          description: errorMessage,
+          variant: "destructive"
+        });
+    } finally {
+        setIsLoading(false);
     }
   }, [selectedCategory, selectedFormat, toast]);
 
@@ -246,5 +258,3 @@ export default function VisualGeneratorPage() {
     </AppShell>
   );
 }
-
-    

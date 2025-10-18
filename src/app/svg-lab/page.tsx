@@ -11,8 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, AlertCircle, Beaker, Code, Eye, Palette } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { generateSvgAction } from './actions';
-import type { SvgGenerationInput } from '@/types';
+import type { SvgGenerationInput, SvgGenerationOutput } from '@/types';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Canvg } from 'canvg';
 
@@ -83,25 +82,39 @@ export default function SvgLabPage() {
       headers: componentType === 'tabla_personalizada' ? headers : undefined,
     };
     
-    const result = await generateSvgAction(input);
-    setIsLoading(false);
+    try {
+      const response = await fetch('/api/genkit/flows/generateSvgFromGuideFlow', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(input),
+      });
 
-    if (result.success && result.data) {
-      setGeneratedSvg(result.data.svgCode);
-      const svgBlob = new Blob([result.data.svgCode], { type: 'image/svg+xml' });
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Ocurrió un error en el servidor');
+      }
+      
+      const data = result as SvgGenerationOutput;
+
+      setGeneratedSvg(data.svgCode);
+      const svgBlob = new Blob([data.svgCode], { type: 'image/svg+xml' });
       setFileSize(formatBytes(svgBlob.size));
       toast({
         title: "¡SVG Generado!",
         description: `Tu componente SVG está listo.`
       });
-    } else {
-      const errorMessage = result.error || "Ocurrió un error desconocido durante la generación.";
+
+    } catch (err: any) {
+      const errorMessage = err.message || "Ocurrió un error desconocido durante la generación.";
       setError(errorMessage);
       toast({
         title: "Error de Generación",
         description: errorMessage,
         variant: "destructive"
       });
+    } finally {
+        setIsLoading(false);
     }
   };
 
