@@ -135,7 +135,7 @@ export interface ConceptIllustParams {
 }
 
 export const SvgGenerationInputSchema = z.object({
-  componentType: z.enum(['svg_carta_pregunta', 'svg_carta_accion', 'svg_tabla_personalizada']),
+  componentType: z.enum(['carta_pregunta', 'carta_accion', 'tabla_personalizada']),
   color: z.string(),
   title: z.string().optional(),
   content: z.string().optional(),

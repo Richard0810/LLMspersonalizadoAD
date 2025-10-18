@@ -33,15 +33,13 @@ async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: stri
 
     try {
         // @ts-ignore - This is added to bypass the type check in Vercel build
-        const response = await ai.generate({
+        const { media, text } = await ai.generate({
             model: 'googleai/gemini-2.0-flash-exp',
             prompt: fullPrompt,
             config: {
                 responseModalities: ['TEXT', 'IMAGE'], // CRITICAL: This is required to get an image
             },
         });
-        
-        const media = response.media();
 
         if (media && media.url) {
             return { imageUrl: media.url, altText };
