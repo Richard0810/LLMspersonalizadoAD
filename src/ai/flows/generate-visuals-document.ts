@@ -53,15 +53,16 @@ const generateVisualsDocumentFlow = ai.defineFlow(
     outputSchema: GenerateVisualsDocumentOutputSchema,
   },
   async (visualItems) => {
-    // --- 1. Load logo assets ---
+    // --- 1. Load logo assets from the filesystem ---
     let logoUnicorBuffer: Buffer;
     let logoEscudoBuffer: Buffer;
-    const fallbackImage = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', 'base64');
+    const fallbackImage = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', 'base64'); // 1x1 transparent pixel
 
     try {
         const unicorPath = path.join(process.cwd(), 'public', 'logo_unicor.png');
         logoUnicorBuffer = await fs.readFile(unicorPath);
     } catch (error) {
+        console.error("Could not read Unicor logo, using fallback.", error);
         logoUnicorBuffer = fallbackImage;
     }
 
@@ -69,10 +70,11 @@ const generateVisualsDocumentFlow = ai.defineFlow(
         const escudoPath = path.join(process.cwd(), 'public', 'escudo.jpg');
         logoEscudoBuffer = await fs.readFile(escudoPath);
     } catch (error) {
+        console.error("Could not read Escudo logo, using fallback.", error);
         logoEscudoBuffer = fallbackImage;
     }
     
-    // --- 2. Create Header ---
+    // --- 2. Create Header Table ---
     const invisibleBorderStyle = {
         top: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
         bottom: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
@@ -85,13 +87,59 @@ const generateVisualsDocumentFlow = ai.defineFlow(
         rows: [
             new TableRow({
                 children: [
+                    // Left Cell: Unicor Logo and Text
                     new TableCell({
-                        children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new ImageRun({ data: logoUnicorBuffer, transformation: { width: 180, height: 60 } })] })],
-                        borders: invisibleBorderStyle, width: { size: 50, type: WidthType.PERCENTAGE },
+                        children: [
+                            new Paragraph({
+                                alignment: AlignmentType.CENTER,
+                                children: [
+                                    new ImageRun({
+                                        data: logoUnicorBuffer,
+                                        transformation: { width: 180, height: 60 },
+                                    }),
+                                ],
+                                spacing: { after: 120 },
+                            }),
+                            new Paragraph({
+                                alignment: AlignmentType.CENTER,
+                                children: [new TextRun({ text: "Licenciatura en Informática", bold: true, size: 22, font: "Arial" })],
+                                spacing: { after: 120 },
+                            }),
+                            new Paragraph({
+                                alignment: AlignmentType.CENTER,
+                                children: [new TextRun({ text: "Facultad de Educación y Ciencias Humanas", size: 20, font: "Arial" })],
+                                spacing: { after: 120 },
+                            }),
+                        ],
+                        borders: invisibleBorderStyle,
+                        width: { size: 50, type: WidthType.PERCENTAGE },
                     }),
+                    // Right Cell: School Logo and Text
                     new TableCell({
-                        children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new ImageRun({ data: logoEscudoBuffer, transformation: { width: 64, height: 64 } })] })],
-                         borders: invisibleBorderStyle, width: { size: 50, type: WidthType.PERCENTAGE },
+                        children: [
+                           new Paragraph({
+                                alignment: AlignmentType.CENTER,
+                                children: [
+                                    new ImageRun({
+                                        data: logoEscudoBuffer,
+                                        transformation: { width: 64, height: 64 },
+                                    }),
+                                ],
+                                spacing: { after: 120 },
+                            }),
+                            new Paragraph({
+                                alignment: AlignmentType.CENTER,
+                                children: [new TextRun({ text: "I.E. Alfonso Spath Spath", bold: true, size: 22, font: "Arial" })],
+                                spacing: { after: 120 },
+                            }),
+                             new Paragraph({
+                                alignment: AlignmentType.CENTER,
+                                children: [new TextRun({ text: "Martinez - Cereté, Córdoba", size: 20, font: "Arial" })],
+                                spacing: { after: 120 },
+                            }),
+                        ],
+                         borders: invisibleBorderStyle,
+                         width: { size: 50, type: WidthType.PERCENTAGE },
                     }),
                 ],
             }),
