@@ -470,8 +470,7 @@ export default function ActivityDetailPage() {
             </CardHeader>
             <CardContent className="space-y-6">
               {generatedVisuals.map((item, index) => {
-                // No renderizar tarjetas vacías si no hay ni SVG ni imagen
-                if (!item.svgCode && !item.imageUrl && item.text) {
+                if (!item.svgCode && !item.imageUrl) {
                     // Render simple text for headers or non-visual items
                      return (
                         <div key={index} className="p-4 bg-muted/30 rounded-lg">
@@ -479,8 +478,6 @@ export default function ActivityDetailPage() {
                         </div>
                     );
                 }
-
-                if (!item.svgCode && !item.imageUrl) return null;
                 
                 return (
                     <div key={index} className="p-4 bg-muted/30 rounded-lg border border-primary/20">
@@ -488,9 +485,11 @@ export default function ActivityDetailPage() {
                         className="text-muted-foreground whitespace-pre-line mb-4 italic border-l-4 border-muted-foreground/30 pl-3"
                         dangerouslySetInnerHTML={{ __html: item.text }}
                     />
-
+                    
                     {item.svgCode && (
-                        <div className="mb-4 flex justify-center" dangerouslySetInnerHTML={{ __html: item.svgCode }} />
+                       <div className="mb-4 flex justify-center">
+                         <div className="w-full max-w-[200px]" dangerouslySetInnerHTML={{ __html: item.svgCode }} />
+                       </div>
                     )}
 
                     {item.imageUrl && (

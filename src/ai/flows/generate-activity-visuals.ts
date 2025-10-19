@@ -75,21 +75,23 @@ Your task is to analyze a list of activity resources and, for EACH item, generat
 1.  **Process EVERY Item:** You MUST process EACH item from the input string, which is separated by newlines.
 2.  **Choose ONE path:** For each resource, you must decide to generate parameters for EITHER 'svgGenerationInput' OR 'imagePrompt'. NEVER both.
 3.  **SVG for Components:** If a resource describes structured content like a card or a table, you MUST generate an 'svgGenerationInput' object for it. 'imagePrompt' MUST be null.
-    *   For cards, identify if it's a 'carta_pregunta' (if it asks something) or 'carta_accion' (if it gives an instruction). Extract the 'title' and 'content'. Use a default color like '#28a745'.
-    *   For tables, set componentType to 'tabla_personalizada'. Extract the 'title', 'numRows', 'numCols', and 'headers'.
 4.  **Image Prompts for Drawings ONLY:** Only generate an 'imagePrompt' if the resource explicitly describes a physical, visual item to be DRAWN or CREATED BY HAND (e.g., "Dibuja un tablero con 20 casillas", "Crea un mapa del tesoro en una cartulina", "Un semáforo hecho con cartulina"). 'svgGenerationInput' MUST be null.
 5.  **Headers and Titles:** If an item is just a header for sub-items (e.g., "Tarjetas de acción rítmica:"), you MUST treat it as a simple text item. Both 'svgGenerationInput' and 'imagePrompt' MUST be null. The text itself will be used as a title in the UI.
 6.  **Simple Items = Null:** For simple resources that don't need a visual component (e.g., "Un lápiz", "Tijeras", "Una moneda"), BOTH 'svgGenerationInput' and 'imagePrompt' MUST be null.
+7.  **QUANTITY & CONTENT (EXTREMELY IMPORTANT):** If a resource line specifies a quantity (e.g., "Tarjetas de Instrucción (10 tarjetas): ... con ejemplo: 'Sumar A y B'"), you MUST generate an array with EXACTLY that number of items. For each item in the array, you MUST generate a relevant and distinct 'title' and 'content', using the provided examples as a guide and creatively completing the rest. DO NOT generate empty or generic cards. Each card MUST have meaningful content derived from the instruction.
 
-**CRITICAL EXAMPLE FOR SVG CARD:**
--   **Input Resource:** "Tarjeta de Instrucción: Título: AVANZAR, Contenido: Avanza 2 casillas."
--   **Your Output 'svgGenerationInput':** \`{ "componentType": "carta_accion", "color": "#28a745", "title": "AVANZAR", "content": "Avanza 2 casillas" }\`
--   **'imagePrompt' MUST be null.**
+**CRITICAL EXAMPLE FOR SVG CARD (Expanding Quantity):**
+-   **Input Resource:** "Tarjetas de Instrucción (3 tarjetas): Cada tarjeta debe tener una instrucción simple, por ejemplo: 'Sumar A y B', 'Restar B de A'."
+-   **Your Output (must be an array of 3 objects):**
+    [
+      { "text": "Tarjeta de Instrucción 1", "svgGenerationInput": { "componentType": "carta_accion", "color": "#17a2b8", "title": "INSTRUCCIÓN", "content": "Sumar A y B" }, "imagePrompt": null },
+      { "text": "Tarjeta de Instrucción 2", "svgGenerationInput": { "componentType": "carta_accion", "color": "#17a2b8", "title": "INSTRUCCIÓN", "content": "Restar B de A" }, "imagePrompt": null },
+      { "text": "Tarjeta de Instrucción 3", "svgGenerationInput": { "componentType": "carta_accion", "color": "#17a2b8", "title": "INSTRUCCIÓN", "content": "Guardar resultado en A" }, "imagePrompt": null }
+    ]
 
 **CRITICAL EXAMPLE FOR IMAGE PROMPT:**
 -   **Input Resource:** "Un semáforo de cartulina con círculos de colores rojo, amarillo y verde."
--   **Your Output 'imagePrompt':** "Un dibujo de un semáforo simple hecho de cartulina, estilo guía para manualidades, mostrando claramente los círculos rojo, amarillo y verde."
--   **'svgGenerationInput' MUST be null.**
+-   **Your Output:** \`[{ "text": "Un semáforo de cartulina...", "svgGenerationInput": null, "imagePrompt": "Un dibujo de un semáforo simple hecho de cartulina, estilo guía para manualidades, mostrando claramente los círculos rojo, amarillo y verde." }]\`
 
 Analyze the following activity resources and provide the output in the required JSON array format, following all rules.
 
@@ -145,6 +147,9 @@ const generateActivityVisualsFlow = ai.defineFlow(
 
     const finalVisualItems = await Promise.all(generationPromises);
     
-    return finalVisualItems;
+    // The analysis result might be a nested array if the AI expands a quantity. Flatten it.
+    const flattenedItems = finalVisualItems.flat();
+
+    return flattenedItems;
   }
 );
