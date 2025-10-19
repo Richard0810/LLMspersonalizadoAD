@@ -14,7 +14,7 @@ import type { VisualItem } from '@/types';
 const VisualAnalysisItemSchema = z.object({
   text: z.string().describe('The original, unmodified text of the resource item.'),
   htmlContent: z.string().nullable().describe('A self-contained, Tailwind-styled HTML block for this resource. If the resource is a simple text that doesn\'t need a visual component, this MUST be null.'),
-  imagePrompt: z.string().nullable().describe("A detailed, specific prompt for a text-to-image model to generate a visual guide. This should ONLY be created if the resource describes a physical item to be drawn or built (e.g., a game board, a specific craft). For abstract cards or simple items, this MUST be null."),
+  imagePrompt: z.string().nullable().describe("A detailed, specific prompt for a text-to-image model to generate a visual guide. This should ONLY be created if the resource describes a physical item to be DRAWN or CREATED BY HAND (e.g., a game board, a specific craft). For abstract cards or simple items, this MUST be null."),
 });
 
 const VisualAnalysisSchema = z.array(VisualAnalysisItemSchema);
@@ -70,7 +70,7 @@ Your task is to analyze a list of activity resources and, for EACH item, generat
 
 **CRITICAL RULES (NON-NEGOTIABLE):**
 1.  **Process EVERY Item:** You MUST process EACH item from the input string, which is separated by newlines.
-2.  **Generate One Component per Item:** For each resource, you must decide to generate EITHER 'htmlContent' OR 'imagePrompt', but NEVER both. If 'htmlContent' is generated, 'imagePrompt' MUST be null.
+2.  **Generate One Component per Item:** For each resource, you must decide to generate EITHER 'htmlContent' OR 'imagePrompt'. If 'htmlContent' is generated, 'imagePrompt' MUST be null.
 3.  **HTML for Structured Data:** If a resource describes structured content (like a card with title/action, a table with columns, or a list of instructions), you MUST generate 'htmlContent' for it. For example, "Plantilla... dividida en dos columnas: 'Instrucción' y 'Repeticiones'" MUST be generated as an HTML table.
 4.  **Image Prompts for Drawings ONLY:** Only generate an 'imagePrompt' if the resource explicitly describes a physical, visual item to be DRAWN or CREATED BY HAND (e.g., "Dibuja un tablero con 20 casillas", "Crea un mapa del tesoro en una cartulina").
 5.  **Headers as HTML:** If an item is a header for sub-items (e.g., "Tarjetas de acción rítmica:"), you MUST generate an 'htmlContent' block that styles it as a title (e.g., \`<h4 class="text-2xl font-bold ...">...</h4>\`). 'imagePrompt' MUST be null.
