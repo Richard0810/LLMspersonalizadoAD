@@ -5,7 +5,7 @@ import { openDB, type DBSchema } from 'idb';
 import type { VisualItem } from '@/types';
 
 const DB_NAME = 'EduSparkDB';
-const DB_VERSION = 1;
+const DB_VERSION = 2; // Incremented version
 const STORE_NAME = 'visualContent';
 
 interface EduSparkDBSchema extends DBSchema {
@@ -17,8 +17,11 @@ interface EduSparkDBSchema extends DBSchema {
 
 async function getDB() {
   return openDB<EduSparkDBSchema>(DB_NAME, DB_VERSION, {
-    upgrade(db) {
-      if (!db.objectStoreNames.contains(STORE_NAME)) {
+    upgrade(db, oldVersion) {
+      if (oldVersion < 2) {
+        if (db.objectStoreNames.contains(STORE_NAME)) {
+          db.deleteObjectStore(STORE_NAME);
+        }
         db.createObjectStore(STORE_NAME);
       }
     },

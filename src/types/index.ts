@@ -67,11 +67,22 @@ export const computationalConcepts = [
   "Todos los conceptos"
 ];
 
+export const SvgGenerationInputSchema = z.object({
+  componentType: z.enum(['carta_pregunta', 'carta_accion', 'tabla_personalizada']),
+  color: z.string(),
+  title: z.string().optional(),
+  content: z.string().optional(),
+  numRows: z.number().optional(),
+  numCols: z.number().optional(),
+  headers: z.string().optional(),
+});
+export type SvgGenerationInput = z.infer<typeof SvgGenerationInputSchema>;
 
 // Activity Visuals Types
 export interface VisualItem {
   text: string;
-  htmlContent: string | null;
+  svgCode: string | null; // Reemplaza htmlContent
+  svgGenerationInput: SvgGenerationInput | null; // Nuevo campo para los parámetros
   imageUrl: string | null;
   imageAlt: string | null;
 }
@@ -133,17 +144,6 @@ export interface ConceptIllustParams {
   visualStyle: string; // e.g., 'fotorrealista', 'ilustración estilizada'
   specificElements?: string;
 }
-
-export const SvgGenerationInputSchema = z.object({
-  componentType: z.enum(['carta_pregunta', 'carta_accion', 'tabla_personalizada']),
-  color: z.string(),
-  title: z.string().optional(),
-  content: z.string().optional(),
-  numRows: z.number().optional(),
-  numCols: z.number().optional(),
-  headers: z.string().optional(),
-});
-export type SvgGenerationInput = z.infer<typeof SvgGenerationInputSchema>;
 
 
 export interface GenerateVisualContentFlowInput {

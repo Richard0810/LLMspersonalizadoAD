@@ -1,20 +1,23 @@
 
 'use server';
 /**
- * @fileOverview A Genkit flow to analyze an educational activity's resources and generate rich HTML components and conditional image guides.
- * The flow acts as an "Art Director AI", generating rich HTML components for activity resources and deciding when to generate an image guide.
+ * @fileOverview A Genkit flow to analyze an educational activity's resources and generate SVG parameters or image prompts.
+ * The flow acts as an "Art Director AI", deciding whether to generate parameters for an SVG component (like a card or table)
+ * or an image prompt for something that needs to be drawn by hand.
  * - generateActivityVisuals - The main exported function to trigger the flow.
  */
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
-import type { VisualItem } from '@/types';
+import type { VisualItem, SvgGenerationInput } from '@/types';
+import { SvgGenerationInputSchema } from '@/types';
+import { generateSvgFromGuide } from './generate-svg-code';
 
 // Step 1: AI analysis output schema
 const VisualAnalysisItemSchema = z.object({
   text: z.string().describe('The original, unmodified text of the resource item.'),
-  htmlContent: z.string().nullable().describe('A self-contained, Tailwind-styled HTML block for this resource. If the resource is a simple text that doesn\'t need a visual component, this MUST be null.'),
-  imagePrompt: z.string().nullable().describe("A detailed, specific prompt for a text-to-image model to generate a visual guide. This should ONLY be created if the resource describes a physical item to be DRAWN or CREATED BY HAND (e.g., a game board, a specific craft). For abstract cards or simple items, this MUST be null."),
+  svgGenerationInput: SvgGenerationInputSchema.nullable().describe("An object with the exact parameters for the 'generateSvgFromGuide' flow. This MUST be generated if the resource describes a card, table, or other structured component. If an 'imagePrompt' is generated, this MUST be null."),
+  imagePrompt: z.string().nullable().describe("A detailed, specific prompt for a text-to-image model. This should ONLY be created if the resource describes a physical item to be DRAWN or CREATED BY HAND (e.g., a game board, a craft). If 'svgGenerationInput' is generated, this MUST be null."),
 });
 
 const VisualAnalysisSchema = z.array(VisualAnalysisItemSchema);
@@ -29,15 +32,15 @@ const ActivityResourcesInputSchema = z.object({
  */
 async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: string, altText: string } | null> {
     const fullPrompt = `Educational illustration, simple, clean, minimalist, whiteboard drawing style for a teacher's guide: ${prompt}`;
-    const altText = `Guía visual para: ${prompt.substring(0, 100)}`; // Simple and reliable alt text
+    const altText = `Guía visual para: ${prompt.substring(0, 100)}`;
 
     try {
         // @ts-ignore - This is added to bypass the type check in Vercel build
-        const { media, text } = await ai.generate({
+        const { media } = await ai.generate({
             model: 'googleai/gemini-2.0-flash-exp',
             prompt: fullPrompt,
             config: {
-                responseModalities: ['TEXT', 'IMAGE'], // CRITICAL: This is required to get an image
+                responseModalities: ['TEXT', 'IMAGE'],
             },
         });
 
@@ -66,46 +69,27 @@ const analysisPrompt = ai.definePrompt({
     input: { schema: ActivityResourcesInputSchema },
     output: { schema: VisualAnalysisSchema },
     prompt: `You are an expert UI/UX designer and Art Director specializing in educational materials.
-Your task is to analyze a list of activity resources and, for EACH item, generate a rich visual representation.
+Your task is to analyze a list of activity resources and, for EACH item, generate a plan to create a visual component.
 
 **CRITICAL RULES (NON-NEGOTIABLE):**
 1.  **Process EVERY Item:** You MUST process EACH item from the input string, which is separated by newlines.
-2.  **Generate One Component per Item:** For each resource, you must decide to generate EITHER 'htmlContent' OR 'imagePrompt'. If 'htmlContent' is generated, 'imagePrompt' MUST be null.
-3.  **HTML for Structured Data:** If a resource describes structured content (like a card with title/action, a table with columns, or a list of instructions), you MUST generate 'htmlContent' for it. For example, "Plantilla... dividida en dos columnas: 'Instrucción' y 'Repeticiones'" MUST be generated as an HTML table.
-4.  **Image Prompts for Drawings ONLY:** Only generate an 'imagePrompt' if the resource explicitly describes a physical, visual item to be DRAWN or CREATED BY HAND (e.g., "Dibuja un tablero con 20 casillas", "Crea un mapa del tesoro en una cartulina").
-5.  **Headers as HTML:** If an item is a header for sub-items (e.g., "Tarjetas de acción rítmica:"), you MUST generate an 'htmlContent' block that styles it as a title (e.g., \`<h4 class="text-2xl font-bold ...">...</h4>\`). 'imagePrompt' MUST be null.
-6.  **Simple Items = Null:** For simple resources that don't need a visual component (e.g., "Un lápiz", "Tijeras", "Una moneda"), BOTH 'htmlContent' and 'imagePrompt' MUST be null.
+2.  **Choose ONE path:** For each resource, you must decide to generate parameters for EITHER 'svgGenerationInput' OR 'imagePrompt'. NEVER both.
+3.  **SVG for Components:** If a resource describes structured content like a card or a table, you MUST generate an 'svgGenerationInput' object for it. 'imagePrompt' MUST be null.
+    *   For cards, identify if it's a 'carta_pregunta' (if it asks something) or 'carta_accion' (if it gives an instruction). Extract the 'title' and 'content'. Use a default color like '#28a745'.
+    *   For tables, set componentType to 'tabla_personalizada'. Extract the 'title', 'numRows', 'numCols', and 'headers'.
+4.  **Image Prompts for Drawings ONLY:** Only generate an 'imagePrompt' if the resource explicitly describes a physical, visual item to be DRAWN or CREATED BY HAND (e.g., "Dibuja un tablero con 20 casillas", "Crea un mapa del tesoro en una cartulina", "Un semáforo hecho con cartulina"). 'svgGenerationInput' MUST be null.
+5.  **Headers and Titles:** If an item is just a header for sub-items (e.g., "Tarjetas de acción rítmica:"), you MUST treat it as a simple text item. Both 'svgGenerationInput' and 'imagePrompt' MUST be null. The text itself will be used as a title in the UI.
+6.  **Simple Items = Null:** For simple resources that don't need a visual component (e.g., "Un lápiz", "Tijeras", "Una moneda"), BOTH 'svgGenerationInput' and 'imagePrompt' MUST be null.
 
-**HTML & STYLING REQUIREMENTS ('htmlContent'):**
-*   Use Tailwind CSS classes ONLY. DO NOT use inline \`<style>\` tags.
-*   **Card Design**: Create a vertical card. Use classes like \`border\`, \`rounded-lg\`, \`shadow-lg\`, \`w-full\`, \`max-w-xs\`, \`mx-auto\`, \`bg-card\`, \`font-sans\`, \`overflow-hidden\`.
-    *   **Header**: A div with a background color (\`bg-primary\`, \`p-3\`).
-    *   **Main Title**: Inside, an \`h3\` with \`text-xl\`, \`font-bold\`, \`text-primary-foreground\`, \`text-center\`, \`uppercase\`.
-    *   **Content Body**: Main content area with padding (\`p-6\`).
-    *   **Symbol/Icon**: Centered (\`text-center\`), large (\`text-6xl\`), with space (\`my-4\`). Use unicode characters.
-    *   **Separator**: A horizontal rule (\`<hr class="border-border">\`).
-    *   **Text Details**: Labels like "Acción:" MUST be in \`<strong>\` tags.
-*   **For tables**: If a resource describes a "tabla" or "columnas", you MUST generate a valid HTML \`<table>\` with Tailwind classes (\`w-full\`, \`border-collapse\`), and style the header (\`bg-gray-100\`).
-*   **CRITICAL EXAMPLE FOR CARD**: For "Título: PALMADA, Acción: Dar una palmada., Símbolo: 👏", the HTML MUST look like this:
-    \`\`\`html
-    <div class="border rounded-lg shadow-lg w-full max-w-xs mx-auto bg-card font-sans overflow-hidden">
-      <div class="bg-primary p-3">
-        <h3 class="text-xl font-bold text-primary-foreground text-center uppercase">PALMADA</h3>
-      </div>
-      <div class="p-6">
-        <div class="text-center text-6xl my-4">👏</div>
-        <hr class="border-border">
-        <div class="mt-4 space-y-2 text-sm">
-          <p><strong class="text-foreground">Acción:</strong> <span class="text-muted-foreground">Dar una palmada.</span></p>
-        </div>
-      </div>
-    </div>
-    \`\`\`
-*   **CRITICAL EXAMPLE FOR TABLE**: For "Plantilla... dividida en dos columnas: 'Instrucción' y 'Repeticiones'.", generate an HTML table. 'imagePrompt' MUST be null.
+**CRITICAL EXAMPLE FOR SVG CARD:**
+-   **Input Resource:** "Tarjeta de Instrucción: Título: AVANZAR, Contenido: Avanza 2 casillas."
+-   **Your Output 'svgGenerationInput':** \`{ "componentType": "carta_accion", "color": "#28a745", "title": "AVANZAR", "content": "Avanza 2 casillas" }\`
+-   **'imagePrompt' MUST be null.**
 
-**IMAGE PROMPT REQUIREMENTS ('imagePrompt'):**
-*   Be specific. Instead of "un tablero", describe "Un tablero de juego simple, estilo dibujo, con 20 casillas numeradas. La casilla 1 dice 'Inicio' y la 20 'Fin'."
-*   If you generate an 'imagePrompt', 'htmlContent' MUST be null.
+**CRITICAL EXAMPLE FOR IMAGE PROMPT:**
+-   **Input Resource:** "Un semáforo de cartulina con círculos de colores rojo, amarillo y verde."
+-   **Your Output 'imagePrompt':** "Un dibujo de un semáforo simple hecho de cartulina, estilo guía para manualidades, mostrando claramente los círculos rojo, amarillo y verde."
+-   **'svgGenerationInput' MUST be null.**
 
 Analyze the following activity resources and provide the output in the required JSON array format, following all rules.
 
@@ -123,36 +107,44 @@ const generateActivityVisualsFlow = ai.defineFlow(
     outputSchema: z.array(z.custom<VisualItem>()),
   },
   async (input) => {
-    // Step 1: Analyze the resources to decide what to generate (HTML and/or image prompts)
+    // Step 1: Analyze the resources to decide what to generate (SVG inputs and/or image prompts)
     const { output: analysisResult } = await analysisPrompt(input);
     
     if (!analysisResult) {
       throw new Error("AI analysis failed to produce a visual plan for the resources.");
     }
 
-    // Step 2: Concurrently generate images for items that have an imagePrompt
-    const imageGenerationPromises = analysisResult.map(item => {
-        if (item.imagePrompt) {
-            return generateImageAndAltText(item.imagePrompt);
+    // Step 2: Concurrently generate all visuals (both SVG and images)
+    const generationPromises = analysisResult.map(async (item) => {
+        let svgCode: string | null = null;
+        let imageUrl: string | null = null;
+        let imageAlt: string | null = null;
+
+        if (item.svgGenerationInput) {
+            // Generate SVG from the parameters
+            const svgResult = await generateSvgFromGuide(item.svgGenerationInput);
+            svgCode = svgResult.svgCode;
+        } else if (item.imagePrompt) {
+            // Generate image from the prompt
+            const imageResult = await generateImageAndAltText(item.imagePrompt);
+            if (imageResult) {
+                imageUrl = imageResult.imageUrl;
+                imageAlt = imageResult.altText;
+            }
         }
-        return Promise.resolve(null); // No image needed for this item
-    });
 
-    const generatedImages = await Promise.all(imageGenerationPromises);
-
-    // Step 3: Combine the analysis results with the generated images
-    const finalVisualItems: VisualItem[] = analysisResult.map((item, index) => {
-        const imageResult = generatedImages[index];
-        return {
+        const finalItem: VisualItem = {
             text: item.text,
-            htmlContent: item.htmlContent,
-            imageUrl: imageResult ? imageResult.imageUrl : null,
-            imageAlt: imageResult ? imageResult.altText : null,
+            svgGenerationInput: item.svgGenerationInput,
+            svgCode,
+            imageUrl,
+            imageAlt,
         };
+        return finalItem;
     });
+
+    const finalVisualItems = await Promise.all(generationPromises);
     
     return finalVisualItems;
   }
 );
-
-    
