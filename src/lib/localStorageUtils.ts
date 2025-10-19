@@ -1,11 +1,10 @@
 
 
-import type { User, Activity, LessonParams, ChatMessage, VisualItem } from '@/types';
+import type { User, Activity, LessonParams, ChatMessage } from '@/types';
 
 const LESSON_PARAMS_KEY = 'eduspark_lesson_params';
 const ACTIVITY_HISTORY_KEY = 'eduspark_activity_history';
 const CHAT_HISTORY_KEY = 'eduspark_chat_history';
-const VISUAL_CONTENT_KEY_PREFIX = 'eduspark_visual_content_';
 const MAX_HISTORY_ITEMS = 10;
 
 // Lesson Parameters
@@ -94,28 +93,3 @@ export const clearChatHistoryFromLocalStorage = (): void => {
     localStorage.removeItem(CHAT_HISTORY_KEY);
   }
 };
-
-// Visual Content per Activity
-export const saveVisualsForActivity = (activityId: string, visuals: VisualItem[]): void => {
-  if (typeof window !== 'undefined') {
-    const key = `${VISUAL_CONTENT_KEY_PREFIX}${activityId}`;
-    localStorage.setItem(key, JSON.stringify(visuals));
-  }
-};
-
-export const getVisualsForActivity = (activityId: string): VisualItem[] | null => {
-  if (typeof window !== 'undefined') {
-    const key = `${VISUAL_CONTENT_KEY_PREFIX}${activityId}`;
-    const visualsJson = localStorage.getItem(key);
-    return visualsJson ? JSON.parse(visualsJson) : null;
-  }
-  return null;
-};
-
-export const clearVisualsForActivity = (activityId: string): void => {
-    if (typeof window !== 'undefined') {
-        const key = `${VISUAL_CONTENT_KEY_PREFIX}${activityId}`;
-        localStorage.removeItem(key);
-    }
-};
-    

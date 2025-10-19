@@ -9,7 +9,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, ListChecks, BookOpen, ThumbsUp, Sparkles, Loader2, Clock, ClipboardCheck, Brain, Layers, Wand2, FileDown, UserCheck, Trash2 } from 'lucide-react';
 import type { Activity, VisualItem } from '@/types';
-import { getActivityByIdFromLocalStorage, saveVisualsForActivity, getVisualsForActivity, clearVisualsForActivity } from '@/lib/localStorageUtils';
+import { getActivityByIdFromLocalStorage } from '@/lib/localStorageUtils';
+import { saveVisualsForActivity, getVisualsForActivity, clearVisualsForActivity } from '@/lib/db';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { generateActivityVisuals } from '@/ai/flows/generate-activity-visuals';
@@ -125,17 +126,29 @@ export default function ActivityDetailPage() {
   const activityId = Array.isArray(params.id) ? params.id[0] : params.id as string;
 
   useEffect(() => {
-    if (activityId) {
-      const fetchedActivity = getActivityByIdFromLocalStorage(activityId);
-      setActivity(fetchedActivity);
-      
-      const savedVisuals = getVisualsForActivity(activityId);
-      if (savedVisuals) {
-        setGeneratedVisuals(savedVisuals);
+    const loadData = async () => {
+      if (activityId) {
+        const fetchedActivity = getActivityByIdFromLocalStorage(activityId);
+        setActivity(fetchedActivity);
+        
+        try {
+          const savedVisuals = await getVisualsForActivity(activityId);
+          if (savedVisuals) {
+            setGeneratedVisuals(savedVisuals);
+          }
+        } catch (dbError) {
+          console.error("Error loading visuals from IndexedDB:", dbError);
+          toast({
+            title: "Error al Cargar Apoyos Visuales",
+            description: "No se pudieron cargar los apoyos visuales guardados. Puede que necesites volver a generarlos.",
+            variant: "destructive",
+          });
+        }
       }
-    }
-    setIsLoading(false);
-  }, [activityId]);
+      setIsLoading(false);
+    };
+    loadData();
+  }, [activityId, toast]);
 
   const handleGenerateVisualContent = async () => {
     if (!activity) return;
@@ -150,14 +163,23 @@ export default function ActivityDetailPage() {
     try {
       const visualResult = await generateActivityVisuals(activity.activityResources);
       
-      setGeneratedVisuals(visualResult);
-      saveVisualsForActivity(activity.id, visualResult); // Save to localStorage
-
-      toast({
-        title: "¡Apoyo Visual Generado!",
-        description: "Los recursos visuales para tu actividad están listos.",
-        className: 'bg-green-100 border-green-400 text-green-800'
-      });
+      try {
+        await saveVisualsForActivity(activity.id, visualResult); // Save to IndexedDB
+        setGeneratedVisuals(visualResult);
+        toast({
+          title: "¡Apoyo Visual Generado y Guardado!",
+          description: "Los recursos visuales para tu actividad están listos y se guardaron en tu navegador.",
+          className: 'bg-green-100 border-green-400 text-green-800'
+        });
+      } catch (dbError) {
+        setGeneratedVisuals(visualResult); // Show the visuals even if saving fails
+        console.error("Error saving to IndexedDB:", dbError);
+        toast({
+          title: "¡Apoyo Visual Generado!",
+          description: "Los recursos están listos, pero no se pudieron guardar para la próxima vez debido a un error de almacenamiento.",
+          variant: "destructive",
+        });
+      }
 
     } catch (error) {
       console.error("Error generando contenido visual de la actividad:", error);
@@ -257,13 +279,13 @@ export default function ActivityDetailPage() {
     }
   };
 
-  const handleDeleteVisualContent = () => {
+  const handleDeleteVisualContent = async () => {
     if (!activityId) return;
-    clearVisualsForActivity(activityId);
+    await clearVisualsForActivity(activityId);
     setGeneratedVisuals(null);
     toast({
         title: "Contenido Eliminado",
-        description: "El apoyo visual generado ha sido eliminado.",
+        description: "El apoyo visual guardado ha sido eliminado.",
     });
   };
   
