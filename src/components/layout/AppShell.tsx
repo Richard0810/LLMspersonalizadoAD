@@ -109,7 +109,7 @@ export const AppShell: React.FC<AppShellProps> = ({
           <SidebarFooter>
              <div className="flex items-center gap-2">
                 <Image
-                  src="/Logo Eduspark.jpg"
+                  src="/Logo Eduspark.jpg?v=2"
                   alt="Logo EduSpark AI"
                   width={40}
                   height={40}
