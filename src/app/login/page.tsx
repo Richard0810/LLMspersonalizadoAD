@@ -65,7 +65,7 @@ export default function LoginPage() {
                 </h1>
               </div>
               <Image
-                src="/Logo Eduspark.jpg"
+                src="/Logo Eduspark.jpg?v=2"
                 alt="Logo EduSpark AI"
                 width={60}
                 height={60}
