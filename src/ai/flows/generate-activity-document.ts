@@ -177,7 +177,7 @@ const generateActivityDocumentFlow = ai.defineFlow(
   async (activity) => {
     // --- 1. Load logo assets from the filesystem ---
     let logoUnicorBuffer: Buffer;
-    let logoEscudoBuffer: Buffer;
+    let logoEdusparkBuffer: Buffer;
     const fallbackImage = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', 'base64'); // 1x1 transparent pixel
 
     try {
@@ -189,11 +189,11 @@ const generateActivityDocumentFlow = ai.defineFlow(
     }
 
     try {
-        const escudoPath = path.join(process.cwd(), 'public', 'escudo.jpg');
-        logoEscudoBuffer = await fs.readFile(escudoPath);
+        const edusparkPath = path.join(process.cwd(), 'public', 'Logo Eduspark.jpg');
+        logoEdusparkBuffer = await fs.readFile(edusparkPath);
     } catch (error) {
-        console.error("Could not read Escudo logo, using fallback.", error);
-        logoEscudoBuffer = fallbackImage;
+        console.error("Could not read EduSpark logo, using fallback.", error);
+        logoEdusparkBuffer = fallbackImage;
     }
     
     // --- 2. Create Header Table ---
@@ -236,14 +236,14 @@ const generateActivityDocumentFlow = ai.defineFlow(
                         borders: invisibleBorderStyle,
                         width: { size: 50, type: WidthType.PERCENTAGE },
                     }),
-                    // Right Cell: School Logo and Text
+                    // Right Cell: EduSpark Logo and Text
                     new TableCell({
                         children: [
                            new Paragraph({
                                 alignment: AlignmentType.CENTER,
                                 children: [
                                     new ImageRun({
-                                        data: logoEscudoBuffer,
+                                        data: logoEdusparkBuffer,
                                         transformation: { width: 64, height: 64 },
                                     }),
                                 ],
@@ -251,12 +251,7 @@ const generateActivityDocumentFlow = ai.defineFlow(
                             }),
                             new Paragraph({
                                 alignment: AlignmentType.CENTER,
-                                children: [new TextRun({ text: "I.E. Alfonso Spath Spath", bold: true, size: 22, font: "Arial" })],
-                                spacing: { after: 120 },
-                            }),
-                             new Paragraph({
-                                alignment: AlignmentType.CENTER,
-                                children: [new TextRun({ text: "Martinez - Cereté, Córdoba", size: 20, font: "Arial" })],
+                                children: [new TextRun({ text: "EduSpark AI", bold: true, size: 24, font: "Arial", color: "229954" })],
                                 spacing: { after: 120 },
                             }),
                         ],
@@ -359,5 +354,3 @@ export async function generateActivityDocument(
 ): Promise<z.infer<typeof GenerateActivityDocumentOutputSchema>> {
   return generateActivityDocumentFlow(input);
 }
-
-    
