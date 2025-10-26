@@ -116,7 +116,7 @@ export const AppShell: React.FC<AppShellProps> = ({
                   className="w-10 h-10 rounded-full"
                 />
                 <div className='transition-opacity duration-200 group-data-[collapsible=icon]:opacity-0'>
-                    <p className="text-sm font-bold text-primary">EduSpark AI</p>
+                    <p className="text-sm font-bold animate-background-shine bg-[length:200%_auto] bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">EduSpark AI</p>
                 </div>
             </div>
           </SidebarFooter>
