@@ -47,7 +47,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ page, lessonParams, onRese
       <div className="flex items-center gap-2">
         <SidebarTrigger className="md:hidden"/>
         <h1 className="text-xl md:text-2xl font-bold text-primary font-headline animate-background-shine bg-[length:200%_auto] bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-          EDUSPARK AI
+          EduSpark AI
         </h1>
       </div>
       

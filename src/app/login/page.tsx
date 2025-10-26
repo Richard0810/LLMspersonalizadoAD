@@ -59,13 +59,13 @@ export default function LoginPage() {
             {/* EduSpark AI Project */}
              <div className="flex items-center gap-2 min-w-0">
               <div className="text-right min-w-0">
-                <h1 className="text-sm md:text-base font-headline font-bold uppercase text-primary tracking-wider truncate">
+                <h1 className="text-sm md:text-base font-headline font-bold uppercase text-primary tracking-wider truncate animate-background-shine bg-[length:200%_auto] bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
                    <Wand2 className="inline-block h-4 w-4 md:h-5 md:w-5 mr-1 md:mr-2" />
                   EduSpark AI
                 </h1>
               </div>
               <Image
-                src="/Logo Eduspark.jpg?v=2"
+                src="/Logo Eduspark.jpg"
                 alt="Logo EduSpark AI"
                 width={60}
                 height={60}
