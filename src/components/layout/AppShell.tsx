@@ -109,15 +109,14 @@ export const AppShell: React.FC<AppShellProps> = ({
           <SidebarFooter>
              <div className="flex items-center gap-2">
                 <Image
-                  src="/escudo.jpg"
-                  alt="Escudo Institucional"
+                  src="/Logo Eduspark.jpg?v=2"
+                  alt="Logo EduSpark AI"
                   width={40}
                   height={40}
-                  className="w-10 h-10"
+                  className="w-10 h-10 rounded-full"
                 />
                 <div className='transition-opacity duration-200 group-data-[collapsible=icon]:opacity-0'>
-                    <p className="text-xs font-bold text-foreground">I.E. Alfonso Spath Spath</p>
-                    <p className="text-xs text-muted-foreground">Martinez - Cereté, Córdoba</p>
+                    <p className="text-sm font-bold animate-background-shine bg-[length:200%_auto] bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">EduSpark AI</p>
                 </div>
             </div>
           </SidebarFooter>

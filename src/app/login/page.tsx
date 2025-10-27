@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import InteractiveBackground from '@/components/shared/InteractiveBackground';
-import { Eye, EyeOff, LogInIcon, School, GraduationCap } from 'lucide-react';
+import { Eye, EyeOff, LogInIcon, School, GraduationCap, Wand2 } from 'lucide-react';
 import Image from 'next/image';
 
 export default function LoginPage() {
@@ -56,22 +56,21 @@ export default function LoginPage() {
               </div>
             </div>
             
-            {/* Institucion Educativa */}
+            {/* EduSpark AI Project */}
              <div className="flex items-center gap-2 min-w-0">
               <div className="text-right min-w-0">
-                <h1 className="text-xs md:text-sm font-headline font-bold uppercase text-foreground tracking-wider truncate">
-                   <School className="inline-block h-4 w-4 md:h-5 md:w-5 mr-1 md:mr-2" />
-                  I.E. Alfonso Spath Spath
+                <h1 className="text-sm md:text-base font-headline font-bold uppercase text-primary tracking-wider truncate animate-background-shine bg-[length:200%_auto] bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+                   <Wand2 className="inline-block h-4 w-4 md:h-5 md:w-5 mr-1 md:mr-2" />
+                  EduSpark AI
                 </h1>
-                <p className="text-[10px] md:text-sm text-muted-foreground font-medium truncate">Martinez - Cereté, Córdoba</p>
               </div>
               <Image
-                src="/escudo.jpg"
-                alt="Escudo Institucional"
+                src="/Logo Eduspark.jpg?v=2"
+                alt="Logo EduSpark AI"
                 width={60}
                 height={60}
                 priority
-                className="transition-all duration-300 hover:scale-105 w-10 h-10 md:w-16 md:h-16 flex-shrink-0"
+                className="transition-all duration-300 hover:scale-105 w-10 h-10 md:w-16 md:h-16 flex-shrink-0 rounded-full"
               />
             </div>
         </div>

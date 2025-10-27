@@ -74,23 +74,23 @@ Genera tres actividades desconectadas distintas y muy detalladas, basadas en la 
 {{/if}}
 
 
-**Formato de Salida Requerido para cada actividad (Debes ser MUY RIGUROSO con esta estructura):**
+**Formato de Salida Requerido y Guía de Calidad (Debes ser MUY RIGUROSO con esta estructura):**
 Asegúrate de que cada actividad generada cumpla estrictamente con lo siguiente:
 - **title:** Un nombre creativo, lúdico y descriptivo para la actividad.
 - **objective:** Un objetivo de aprendizaje claro, medible y específico, que esté en coherencia con los lineamientos del Ministerio de Educación Nacional (MEN) de Colombia para el grado especificado.
 - **computationalConcept:** Menciona explícitamente el concepto o conceptos de pensamiento computacional que se trabajan (Descomposición, Abstracción, Algoritmos, Reconocimiento de patrones, etc.).
-- **materials:** Una lista de materiales simples y accesibles (no electrónicos), descritos con suficiente detalle. **Cada material debe estar en una nueva línea.**
-- **estimatedTime:** El tiempo estimado para realizar la actividad (ej: "45 minutos").
+- **materials:** Una lista de materiales simples y accesibles (no electrónicos). **Especifica cantidades por grupo y ofrece opciones de sustitución**. Cada material debe estar en una nueva línea.
+- **estimatedTime:** El tiempo estimado para realizar la actividad (ej: "45 minutos"). La suma de los tiempos de las fases de desarrollo debe ser coherente con este total.
 - **teacherPreparation:** Describe qué debe hacer o preparar el docente ANTES de iniciar la clase. **Cada paso debe estar en una nueva línea.**
 - **stepByStepDevelopment:** Esta es la sección más importante. Debe ser un guion de clase **exhaustivo y obligatoriamente numerado** (1., 2., 3., etc.). Detalla no solo lo que hay que hacer, sino **cómo hacerlo**. Incluye:
     - **Guion para el docente:** Sugerencias sobre qué decir, qué preguntas hacer para motivar a los estudiantes y cómo introducir cada fase (Inicio, Desarrollo, Cierre).
     - **Acciones de los estudiantes:** Describe con claridad qué deben hacer los estudiantes en cada paso.
-    - **Gestión del tiempo:** Ofrece una estimación de tiempo para cada bloque de la actividad.
+    - **Gestión del tiempo:** Ofrece una estimación de tiempo realista para cada bloque de la actividad (ej: Inicio (10 min), Desarrollo (25 min), Cierre (10 min)) que sume el total de 'estimatedTime'.
     - **Ejemplos prácticos:** Incluye ejemplos concretos que el docente pueda usar o dibujar en el tablero.
     - **Cada paso numerado debe estar en una nueva línea.**
-- **activityResources:** ¡Aquí es donde tu creatividad brilla! Describe de manera exhaustiva y como una lista los recursos específicos y tangibles que el docente debe crear o dibujar. **Piensa más allá de las 'tarjetas'**. Tu prioridad es inventar elementos interactivos como **tableros de juego, diales con flechas, fichas personalizadas, modelos de papel para armar, semáforos de cartulina, o cualquier otro artefacto físico** que haga la actividad más memorable. Si propones tarjetas, deben ser muy justificadas. Describe el contenido final de cada recurso, no des ejemplos. Para tablas, define columnas y filas. **Cada recurso debe estar en una nueva línea.**
+- **activityResources:** ¡Aquí es donde tu creatividad brilla! Describe de manera exhaustiva y como una lista los recursos específicos y tangibles que el docente debe crear o dibujar. **Piensa más allá de las 'tarjetas'**. Tu prioridad es inventar elementos interactivos como **tableros de juego, diales con flechas, fichas personalizadas, modelos de papel para armar, semáforos de cartulina, o cualquier otro artefacto físico** que haga la actividad más memorable. Si propones tarjetas, deben ser muy justificadas. Describe el contenido final de cada recurso, no des ejemplos. Para tablas, define columnas y filas. **Incluye pasos numerados para la construcción de los materiales si son complejos.** Cada recurso debe estar en una nueva línea.
 - **reflectionQuestion:** El contenido debe tener dos partes. Primero, una explicación detallada y clara que demuestre cómo la actividad evidencia el concepto de pensamiento computacional, conectando las acciones específicas del ejercicio con la teoría. Segundo, a continuación de la explicación, debe incluir preguntas para guiar la reflexión y la metacognición de los estudiantes. **Cada pregunta debe estar en una nueva línea y comenzar con un guion (-).**
-- **evaluationCriteria:** Describe las evidencias de aprendizaje o los criterios que el docente puede observar para evaluar si los estudiantes alcanzaron el objetivo. **Cada criterio debe estar en una nueva línea.**
+- **evaluationCriteria:** Describe las **evidencias de aprendizaje observables y verificables**. No uses categorías vagas como "bueno" o "regular". En su lugar, usa una lista de criterios de logro concretos (ej: "El estudiante logra crear una secuencia de 5 pasos sin errores", "El equipo identifica correctamente 3 patrones en el set de datos"). **Cada criterio debe estar en una nueva línea.**
 
 La salida debe ser un JSON array con tres objetos, donde cada objeto representa una actividad completa y detallada, conteniendo los campos especificados.
   `,
