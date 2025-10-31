@@ -180,8 +180,9 @@ const InitialSetupForm: React.FC<InitialSetupFormProps> = ({ onSetupComplete }) 
                                       <SelectTrigger id="activityType"><SelectValue placeholder="Selecciona un tipo" /></SelectTrigger>
                                       <SelectContent>
                                         {activityTypes.map(type => (
-                                          <Tooltip key={type.id}>
+                                          <Tooltip key={type.id} delayDuration={300}>
                                             <TooltipTrigger asChild>
+                                              {/* The SelectItem needs to be a direct child for keyboard navigation */}
                                               <SelectItem value={type.id}>{type.name}</SelectItem>
                                             </TooltipTrigger>
                                             <TooltipContent side="right" align="start">
