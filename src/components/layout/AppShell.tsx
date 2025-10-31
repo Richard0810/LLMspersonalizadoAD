@@ -105,16 +105,17 @@ export const AppShell: React.FC<AppShellProps> = ({
             </SidebarMenu>
           </SidebarContent>
           <SidebarFooter>
-             <div className="flex items-center gap-2">
+             <div className="eduspark-footer-button">
                 <Image
                   src="/Logo Eduspark.jpg?v=2"
                   alt="Logo EduSpark AI"
                   width={40}
                   height={40}
-                  className="w-10 h-10 rounded-full"
+                  className="footer-logo-image w-10 h-10 rounded-full transition-all duration-300"
                 />
-                <div className='transition-opacity duration-200 group-data-[collapsible=icon]:opacity-0'>
+                <div className='transition-opacity duration-200 group-data-[collapsible=icon]:opacity-0 ml-2'>
                     <p className="text-sm font-bold animate-background-shine bg-[length:200%_auto] bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">EduSpark AI</p>
+                    <p className="text-xs text-muted-foreground">Potenciado con IA</p>
                 </div>
             </div>
           </SidebarFooter>
