@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, BrainCircuit, Puzzle, Youtube, Presentation, ExternalLink, Lightbulb, Users, Bot, Rocket, School, Globe, BookOpenCheck, Brain, GraduationCap, Target, Settings, MessageSquare, Calculator, Code, FlaskConical, BookText, Landmark, Palette, Footprints } from 'lucide-react';
+import { ArrowLeft, BrainCircuit, Puzzle, Youtube, Presentation, ExternalLink, Lightbulb, Users, Bot, Rocket, School, Globe, BookOpenCheck, Brain, GraduationCap, Target, Settings, MessageSquare, Calculator, Code, FlaskConical, BookText, Landmark, Palette, Footprints, Wand2 } from 'lucide-react';
 import InteractiveBackground from '@/components/shared/InteractiveBackground';
 import { AppShell } from '@/components/layout/AppShell';
 import type { ReactNode, ElementType } from 'react';
@@ -209,53 +209,55 @@ export default function LearnPage() {
                                     </div>
                                 </TabsContent>
                                 <TabsContent value="audience" className="mt-6">
-                                     <p className="text-center mb-4">
+                                    <p className="text-center mb-6">
                                       EduSpark AI está diseñada para docentes de distintas áreas del conocimiento que buscan integrar el pensamiento computacional en sus clases mediante actividades desconectadas, accesibles y contextualizadas.
                                     </p>
-                                      <p className="text-center mb-6 text-sm">
-                                      Así, cualquier docente interesado en promover el razonamiento lógico, la creatividad y la resolución de problemas puede utilizar la herramienta en su contexto.
-                                    </p>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                      <InfoCard icon={<Calculator size={20}/>} title="Matemáticas" description="Para fortalecer la lógica, la secuenciación y la resolución estructurada de problemas."/>
-                                      <InfoCard icon={<Code size={20}/>} title="Tecnología e Informática" description="Para diseñar actividades que desarrollen pensamiento algorítmico sin depender de dispositivos."/>
-                                      <InfoCard icon={<FlaskConical size={20}/>} title="Ciencias Naturales" description="Para analizar procesos, reconocer patrones y formular soluciones basadas en la experimentación."/>
-                                      <InfoCard icon={<BookText size={20}/>} title="Lengua Castellana" description="Para aplicar la descomposición en la comprensión lectora y la producción textual."/>
-                                      <InfoCard icon={<Landmark size={20}/>} title="Ciencias Sociales" description="Para abstraer información, identificar relaciones y secuenciar eventos históricos o sociales."/>
-                                      <InfoCard icon={<Palette size={20}/>} title="Educación Artística" description="Para fomentar la creatividad estructurada a través de patrones visuales o sonoros."/>
-                                      <InfoCard icon={<Footprints size={20}/>} title="Educación Física" description="Para diseñar juegos y dinámicas basadas en secuencias, reglas y retos colaborativos."/>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                      <InfoCard icon={<Calculator size={20}/>} title="Matemáticas" description="Fortalece la lógica, secuenciación y resolución estructurada de problemas."/>
+                                      <InfoCard icon={<Code size={20}/>} title="Tecnología e Informática" description="Diseña actividades de pensamiento algorítmico sin depender de dispositivos."/>
+                                      <InfoCard icon={<FlaskConical size={20}/>} title="Ciencias Naturales" description="Analiza procesos, reconoce patrones y formula soluciones basadas en la experimentación."/>
+                                      <InfoCard icon={<BookText size={20}/>} title="Lengua Castellana" description="Aplica la descomposición en la comprensión lectora y la producción textual."/>
+                                      <InfoCard icon={<Landmark size={20}/>} title="Ciencias Sociales" description="Abstrae información, identifica relaciones y secuencia eventos históricos o sociales."/>
+                                      <InfoCard icon={<Palette size={20}/>} title="Educación Artística" description="Fomenta la creatividad estructurada a través de patrones visuales o sonoros."/>
+                                      <InfoCard icon={<Footprints size={20}/>} title="Educación Física" description="Diseña juegos y dinámicas basadas en secuencias, reglas y retos colaborativos."/>
                                     </div>
                                 </TabsContent>
                                 <TabsContent value="what-it-does" className="mt-6">
                                     <Accordion type="single" collapsible className="w-full" defaultValue="item-1">
                                         <AccordionItem value="item-1">
                                             <AccordionTrigger className="text-lg font-semibold text-primary/90 hover:text-primary">
-                                                <Settings className="mr-2 h-5 w-5"/>Paso 1: La Magia de los Parámetros
+                                                <Settings className="mr-2 h-5 w-5"/>Paso 1: Configuración Inteligente
                                             </AccordionTrigger>
                                             <AccordionContent className="space-y-2">
-                                                <p>El primer paso es definir cuatro parámetros clave: <strong className='text-foreground'>Tema, Concepto, Área y Grado.</strong></p>
-                                                <p>Estos no son simples campos de un formulario; son las instrucciones directas que le das a la IA. Este proceso se conoce como <strong className='text-accent'>prompt engineering</strong> guiado. Al ser específico, le dices al modelo exactamente qué tipo de contenido necesitas, asegurando que las actividades generadas sean relevantes y personalizadas para tu clase.</p>
+                                                <p>Define los <strong className='text-foreground'>parámetros básicos</strong> (tema, concepto, área y grado) y <strong className='text-foreground'>avanzados</strong> (duración, complejidad, tipo de actividad, etc.) para guiar a la IA.</p>
+                                                <p>Este proceso de <strong className='text-accent'>ingeniería de prompts guiada</strong> asegura que las actividades generadas sean relevantes, personalizadas y se ajusten perfectamente a las necesidades de tu clase.</p>
                                             </AccordionContent>
                                         </AccordionItem>
                                         <AccordionItem value="item-2">
                                             <AccordionTrigger className="text-lg font-semibold text-primary/90 hover:text-primary">
-                                                <MessageSquare className="mr-2 h-5 w-5"/>Paso 2: Conversa con tu Asistente de IA
+                                                <MessageSquare className="mr-2 h-5 w-5"/>Paso 2: Generación y Asesoramiento
                                             </AccordionTrigger>
                                             <AccordionContent className="space-y-2">
                                                 <p>Una vez definidos los parámetros, el chat se convierte en tu centro de mando. Puedes:</p>
                                                 <ul className='list-disc pl-5 space-y-1'>
-                                                    <li><strong>Hacer preguntas abiertas:</strong> "¿Puedes explicarme la abstracción con un ejemplo de la vida real?"</li>
-                                                    <li><strong>Generar contenido nuevo:</strong> Escribe "generar nuevas actividades" para obtener un set completamente nuevo basado en tus parámetros.</li>
-                                                    <li><strong>Usar comandos rápidos:</strong> Usa "cambiar tema" o "modificar grado" para ajustar los parámetros sobre la marcha sin volver al formulario inicial.</li>
+                                                    <li><strong>Generar actividades:</strong> La IA crea tres actividades detalladas, listas para implementar.</li>
+                                                    <li><strong>Hacer preguntas de seguimiento:</strong> "¿Puedes darme un ejemplo de 'abstracción' para niños de primaria?"</li>
+                                                    <li><strong>Modificar sobre la marcha:</strong> Usa comandos como "cambiar tema" para ajustar los parámetros sin reiniciar.</li>
                                                 </ul>
                                             </AccordionContent>
                                         </AccordionItem>
                                          <AccordionItem value="item-3">
                                             <AccordionTrigger className="text-lg font-semibold text-primary/90 hover:text-primary">
-                                                <Bot className="mr-2 h-5 w-5"/>Un LLM Especializado para Educación
+                                                <Wand2 className="mr-2 h-5 w-5"/>Paso 3: Creación de Apoyos Visuales
                                             </AccordionTrigger>
                                             <AccordionContent className="space-y-2">
-                                                <p>EduSpark AI no usa un modelo de lenguaje genérico. Está conectado a un LLM (Large Language Model) configurado específicamente para actuar como un <strong className='text-foreground'>diseñador instruccional experto</strong> en pedagogía y pensamiento computacional.</p>
-                                                <p>Esto asegura que las respuestas y actividades no solo sean creativas, sino también pedagógicamente sólidas, detalladas y listas para ser implementadas en un entorno educativo real.</p>
+                                                <p>Para cualquier actividad generada, puedes solicitar la creación de <strong className='text-foreground'>apoyos visuales</strong>. La IA actúa como un "Director de Arte":</p>
+                                                 <ul className='list-disc pl-5 space-y-1'>
+                                                    <li>Analiza los recursos de la actividad (materiales, tarjetas, tableros).</li>
+                                                    <li>Genera <strong className='text-accent'>tarjetas, tablas o componentes</strong> en formato SVG.</li>
+                                                    <li>Crea <strong className='text-accent'>ilustraciones y guías visuales</strong> para los elementos que necesitan ser dibujados.</li>
+                                                </ul>
+                                                <p>Estos recursos se pueden descargar y son perfectos para complementar tus clases.</p>
                                             </AccordionContent>
                                         </AccordionItem>
                                     </Accordion>
