@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -105,7 +106,7 @@ export const AppShell: React.FC<AppShellProps> = ({
             </SidebarMenu>
           </SidebarContent>
           <SidebarFooter>
-             <div className="eduspark-footer-button">
+             <div className="eduspark-footer-button flex items-center">
                 <Image
                   src="/Logo Eduspark.jpg?v=2"
                   alt="Logo EduSpark AI"
