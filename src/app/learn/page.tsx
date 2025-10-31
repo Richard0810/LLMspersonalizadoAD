@@ -17,7 +17,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { RadialBarChart, RadialBar, Label as RechartsLabel, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
+import { PieChart, Pie, Cell } from 'recharts';
 
 
 interface InfoSectionProps {
@@ -87,10 +87,10 @@ const PresentationEmbed = ({ presentationId, title }: PresentationEmbedProps) =>
 );
 
 const chartData = [
-  { name: 'Descomposición', value: 25, fill: 'var(--color-descomposicion)' },
-  { name: 'Patrones', value: 25, fill: 'var(--color-patrones)' },
-  { name: 'Abstracción', value: 25, fill: 'var(--color-abstraccion)' },
-  { name: 'Algoritmos', value: 25, fill: 'var(--color-algoritmos)' },
+  { name: 'Descomposición', value: 25, color: 'hsl(var(--chart-2))' },
+  { name: 'Patrones', value: 25, color: 'hsl(var(--chart-1))' },
+  { name: 'Abstracción', value: 25, color: 'hsl(var(--chart-3))' },
+  { name: 'Algoritmos', value: 25, color: 'hsl(var(--chart-4))' },
 ];
 
 const chartConfig = {
@@ -146,24 +146,29 @@ export default function LearnPage() {
                     <TabsContent value="about" className="animate-fade-in">
                          <InfoSection title="Acerca de EduSpark AI" icon={Lightbulb}>
                              <p>Una plataforma diseñada para potenciar la enseñanza del pensamiento computacional a través de la Inteligencia Artificial, en el marco de una iniciativa de investigación de la Universidad de Córdoba, Colombia.</p>
-                              <p>Su objetivo es apoyar al profesorado en el desarrollo de los cuatro pilares del pensamiento computacional —descomposición, reconocimiento de patrones, abstracción y algoritmos— desde cualquier disciplina.</p>
-                             <p className="mb-6">Su objetivo es apoyar al profesorado en el desarrollo de los cuatro pilares del pensamiento computacional —descomposición, reconocimiento de patrones, abstracción y algoritmos— desde cualquier disciplina.</p>
+                             <p>Su objetivo es apoyar al profesorado en el desarrollo de los cuatro pilares del pensamiento computacional —descomposición, reconocimiento de patrones, abstracción y algoritmos— desde cualquier disciplina.</p>
                              <div className="my-8 flex flex-col md:flex-row items-center justify-center gap-8">
                                 <ChartContainer
                                     config={chartConfig}
                                     className="aspect-square w-full max-w-[250px]"
                                 >
-                                    <RadialBarChart
-                                        data={chartData}
-                                        startAngle={-90}
-                                        endAngle={30}
-                                        innerRadius={30}
-                                        outerRadius={110}
-                                        barSize={8}
-                                    >
-                                        <PolarAngleAxis type="number" domain={[0, 100]} dataKey="value" tick={false} />
-                                        <RadialBar dataKey="value" background cornerRadius={5} />
-                                    </RadialBarChart>
+                                    <PieChart>
+                                        <ChartTooltip
+                                          cursor={false}
+                                          content={<ChartTooltipContent hideLabel />}
+                                        />
+                                        <Pie
+                                            data={chartData}
+                                            dataKey="value"
+                                            nameKey="name"
+                                            innerRadius={60}
+                                            strokeWidth={5}
+                                        >
+                                            {chartData.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={entry.color} />
+                                            ))}
+                                        </Pie>
+                                    </PieChart>
                                 </ChartContainer>
                                 <div className="grid grid-cols-2 gap-x-6 gap-y-4">
                                   <InfoCard icon={<Zap className="text-chart-2" />} title="Descomposición" description="Dividir problemas complejos." />
