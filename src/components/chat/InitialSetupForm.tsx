@@ -8,8 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Textarea } from '@/components/ui/textarea';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { BookOpenCheck, Brain, GraduationCap, Target, Lightbulb, HelpCircle, ChevronsUpDown, Settings2, Clock, Users, School, Puzzle } from 'lucide-react';
+import { BookOpenCheck, Brain, GraduationCap, Target, Lightbulb, Settings2, Clock, Users, School, Puzzle } from 'lucide-react';
 import type { LessonParams } from '@/types';
 import { saveLessonParamsToLocalStorage, getLessonParamsFromLocalStorage, clearChatHistoryFromLocalStorage } from '@/lib/localStorageUtils';
 import { 
@@ -145,7 +144,7 @@ const InitialSetupForm: React.FC<InitialSetupFormProps> = ({ onSetupComplete }) 
                                       <Input id="duration" type="number" value={duration} onChange={(e) => setDuration(e.target.value)} placeholder="Ej: 45" />
                                   </div>
                                   <div className="space-y-2">
-                                      <Label htmlFor="complexityLevel" className="flex items-center gap-2"><ChevronsUpDown size={16}/>Nivel de Complejidad</Label>
+                                      <Label htmlFor="complexityLevel" className="flex items-center gap-2">Nivel de Complejidad</Label>
                                       <Select value={complexityLevel} onValueChange={(v) => setComplexityLevel(v as any)} required>
                                           <SelectTrigger id="complexityLevel"><SelectValue/></SelectTrigger>
                                           <SelectContent>
