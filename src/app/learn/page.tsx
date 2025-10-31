@@ -1,12 +1,12 @@
 
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft, BrainCircuit, Puzzle, Youtube, Presentation, ExternalLink, Lightbulb, Users, Bot, Rocket, School, Globe, BookOpenCheck, Brain, GraduationCap, Target, Settings, MessageSquare, Calculator, Code, FlaskConical, BookText, Landmark, Palette, Footprints, Wand2 } from 'lucide-react';
 import InteractiveBackground from '@/components/shared/InteractiveBackground';
 import { AppShell } from '@/components/layout/AppShell';
@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/chart";
 import { PieChart, Pie, Cell } from 'recharts';
 
+type LearnSection = 'about' | 'pc' | 'ad' | 'presentation';
 
 interface InfoSectionProps {
   title: string;
@@ -117,125 +118,106 @@ const chartConfig = {
 
 
 export default function LearnPage() {
-    const router = useRouter();
+    const [activeSection, setActiveSection] = useState<LearnSection>('about');
     const presentationId = "1_Iys9XP0Te5-spn3DO5vhB01vm1OVC5d";
     const presentationUrl = `https://docs.google.com/presentation/d/${presentationId}/edit?usp=drive_link&ouid=105808271510700269082&rtpof=true&sd=true`;
 
-    return (
-      <AppShell>
-        <div className="flex flex-col items-center min-h-screen bg-background p-4 md:p-8">
-            <InteractiveBackground />
-            <main className="w-full max-w-5xl z-10 animate-fade-in">
-                
-                <Tabs defaultValue="about" className="w-full animate-slide-up" style={{ animationDelay: '0.2s' }}>
-                    <TabsList className="grid w-full grid-cols-1 md:grid-cols-4 mb-6 h-auto p-2 bg-primary/10 rounded-lg">
-                         <TabsTrigger value="about" className="py-2.5 text-base">
-                            <Lightbulb className="mr-2 h-5 w-5" /> Sobre EduSpark AI
-                        </TabsTrigger>
-                        <TabsTrigger value="pc" className="py-2.5 text-base">
-                            <BrainCircuit className="mr-2 h-5 w-5" /> Pensamiento Computacional
-                        </TabsTrigger>
-                        <TabsTrigger value="ad" className="py-2.5 text-base">
-                            <Puzzle className="mr-2 h-5 w-5" /> Actividades Desconectadas
-                        </TabsTrigger>
-                        <TabsTrigger value="presentation" className="py-2.5 text-base">
-                            <Presentation className="mr-2 h-5 w-5" /> Presentación
-                        </TabsTrigger>
-                    </TabsList>
-
-                    <TabsContent value="about" className="animate-fade-in">
-                         <InfoSection title="Acerca de EduSpark AI" icon={Lightbulb}>
-                             <p>Una plataforma diseñada para potenciar la enseñanza del pensamiento computacional a través de la Inteligencia Artificial, en el marco de una iniciativa de investigación de la Universidad de Córdoba, Colombia.</p>
-                             <p>Su objetivo es apoyar al profesorado en el desarrollo de los cuatro pilares del pensamiento computacional —descomposición, reconocimiento de patrones, abstracción y algoritmos— desde cualquier disciplina.</p>
-                             <div className="my-8 flex flex-col md:flex-row items-center justify-center gap-8">
-                                <ChartContainer
-                                    config={chartConfig}
-                                    className="aspect-square w-full max-w-[250px]"
-                                >
-                                    <PieChart>
-                                        <ChartTooltip
-                                          cursor={false}
-                                          content={<ChartTooltipContent hideLabel />}
-                                        />
-                                        <Pie
-                                            data={chartData}
-                                            dataKey="value"
-                                            nameKey="name"
-                                            innerRadius={60}
-                                            strokeWidth={5}
-                                        >
-                                            {chartData.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={entry.color} />
-                                            ))}
-                                        </Pie>
-                                    </PieChart>
-                                </ChartContainer>
-                                <div className="grid grid-cols-2 gap-x-6 gap-y-4">
-                                  <InfoCard icon={<Zap className="text-chart-2" />} title="Descomposición" description="Dividir problemas complejos." />
-                                  <InfoCard icon={<TrendingUp className="text-chart-1" />} title="Patrones" description="Identificar similitudes." />
-                                  <InfoCard icon={<Brain className="text-chart-3" />} title="Abstracción" description="Focalizarse en lo esencial." />
-                                  <InfoCard icon={<Puzzle className="text-chart-4" />} title="Algoritmos" description="Crear pasos para soluciones." />
-                                </div>
-                             </div>
-                            <Tabs defaultValue="objective" className="w-full">
-                                <TabsList className="grid w-full grid-cols-3 mb-4 bg-primary/20">
-                                    <TabsTrigger value="objective">
-                                        <Target className="h-4 w-4 mr-1"/> Objetivo
-                                    </TabsTrigger>
-                                    <TabsTrigger value="audience">
-                                        <Users className="h-4 w-4 mr-1"/> ¿Para Quién?
-                                    </TabsTrigger>
-                                    <TabsTrigger value="what-it-does">
-                                        <Bot className="h-4 w-4 mr-1"/> ¿Qué Hace?
-                                    </TabsTrigger>
-                                </TabsList>
-                                <TabsContent value="objective" className="mt-6">
-                                    <div className="space-y-6">
-                                        <InfoCard
-                                            icon={<Rocket size={24} />}
-                                            title="Innovación Pedagógica"
-                                            description="Asesorar a docentes en el diseño de actividades desconectadas que desarrollen el pensamiento computacional de forma creativa."
-                                        />
-                                        <InfoCard
-                                            icon={<School size={24} />}
-                                            title="Iniciativa de Investigación"
-                                            description="Este proyecto se desarrolla en el marco de la Licenciatura en Informática de la Universidad de Córdoba, Colombia."
-                                        />
-                                        <InfoCard
-                                            icon={<Globe size={24} />}
-                                            title="Acceso Equitativo"
-                                            description="Implementar y validar la herramienta en contextos reales para asegurar su efectividad y mejorarla con retroalimentación."
-                                        />
-                                    </div>
-                                </TabsContent>
-                                <TabsContent value="audience" className="mt-6">
-                                    <p className="text-center mb-6">
-                                      EduSpark AI está diseñada para docentes de distintas áreas del conocimiento que buscan integrar el pensamiento computacional en sus clases mediante actividades desconectadas, accesibles y contextualizadas.
-                                    </p>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                      <InfoCard icon={<Calculator size={20}/>} title="Matemáticas" description="Fortalece la lógica, secuenciación y resolución estructurada de problemas."/>
-                                      <InfoCard icon={<Code size={20}/>} title="Tecnología e Informática" description="Diseña actividades de pensamiento algorítmico sin depender de dispositivos."/>
-                                      <InfoCard icon={<FlaskConical size={20}/>} title="Ciencias Naturales" description="Analiza procesos, reconoce patrones y formula soluciones basadas en la experimentación."/>
-                                      <InfoCard icon={<BookText size={20}/>} title="Lengua Castellana" description="Aplica la descomposición en la comprensión lectora y la producción textual."/>
-                                      <InfoCard icon={<Landmark size={20}/>} title="Ciencias Sociales" description="Abstrae información, identifica relaciones y secuencia eventos históricos o sociales."/>
-                                      <InfoCard icon={<Palette size={20}/>} title="Educación Artística" description="Fomenta la creatividad estructurada a través de patrones visuales o sonoros."/>
-                                      <InfoCard icon={<Footprints size={20}/>} title="Educación Física" description="Diseña juegos y dinámicas basadas en secuencias, reglas y retos colaborativos."/>
-                                    </div>
-                                </TabsContent>
-                                <TabsContent value="what-it-does" className="mt-6">
-                                    <Accordion type="single" collapsible className="w-full" defaultValue="item-1">
-                                        <AccordionItem value="item-1">
-                                            <AccordionTrigger className="text-lg font-semibold text-primary/90 hover:text-primary">
-                                                <Settings className="mr-2 h-5 w-5"/>Paso 1: Configuración Inteligente
+    const menuItems = [
+      { id: 'about', title: 'Sobre EduSpark', icon: Lightbulb },
+      { id: 'pc', title: 'Pensamiento Comp.', icon: BrainCircuit },
+      { id: 'ad', title: 'Act. Desconectadas', icon: Puzzle },
+      { id: 'presentation', title: 'Presentación', icon: Presentation },
+    ];
+    
+    const renderContent = () => {
+        switch (activeSection) {
+            case 'about':
+                return (
+                    <InfoSection title="Acerca de EduSpark AI" icon={Lightbulb}>
+                        <p>Una plataforma diseñada para potenciar la enseñanza del pensamiento computacional a través de la Inteligencia Artificial, en el marco de una iniciativa de investigación de la Universidad de Córdoba, Colombia.</p>
+                        <p>Su objetivo es apoyar al profesorado en el desarrollo de los cuatro pilares del pensamiento computacional —descomposición, reconocimiento de patrones, abstracción y algoritmos— desde cualquier disciplina.</p>
+                        <div className="my-8 flex flex-col md:flex-row items-center justify-center gap-8">
+                           <ChartContainer
+                               config={chartConfig}
+                               className="aspect-square w-full max-w-[250px]"
+                           >
+                               <PieChart>
+                                   <ChartTooltip
+                                     cursor={false}
+                                     content={<ChartTooltipContent hideLabel />}
+                                   />
+                                   <Pie
+                                       data={chartData}
+                                       dataKey="value"
+                                       nameKey="name"
+                                       innerRadius={60}
+                                       strokeWidth={5}
+                                   >
+                                       {chartData.map((entry, index) => (
+                                           <Cell key={`cell-${index}`} fill={entry.color} />
+                                       ))}
+                                   </Pie>
+                               </PieChart>
+                           </ChartContainer>
+                           <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+                             <InfoCard icon={<Zap className="text-chart-2" />} title="Descomposición" description="Dividir problemas complejos." />
+                             <InfoCard icon={<TrendingUp className="text-chart-1" />} title="Patrones" description="Identificar similitudes." />
+                             <InfoCard icon={<Brain className="text-chart-3" />} title="Abstracción" description="Focalizarse en lo esencial." />
+                             <InfoCard icon={<Puzzle className="text-chart-4" />} title="Algoritmos" description="Crear pasos para soluciones." />
+                           </div>
+                        </div>
+                        <Accordion type="single" collapsible className="w-full" defaultValue="item-3">
+                            <AccordionItem value="item-1">
+                                <AccordionTrigger className="text-lg font-semibold text-primary/90 hover:text-primary"><Target className="h-5 w-5 mr-2"/> Objetivo</AccordionTrigger>
+                                <AccordionContent className="space-y-4 pt-2">
+                                     <InfoCard
+                                         icon={<Rocket size={24} />}
+                                         title="Innovación Pedagógica"
+                                         description="Asesorar a docentes en el diseño de actividades desconectadas que desarrollen el pensamiento computacional de forma creativa."
+                                     />
+                                     <InfoCard
+                                         icon={<School size={24} />}
+                                         title="Iniciativa de Investigación"
+                                         description="Este proyecto se desarrolla en el marco de la Licenciatura en Informática de la Universidad de Córdoba, Colombia."
+                                     />
+                                     <InfoCard
+                                         icon={<Globe size={24} />}
+                                         title="Acceso Equitativo"
+                                         description="Implementar y validar la herramienta en contextos reales para asegurar su efectividad y mejorarla con retroalimentación."
+                                     />
+                                </AccordionContent>
+                            </AccordionItem>
+                             <AccordionItem value="item-2">
+                                <AccordionTrigger className="text-lg font-semibold text-primary/90 hover:text-primary"><Users className="h-5 w-5 mr-2"/> ¿Para Quién?</AccordionTrigger>
+                                <AccordionContent className="space-y-4 pt-2">
+                                    <p className="mb-4">EduSpark AI está diseñada para docentes de distintas áreas del conocimiento que buscan integrar el pensamiento computacional en sus clases mediante actividades desconectadas, accesibles y contextualizadas.</p>
+                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                       <InfoCard icon={<Calculator size={20}/>} title="Matemáticas" description="Fortalece la lógica, secuenciación y resolución estructurada de problemas."/>
+                                       <InfoCard icon={<Code size={20}/>} title="Tecnología e Informática" description="Diseña actividades de pensamiento algorítmico sin depender de dispositivos."/>
+                                       <InfoCard icon={<FlaskConical size={20}/>} title="Ciencias Naturales" description="Analiza procesos, reconoce patrones y formula soluciones basadas en la experimentación."/>
+                                       <InfoCard icon={<BookText size={20}/>} title="Lengua Castellana" description="Aplica la descomposición en la comprensión lectora y la producción textual."/>
+                                       <InfoCard icon={<Landmark size={20}/>} title="Ciencias Sociales" description="Abstrae información, identifica relaciones y secuencia eventos históricos o sociales."/>
+                                       <InfoCard icon={<Palette size={20}/>} title="Educación Artística" description="Fomenta la creatividad estructurada a través de patrones visuales o sonoros."/>
+                                       <InfoCard icon={<Footprints size={20}/>} title="Educación Física" description="Diseña juegos y dinámicas basadas en secuencias, reglas y retos colaborativos."/>
+                                     </div>
+                                </AccordionContent>
+                            </AccordionItem>
+                            <AccordionItem value="item-3">
+                                <AccordionTrigger className="text-lg font-semibold text-primary/90 hover:text-primary"><Bot className="h-5 w-5 mr-2"/> ¿Qué Hace?</AccordionTrigger>
+                                 <AccordionContent className="pt-2">
+                                    <Accordion type="single" collapsible className="w-full" defaultValue="item-3-1">
+                                        <AccordionItem value="item-3-1">
+                                            <AccordionTrigger className="font-semibold text-primary/90 hover:text-primary">
+                                                <Settings className="mr-2 h-4 w-4"/>Paso 1: Configuración Inteligente
                                             </AccordionTrigger>
                                             <AccordionContent className="space-y-2">
                                                 <p>Define los <strong className='text-foreground'>parámetros básicos</strong> (tema, concepto, área y grado) y <strong className='text-foreground'>avanzados</strong> (duración, complejidad, tipo de actividad, etc.) para guiar a la IA.</p>
                                                 <p>Este proceso de <strong className='text-accent'>ingeniería de prompts guiada</strong> asegura que las actividades generadas sean relevantes, personalizadas y se ajusten perfectamente a las necesidades de tu clase.</p>
                                             </AccordionContent>
                                         </AccordionItem>
-                                        <AccordionItem value="item-2">
-                                            <AccordionTrigger className="text-lg font-semibold text-primary/90 hover:text-primary">
-                                                <MessageSquare className="mr-2 h-5 w-5"/>Paso 2: Generación y Asesoramiento
+                                        <AccordionItem value="item-3-2">
+                                            <AccordionTrigger className="font-semibold text-primary/90 hover:text-primary">
+                                                <MessageSquare className="mr-2 h-4 w-4"/>Paso 2: Generación y Asesoramiento
                                             </AccordionTrigger>
                                             <AccordionContent className="space-y-2">
                                                 <p>Una vez definidos los parámetros, el chat se convierte en tu centro de mando. Puedes:</p>
@@ -246,9 +228,9 @@ export default function LearnPage() {
                                                 </ul>
                                             </AccordionContent>
                                         </AccordionItem>
-                                         <AccordionItem value="item-3">
-                                            <AccordionTrigger className="text-lg font-semibold text-primary/90 hover:text-primary">
-                                                <Wand2 className="mr-2 h-5 w-5"/>Paso 3: Creación de Apoyos Visuales
+                                         <AccordionItem value="item-3-3">
+                                            <AccordionTrigger className="font-semibold text-primary/90 hover:text-primary">
+                                                <Wand2 className="mr-2 h-4 w-4"/>Paso 3: Creación de Apoyos Visuales
                                             </AccordionTrigger>
                                             <AccordionContent className="space-y-2">
                                                 <p>Para cualquier actividad generada, puedes solicitar la creación de <strong className='text-foreground'>apoyos visuales</strong>. La IA actúa como un "Director de Arte":</p>
@@ -261,115 +243,142 @@ export default function LearnPage() {
                                             </AccordionContent>
                                         </AccordionItem>
                                     </Accordion>
-                                </TabsContent>
-                            </Tabs>
-                        </InfoSection>
-                    </TabsContent>
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
+                    </InfoSection>
+                );
+            case 'pc':
+                return (
+                     <InfoSection title="Pensamiento Computacional (PC) – Conceptos Clave" icon={BrainCircuit}>
+                        <div className="space-y-4">
+                            <p>El Pensamiento Computacional es un proceso cognitivo de resolución de problemas inspirado en la forma en que los ordenadores procesan la información, pero que trasciende la informática. Consiste en analizar, descomponer y formular soluciones estructuradas para problemas de cualquier ámbito, utilizando principios lógicos, matemáticos y algorítmicos.</p>
+                            <p>No se trata de “pensar como una máquina”, sino de emplear estrategias computacionales para abordar desafíos complejos, de forma que las soluciones puedan ser comprendidas, ejecutadas y reutilizadas tanto por personas como por sistemas tecnológicos.</p>
+                            <p>Este enfoque implica cuatro habilidades fundamentales:</p>
+                        </div>
+                        <Accordion type="single" collapsible className="w-full">
+                            <AccordionItem value="item-1">
+                                <AccordionTrigger className="text-lg font-semibold text-primary/90 hover:text-primary">Descomposición</AccordionTrigger>
+                                <AccordionContent className="space-y-2">
+                                    <p>Dividir un problema complejo en partes más pequeñas y manejables.</p>
+                                    <p className="italic"><strong>Ejemplo:</strong> Al armar un rompecabezas, primero separas las piezas por colores o si tienen bordes rectos.</p>
+                                </AccordionContent>
+                            </AccordionItem>
+                            <AccordionItem value="item-2">
+                                <AccordionTrigger className="text-lg font-semibold text-primary/90 hover:text-primary">Reconocimiento de patrones</AccordionTrigger>
+                                <AccordionContent className="space-y-2">
+                                    <p>Identificar similitudes, tendencias o elementos que se repiten en datos o problemas.</p>
+                                    <p className="italic"><strong>Ejemplo:</strong> Buscas piezas con formas o colores similares (como todas las piezas del cielo azul) para unirlas.</p>
+                                </AccordionContent>
+                            </AccordionItem>
+                            <AccordionItem value="item-3">
+                                <AccordionTrigger className="text-lg font-semibold text-primary/90 hover:text-primary">Abstracción</AccordionTrigger>
+                                <AccordionContent className="space-y-2">
+                                    <p>Enfocarse solo en la información esencial del problema y omitir detalles innecesarios.</p>
+                                    <p className="italic"><strong>Ejemplo:</strong> Te concentras en armar el marco del rompecabezas primero, ignorando temporalmente todas las piezas del centro.</p>
+                                </AccordionContent>
+                            </AccordionItem>
+                            <AccordionItem value="item-4">
+                                <AccordionTrigger className="text-lg font-semibold text-primary/90 hover:text-primary">Algoritmos</AccordionTrigger>
+                                <AccordionContent className="space-y-2">
+                                    <p>Desarrollar una secuencia lógica y ordenada de pasos para resolver un problema o realizar una tarea.</p>
+                                    <p className="italic"><strong>Ejemplo:</strong> Creas una serie de pasos: 1. Buscar las esquinas. 2. Armar el borde. 3. Agrupar piezas por color. 4. Armar las secciones de colores.</p>
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
+                        <Card className="mt-6 bg-muted/30">
+                            <CardHeader className="flex flex-row items-center gap-3">
+                                <Youtube className="w-6 h-6 text-accent"/>
+                                <CardTitle className="text-xl font-headline text-accent">Video Explicativo</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <VideoEmbed videoId="ti315UlVtS4" title="¿Qué es el Pensamiento Computacional?" />
+                            </CardContent>
+                        </Card>
+                    </InfoSection>
+                );
+            case 'ad':
+                return (
+                    <InfoSection title="Actividades Desconectadas (AD)" icon={Puzzle}>
+                        <div className="space-y-3 mb-4">
+                            <p><strong>Definición:</strong> Son estrategias didácticas para enseñar Pensamiento Computacional sin computadoras ni dispositivos. Usan juegos, dinámicas grupales y simulaciones para practicar conceptos como algoritmos o patrones.</p>
+                            <p><strong>Beneficios:</strong> Son muy accesibles ya que no requieren tecnología, fomentan la creatividad, el trabajo en equipo y la resolución de problemas de una manera práctica y tangible.</p>
+                        </div>
+                        <Accordion type="single" collapsible className="w-full">
+                            <AccordionItem value="ad-1">
+                                <AccordionTrigger className="text-lg font-semibold text-primary/90 hover:text-primary">Ejemplos de Actividades</AccordionTrigger>
+                                <AccordionContent className="space-y-4">
+                                    <div>
+                                        <h4 className="font-bold text-foreground">Programación de Rutas</h4>
+                                        <p>Los estudiantes usan flechas y símbolos para crear secuencias de instrucciones que guíen a un compañero a través de un laberinto o mapa. → Trabaja el concepto de algoritmo.</p>
+                                    </div>
+                                    <div>
+                                        <h4 className="font-bold text-foreground">La Cosecha Más Eficiente</h4>
+                                        <p>Los estudiantes, con mapas y fichas que representan cultivos y recolectores, planifican rutas para recolectar la mayor cantidad de productos en el menor tiempo posible. → Trabaja eficiencia algorítmica y optimización.</p>
+                                    </div>
+                                    <div>
+                                        <h4 className="font-bold text-foreground">El Mercado Vecinal</h4>
+                                        <p>Los estudiantes asumen roles de compradores y vendedores, organizan productos, definen precios y gestionan inventario. → Trabaja toma de decisiones algorítmicas.</p>
+                                    </div>
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
+                        <Card className="mt-6 bg-muted/30">
+                            <CardHeader className="flex flex-row items-center gap-3">
+                                <Youtube className="w-6 h-6 text-accent"/>
+                                <CardTitle className="text-xl font-headline text-accent">Video con Ejemplos</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <VideoEmbed videoId="5fU2PT03_Gc" title="Actividades Desconectadas para el aula" />
+                            </CardContent>
+                        </Card>
+                    </InfoSection>
+                );
+            case 'presentation':
+                 return (
+                    <InfoSection title="Presentación: PC y AD en el Contexto Rural" icon={Presentation}>
+                        <p className="mb-4">
+                            Explora esta presentación de diapositivas para obtener una visión más profunda de cómo aplicar estos conceptos en entornos rurales, con ejemplos y estrategias adaptadas.
+                        </p>
+                        <PresentationEmbed presentationId={presentationId} title="Presentación sobre PC y AD en el Contexto Rural" />
+                        <Link href={presentationUrl} target="_blank" rel="noopener noreferrer" className="mt-4 inline-block">
+                            <Button size="sm" variant="outline">
+                                Abrir en nueva pestaña <ExternalLink className="ml-2 h-4 w-4" />
+                            </Button>
+                        </Link>
+                    </InfoSection>
+                 );
+        }
+    }
 
-                    <TabsContent value="pc" className="animate-fade-in">
-                        <InfoSection title="Pensamiento Computacional (PC) – Conceptos Clave" icon={BrainCircuit}>
-                            <div className="space-y-4">
-                                <p>El Pensamiento Computacional es un proceso cognitivo de resolución de problemas inspirado en la forma en que los ordenadores procesan la información, pero que trasciende la informática. Consiste en analizar, descomponer y formular soluciones estructuradas para problemas de cualquier ámbito, utilizando principios lógicos, matemáticos y algorítmicos.</p>
-                                <p>No se trata de “pensar como una máquina”, sino de emplear estrategias computacionales para abordar desafíos complejos, de forma que las soluciones puedan ser comprendidas, ejecutadas y reutilizadas tanto por personas como por sistemas tecnológicos.</p>
-                                <p>Este enfoque implica cuatro habilidades fundamentales:</p>
-                            </div>
-                            <Accordion type="single" collapsible className="w-full">
-                                <AccordionItem value="item-1">
-                                    <AccordionTrigger className="text-lg font-semibold text-primary/90 hover:text-primary">Descomposición</AccordionTrigger>
-                                    <AccordionContent className="space-y-2">
-                                        <p>Dividir un problema complejo en partes más pequeñas y manejables.</p>
-                                        <p className="italic"><strong>Ejemplo:</strong> Al armar un rompecabezas, primero separas las piezas por colores o si tienen bordes rectos.</p>
-                                    </AccordionContent>
-                                </AccordionItem>
-                                <AccordionItem value="item-2">
-                                    <AccordionTrigger className="text-lg font-semibold text-primary/90 hover:text-primary">Reconocimiento de patrones</AccordionTrigger>
-                                    <AccordionContent className="space-y-2">
-                                        <p>Identificar similitudes, tendencias o elementos que se repiten en datos o problemas.</p>
-                                        <p className="italic"><strong>Ejemplo:</strong> Buscas piezas con formas o colores similares (como todas las piezas del cielo azul) para unirlas.</p>
-                                    </AccordionContent>
-                                </AccordionItem>
-                                <AccordionItem value="item-3">
-                                    <AccordionTrigger className="text-lg font-semibold text-primary/90 hover:text-primary">Abstracción</AccordionTrigger>
-                                    <AccordionContent className="space-y-2">
-                                        <p>Enfocarse solo en la información esencial del problema y omitir detalles innecesarios.</p>
-                                        <p className="italic"><strong>Ejemplo:</strong> Te concentras en armar el marco del rompecabezas primero, ignorando temporalmente todas las piezas del centro.</p>
-                                    </AccordionContent>
-                                </AccordionItem>
-                                <AccordionItem value="item-4">
-                                    <AccordionTrigger className="text-lg font-semibold text-primary/90 hover:text-primary">Algoritmos</AccordionTrigger>
-                                    <AccordionContent className="space-y-2">
-                                        <p>Desarrollar una secuencia lógica y ordenada de pasos para resolver un problema o realizar una tarea.</p>
-                                        <p className="italic"><strong>Ejemplo:</strong> Creas una serie de pasos: 1. Buscar las esquinas. 2. Armar el borde. 3. Agrupar piezas por color. 4. Armar las secciones de colores.</p>
-                                    </AccordionContent>
-                                </AccordionItem>
-                            </Accordion>
-                            <Card className="mt-6 bg-muted/30">
-                                <CardHeader className="flex flex-row items-center gap-3">
-                                    <Youtube className="w-6 h-6 text-accent"/>
-                                    <CardTitle className="text-xl font-headline text-accent">Video Explicativo</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <VideoEmbed videoId="ti315UlVtS4" title="¿Qué es el Pensamiento Computacional?" />
-                                </CardContent>
-                            </Card>
-                        </InfoSection>
-                    </TabsContent>
+    return (
+      <AppShell>
+        <div className="flex flex-col items-center min-h-screen bg-background p-4 md:p-8">
+            <InteractiveBackground />
+            <main className="w-full max-w-5xl z-10 animate-fade-in">
+                
+                <div className="learn-menu">
+                  {menuItems.map(item => (
+                    <a 
+                      key={item.id} 
+                      className="learn-menu-link" 
+                      data-active={activeSection === item.id}
+                      onClick={() => setActiveSection(item.id as LearnSection)}
+                    >
+                      <span className="learn-menu-icon">
+                        <item.icon />
+                      </span>
+                      <span className="learn-menu-title">{item.title}</span>
+                    </a>
+                  ))}
+                </div>
 
-                    <TabsContent value="ad" className="animate-fade-in">
-                        <InfoSection title="Actividades Desconectadas (AD)" icon={Puzzle}>
-                            <div className="space-y-3 mb-4">
-                                <p><strong>Definición:</strong> Son estrategias didácticas para enseñar Pensamiento Computacional sin computadoras ni dispositivos. Usan juegos, dinámicas grupales y simulaciones para practicar conceptos como algoritmos o patrones.</p>
-                                <p><strong>Beneficios:</strong> Son muy accesibles ya que no requieren tecnología, fomentan la creatividad, el trabajo en equipo y la resolución de problemas de una manera práctica y tangible.</p>
-                            </div>
-                            <Accordion type="single" collapsible className="w-full">
-                                <AccordionItem value="ad-1">
-                                    <AccordionTrigger className="text-lg font-semibold text-primary/90 hover:text-primary">Ejemplos de Actividades</AccordionTrigger>
-                                    <AccordionContent className="space-y-4">
-                                        <div>
-                                            <h4 className="font-bold text-foreground">Programación de Rutas</h4>
-                                            <p>Los estudiantes usan flechas y símbolos para crear secuencias de instrucciones que guíen a un compañero a través de un laberinto o mapa. → Trabaja el concepto de algoritmo.</p>
-                                        </div>
-                                        <div>
-                                            <h4 className="font-bold text-foreground">La Cosecha Más Eficiente</h4>
-                                            <p>Los estudiantes, con mapas y fichas que representan cultivos y recolectores, planifican rutas para recolectar la mayor cantidad de productos en el menor tiempo posible. → Trabaja eficiencia algorítmica y optimización.</p>
-                                        </div>
-                                        <div>
-                                            <h4 className="font-bold text-foreground">El Mercado Vecinal</h4>
-                                            <p>Los estudiantes asumen roles de compradores y vendedores, organizan productos, definen precios y gestionan inventario. → Trabaja toma de decisiones algorítmicas.</p>
-                                        </div>
-                                    </AccordionContent>
-                                </AccordionItem>
-                            </Accordion>
-                            <Card className="mt-6 bg-muted/30">
-                                <CardHeader className="flex flex-row items-center gap-3">
-                                    <Youtube className="w-6 h-6 text-accent"/>
-                                    <CardTitle className="text-xl font-headline text-accent">Video con Ejemplos</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <VideoEmbed videoId="5fU2PT03_Gc" title="Actividades Desconectadas para el aula" />
-                                </CardContent>
-                            </Card>
-                        </InfoSection>
-                    </TabsContent>
+                <div className="animate-fade-in">
+                  {renderContent()}
+                </div>
 
-                    <TabsContent value="presentation" className="animate-fade-in">
-                         <InfoSection title="Presentación: PC y AD en el Contexto Rural" icon={Presentation}>
-                            <p className="mb-4">
-                                Explora esta presentación de diapositivas para obtener una visión más profunda de cómo aplicar estos conceptos en entornos rurales, con ejemplos y estrategias adaptadas.
-                            </p>
-                            <PresentationEmbed presentationId={presentationId} title="Presentación sobre PC y AD en el Contexto Rural" />
-                            <Link href={presentationUrl} target="_blank" rel="noopener noreferrer" className="mt-4 inline-block">
-                                <Button size="sm" variant="outline">
-                                    Abrir en nueva pestaña <ExternalLink className="ml-2 h-4 w-4" />
-                                </Button>
-                            </Link>
-                        </InfoSection>
-                    </TabsContent>
-                </Tabs>
             </main>
         </div>
       </AppShell>
     );
 }
-
-    
