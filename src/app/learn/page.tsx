@@ -11,6 +11,13 @@ import { ArrowLeft, BrainCircuit, Puzzle, Youtube, Presentation, ExternalLink, L
 import InteractiveBackground from '@/components/shared/InteractiveBackground';
 import { AppShell } from '@/components/layout/AppShell';
 import type { ReactNode, ElementType } from 'react';
+import { TrendingUp, Zap } from 'lucide-react';
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import { RadialBarChart, RadialBar, Label as RechartsLabel, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
 
 
 interface InfoSectionProps {
@@ -79,6 +86,13 @@ const PresentationEmbed = ({ presentationId, title }: PresentationEmbedProps) =>
     ></iframe>
 );
 
+const chartData = [
+  { name: 'Descomposición', value: 25, fill: 'hsl(var(--chart-1))' },
+  { name: 'Patrones', value: 25, fill: 'hsl(var(--chart-2))' },
+  { name: 'Abstracción', value: 25, fill: 'hsl(var(--chart-3))' },
+  { name: 'Algoritmos', value: 25, fill: 'hsl(var(--chart-4))' },
+];
+
 export default function LearnPage() {
     const router = useRouter();
     const presentationId = "1_Iys9XP0Te5-spn3DO5vhB01vm1OVC5d";
@@ -110,6 +124,53 @@ export default function LearnPage() {
                          <InfoSection title="Acerca de EduSpark AI" icon={Lightbulb}>
                              <p>Una plataforma diseñada para potenciar la enseñanza del pensamiento computacional a través de la Inteligencia Artificial, en el marco de una iniciativa de investigación de la Universidad de Córdoba, Colombia.</p>
                              <p className="mb-6">Su objetivo es apoyar al profesorado en el desarrollo de los cuatro pilares del pensamiento computacional —descomposición, reconocimiento de patrones, abstracción y algoritmos— desde cualquier disciplina.</p>
+                             <div className="my-8 flex flex-col md:flex-row items-center justify-center gap-8">
+                                <ChartContainer
+                                    config={{}}
+                                    className="aspect-square w-full max-w-[250px]"
+                                >
+                                    <RadialBarChart
+                                        data={chartData}
+                                        startAngle={-90}
+                                        endAngle={270}
+                                        innerRadius="70%"
+                                        outerRadius="100%"
+                                    >
+                                        <PolarAngleAxis type="number" domain={[0, 100]} dataKey="value" tick={false} />
+                                        <RadialBar dataKey="value" background cornerRadius={10} />
+                                         <RechartsLabel
+                                            content={({ viewBox }) => {
+                                                if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                                                return (
+                                                    <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle">
+                                                    <tspan
+                                                        x={viewBox.cx}
+                                                        y={(viewBox.cy || 0) - 12}
+                                                        className="fill-foreground text-2xl font-bold font-headline"
+                                                    >
+                                                        4 Pilares
+                                                    </tspan>
+                                                    <tspan
+                                                        x={viewBox.cx}
+                                                        y={(viewBox.cy || 0) + 12}
+                                                        className="fill-muted-foreground text-sm"
+                                                    >
+                                                        del PC
+                                                    </tspan>
+                                                    </text>
+                                                )
+                                                }
+                                            }}
+                                            />
+                                    </RadialBarChart>
+                                </ChartContainer>
+                                <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+                                  <InfoCard icon={<Zap className="text-chart-1" />} title="Descomposición" description="Dividir problemas complejos." />
+                                  <InfoCard icon={<TrendingUp className="text-chart-2" />} title="Patrones" description="Identificar similitudes." />
+                                  <InfoCard icon={<Brain className="text-chart-3" />} title="Abstracción" description="Focalizarse en lo esencial." />
+                                  <InfoCard icon={<Puzzle className="text-chart-4" />} title="Algoritmos" description="Crear pasos para soluciones." />
+                                </div>
+                             </div>
                             <Tabs defaultValue="objective" className="w-full">
                                 <TabsList className="grid w-full grid-cols-3 mb-4 bg-primary/20">
                                     <TabsTrigger value="objective">
@@ -302,5 +363,3 @@ export default function LearnPage() {
       </AppShell>
     );
 }
-
-    
