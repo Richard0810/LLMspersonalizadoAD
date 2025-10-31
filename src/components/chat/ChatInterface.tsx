@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
@@ -25,10 +24,10 @@ import { useToast } from '@/hooks/use-toast';
 interface ChatInterfaceProps {
   initialParams: LessonParams;
   onResetSetup: () => void;
-  handleParameterEdit: (func: (field: keyof LessonParams) => void) => void;
+  setParameterEditRequestHandler: (handler: (field: keyof LessonParams) => void) => void;
 }
 
-const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialParams, onResetSetup: externalOnResetSetup, handleParameterEdit }) => {
+const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialParams, onResetSetup: externalOnResetSetup, setParameterEditRequestHandler }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoadingAi, setIsLoadingAi] = useState(false);
@@ -57,9 +56,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialParams, onResetSet
   
   useEffect(scrollToBottom, [messages, isEditorOpen]);
 
-  // Save messages to local storage whenever they change
   useEffect(() => {
-    if (messages.length > 0) { // Only save if there are messages
+    if (messages.length > 0) {
       saveChatHistoryToLocalStorage(messages);
     }
   }, [messages]);
@@ -79,10 +77,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialParams, onResetSet
 
     try {
       const generateInput: GenerateEducationalActivitiesInput = {
-        topicName: params.topicName,
-        computationalConcept: params.computationalConcept,
-        subjectArea: params.subjectArea,
-        gradeLevel: params.gradeLevel,
+        ...params
       };
       const generatedActivities = await generateEducationalActivities(generateInput);
       const activitiesWithIds: Activity[] = generatedActivities.map((act, index) => ({
@@ -122,15 +117,18 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialParams, onResetSet
     if (savedChat && savedChat.length > 0) {
       setMessages(savedChat);
     } else {
+      let systemText = `¡Hola ${user?.username}! Parámetros establecidos:\n`;
+      systemText += `- Tema: ${initialParams.topicName}\n`;
+      systemText += `- Concepto: ${initialParams.computationalConcept}\n`;
+      systemText += `- Área: ${initialParams.subjectArea}\n`;
+      systemText += `- Grado: ${initialParams.gradeLevel}\n`;
+      systemText += `- Duración: ${initialParams.duration} min\n`;
+      systemText += `- Complejidad: ${initialParams.complexityLevel}`;
+
       const systemMessage: ChatMessage = {
         id: Date.now().toString(),
         sender: 'system',
-        text: `¡Hola ${user?.username}! Parámetros de la actividad establecidos:
-- Tema: ${initialParams.topicName}
-- Concepto: ${initialParams.computationalConcept}
-- Área: ${initialParams.subjectArea}
-- Grado: ${initialParams.gradeLevel}
-Generando actividades iniciales...`,
+        text: `${systemText}\nGenerando actividades iniciales...`,
         timestamp: Date.now(),
         type: 'text',
       };
@@ -138,7 +136,7 @@ Generando actividades iniciales...`,
       handleGenerateActivities(initialParams);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // <-- EMPTY DEPENDENCY ARRAY. This is crucial.
+  }, []); 
   
   const addMessage = (message: ChatMessage) => {
     setMessages(prev => [...prev, message]);
@@ -232,6 +230,7 @@ Generando actividades iniciales...`,
       case 'computationalConcept': fieldLabel = 'Concepto computacional'; break;
       case 'subjectArea': fieldLabel = 'Área temática'; break;
       case 'gradeLevel': fieldLabel = 'Nivel de grado'; break;
+      default: fieldLabel = field; break;
     }
 
     addMessage({
@@ -257,8 +256,10 @@ Generando actividades iniciales...`,
       let fieldLabel = 'parámetro';
       if (field === 'topicName') fieldLabel = `tema`;
       if (field === 'computationalConcept') fieldLabel = `concepto computacional`;
+      if (field === 'duration') fieldLabel = `duración (en minutos)`;
+      if (field === 'teacherNotes') fieldLabel = `indicaciones adicionales`;
 
-      addMessage({ id: Date.now().toString(), sender: 'system', text: `¿Cuál es el nuevo ${fieldLabel} que deseas establecer?`, timestamp: Date.now(), type: 'text' });
+      addMessage({ id: Date.now().toString(), sender: 'system', text: `¿Cuál es el nuevo valor para '${fieldLabel}'?`, timestamp: Date.now(), type: 'text' });
       setEditingField(field);
       inputRef.current?.focus();
     }
@@ -266,8 +267,8 @@ Generando actividades iniciales...`,
 
 
   useEffect(() => {
-    handleParameterEdit(editFieldHandler);
-  }, [editFieldHandler, handleParameterEdit]);
+    setParameterEditRequestHandler(() => editFieldHandler);
+  }, [editFieldHandler, setParameterEditRequestHandler]);
 
 
   const handleOpenEditor = (content: string, title: string) => {
@@ -310,9 +311,7 @@ Generando actividades iniciales...`,
             ref={inputRef}
             type="text"
             placeholder={editingField ? 
-              (editingField === 'topicName' ? 'Ingresa el nuevo tema...' : 
-               editingField === 'computationalConcept' ? 'Ingresa el nuevo concepto computacional...' : 
-               `Ingresa nuevo ${editingField.toLowerCase()}...`) 
+              `Ingresa el nuevo valor para ${editingField}...`
               : "Escribe tu mensaje o un comando..."}
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}

@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -9,7 +8,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useAuth } from '@/hooks/useAuth';
 import type { Activity, LessonParams } from '@/types';
 import { getActivityHistoryFromLocalStorage } from '@/lib/localStorageUtils';
-import { LogOut, History, Edit3, Settings, Brain, BookOpen, Target, GraduationCap, User, Sidebar } from 'lucide-react';
+import { LogOut, History, Edit3, Settings, Brain, BookOpen, Target, GraduationCap, User, Sidebar, Clock, Users, School, Puzzle, ChevronsUpDown } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { SidebarTrigger } from '../ui/sidebar';
 
@@ -59,7 +58,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ page, lessonParams, onRese
                 <Settings className="h-4 w-4" /> <span className="hidden md:inline">Modificar</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuContent align="end" className="w-64">
               <DropdownMenuLabel>Editar Parámetros de Actividad</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => onParameterEdit?.('topicName')}>
@@ -68,7 +67,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ page, lessonParams, onRese
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onParameterEdit?.('computationalConcept')}>
                 <Brain className="mr-2 h-4 w-4" />
-                <span>Concepto</span>
+                <span>Concepto Computacional</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onParameterEdit?.('subjectArea')}>
                 <Target className="mr-2 h-4 w-4" />
@@ -79,8 +78,35 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ page, lessonParams, onRese
                 <span>Nivel de Grado</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
+              <DropdownMenuLabel>Parámetros Avanzados</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+               <DropdownMenuItem onClick={() => onParameterEdit?.('duration')}>
+                <Clock className="mr-2 h-4 w-4" />
+                <span>Duración (minutos)</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onParameterEdit?.('complexityLevel')}>
+                <ChevronsUpDown className="mr-2 h-4 w-4" />
+                <span>Nivel de Complejidad</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onParameterEdit?.('groupSize')}>
+                <Users className="mr-2 h-4 w-4" />
+                <span>Tamaño del Grupo</span>
+              </DropdownMenuItem>
+               <DropdownMenuItem onClick={() => onParameterEdit?.('context')}>
+                <School className="mr-2 h-4 w-4" />
+                <span>Contexto Educativo</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onParameterEdit?.('activityType')}>
+                <Puzzle className="mr-2 h-4 w-4" />
+                <span>Tipo de Actividad</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onParameterEdit?.('teacherNotes')}>
+                <Edit3 className="mr-2 h-4 w-4" />
+                <span>Notas para Docente</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
               <DropdownMenuItem onClick={onResetSetup} className="text-destructive focus:bg-destructive/10 focus:text-destructive">
-                <Edit3 className="mr-2 h-4 w-4" /> Reiniciar Config. Inicial
+                <Settings className="mr-2 h-4 w-4" /> Reiniciar Config. Completa
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
