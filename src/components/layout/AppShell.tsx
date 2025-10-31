@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -106,17 +105,17 @@ export const AppShell: React.FC<AppShellProps> = ({
             </SidebarMenu>
           </SidebarContent>
           <SidebarFooter>
-             <div className="eduspark-footer-button flex items-center">
+             <div className="eduspark-footer-button transition-opacity duration-200 group-data-[collapsible=icon]:opacity-0">
                 <Image
                   src="/Logo Eduspark.jpg?v=2"
                   alt="Logo EduSpark AI"
                   width={40}
                   height={40}
-                  className="footer-logo-image w-10 h-10 rounded-full transition-all duration-300"
+                  className="footer-logo-image w-10 h-10 rounded-full"
                 />
-                <div className='transition-opacity duration-200 group-data-[collapsible=icon]:opacity-0 ml-2'>
-                    <p className="text-sm font-bold animate-background-shine bg-[length:200%_auto] bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">EduSpark AI</p>
-                    <p className="text-xs text-muted-foreground">Potenciado con IA</p>
+                <div className='footer-logo-text'>
+                    <span>EduSpark AI</span>
+                    <span>Potenciado con IA</span>
                 </div>
             </div>
           </SidebarFooter>
