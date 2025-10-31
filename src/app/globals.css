@@ -108,3 +108,73 @@
   opacity: 0.6;
   transition: transform 0.1s ease-out;
 }
+
+/* Dynamic Cube Styles */
+.cube-container {
+  width: 200px;
+  height: 200px;
+  perspective: 800px;
+  margin: 50px auto;
+}
+
+.cube {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  animation: rotate 12s infinite linear;
+}
+
+.face {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  color: hsl(var(--primary));
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+  line-height: 200px;
+  background: hsla(var(--card) / 0.5);
+  border: 2px solid;
+  border-image: linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent))) 1;
+  box-shadow: 0 0 120px hsla(var(--primary) / 0.8);
+  backdrop-filter: blur(5px);
+}
+
+.front {
+  transform: translateZ(100px);
+}
+
+.back {
+  transform: rotateY(180deg) translateZ(100px);
+}
+
+.right {
+  transform: rotateY(90deg) translateZ(100px);
+}
+
+.left {
+  transform: rotateY(-90deg) translateZ(100px);
+}
+
+.top {
+  transform: rotateX(90deg) translateZ(100px);
+}
+
+.bottom {
+  transform: rotateX(-90deg) translateZ(100px);
+}
+
+.cube-container:hover .cube {
+  animation-play-state: paused;
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotateX(0) rotateY(0) rotateZ(0);
+  }
+
+  100% {
+    transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg);
+  }
+}
