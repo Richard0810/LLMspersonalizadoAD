@@ -108,7 +108,8 @@ export default function LearnPage() {
 
                     <TabsContent value="about" className="animate-fade-in">
                          <InfoSection title="Acerca de EduSpark AI" icon={Lightbulb}>
-                             <p className="mb-6">Una plataforma diseñada para potenciar la enseñanza del pensamiento computacional a través de la Inteligencia Artificial, en el marco de una iniciativa de investigación de la Universidad de Córdoba, Colombia.</p>
+                             <p>Una plataforma diseñada para potenciar la enseñanza del pensamiento computacional a través de la Inteligencia Artificial, en el marco de una iniciativa de investigación de la Universidad de Córdoba, Colombia.</p>
+                             <p className="mb-6">Su objetivo es apoyar al profesorado en el desarrollo de los cuatro pilares del pensamiento computacional —descomposición, reconocimiento de patrones, abstracción y algoritmos— desde cualquier disciplina.</p>
                             <Tabs defaultValue="objective" className="w-full">
                                 <TabsList className="grid w-full grid-cols-3 mb-4 bg-primary/20">
                                     <TabsTrigger value="objective">
@@ -141,8 +142,11 @@ export default function LearnPage() {
                                     </div>
                                 </TabsContent>
                                 <TabsContent value="audience" className="mt-6">
-                                    <p className="text-center mb-6">
+                                     <p className="text-center mb-4">
                                       EduSpark AI está diseñada para docentes de distintas áreas del conocimiento que buscan integrar el pensamiento computacional en sus clases mediante actividades desconectadas, accesibles y contextualizadas.
+                                    </p>
+                                      <p className="text-center mb-6 text-sm">
+                                      Así, cualquier docente interesado en promover el razonamiento lógico, la creatividad y la resolución de problemas puede utilizar la herramienta en su contexto.
                                     </p>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                       <InfoCard icon={<Calculator size={20}/>} title="Matemáticas" description="Para fortalecer la lógica, la secuenciación y la resolución estructurada de problemas."/>
@@ -153,9 +157,6 @@ export default function LearnPage() {
                                       <InfoCard icon={<Palette size={20}/>} title="Educación Artística" description="Para fomentar la creatividad estructurada a través de patrones visuales o sonoros."/>
                                       <InfoCard icon={<Footprints size={20}/>} title="Educación Física" description="Para diseñar juegos y dinámicas basadas en secuencias, reglas y retos colaborativos."/>
                                     </div>
-                                     <p className="text-center mt-6 text-sm">
-                                      Así, cualquier docente interesado en promover el razonamiento lógico, la creatividad y la resolución de problemas puede utilizar la herramienta en su contexto.
-                                    </p>
                                 </TabsContent>
                                 <TabsContent value="what-it-does" className="mt-6">
                                     <Accordion type="single" collapsible className="w-full" defaultValue="item-1">
@@ -301,3 +302,5 @@ export default function LearnPage() {
       </AppShell>
     );
 }
+
+    
