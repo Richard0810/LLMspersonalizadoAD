@@ -165,10 +165,6 @@
   transform: rotateX(-90deg) translateZ(100px);
 }
 
-.cube-container:hover .cube {
-  animation-play-state: paused;
-}
-
 @keyframes rotate {
   0% {
     transform: rotateX(0) rotateY(0) rotateZ(0);
