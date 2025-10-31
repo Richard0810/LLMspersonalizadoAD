@@ -116,6 +116,39 @@ Cuando solicitas "Crear Apoyo Visual", se activa un flujo de dos pasos, orquesta
 
 Esta estrategia de dos pasos es altamente eficiente. Evita hacer llamadas innecesarias al modelo de imágenes y permite que la IA se enfoque primero en la tarea que mejor hace (análisis y estructuración) antes de proceder con la generación visual.
 
+## Fase 7: Personalización Avanzada y Mejora de la Experiencia de Usuario (27 de octubre de 2025)
+
+En esta fase, el enfoque se centró en otorgar al usuario un control mucho más granular sobre el tipo de actividades generadas, mejorando significativamente la personalización y la usabilidad de la plataforma.
+
+### 7.1. Expansión del Formulario de Creación
+
+Para transformar la herramienta en un asistente de diseño instruccional más completo, se añadieron **seis nuevos parámetros avanzados** al formulario de configuración inicial:
+
+1.  **Duración estimada:** Para ajustar la longitud y complejidad de la actividad.
+2.  **Nivel de Complejidad:** (Básico, Intermedio, Avanzado) para modular la profundidad de los contenidos.
+3.  **Tamaño del Grupo:** (Individual, Parejas, Grupal) para definir la dinámica social.
+4.  **Contexto Educativo:** (Urbano, Rural, Mixto) para adaptar los materiales y ejemplos.
+5.  **Tipo de Actividad:** (Juego, Debate, Manualidad, etc.) para guiar el formato pedagógico.
+6.  **Indicaciones para el Docente:** Un campo de texto para añadir notas o requisitos específicos.
+
+### 7.2. Rediseño de la Interfaz de Usuario (UX)
+
+Para integrar los nuevos parámetros sin sobrecargar al usuario, se implementaron mejoras clave en la UI:
+
+1.  **Formulario Organizado con Acordeón:** Se reestructuró el formulario (`InitialSetupForm.tsx`) utilizando un componente `Accordion`. Esto permite separar los "Parámetros básicos" de las "Opciones avanzadas", manteniendo la interfaz limpia y accesible. El usuario puede optar por una configuración rápida o profundizar en la personalización.
+
+2.  **Selector de Actividad Contextual:** Para mejorar la usabilidad, se modificó el componente `SelectItem` de ShadCN/UI para que pudiera mostrar una **descripción debajo de cada opción** en el menú desplegable "Tipo de Actividad". Esto proporciona al docente información contextual inmediata sobre qué implica cada formato pedagógico (Juego, Debate, etc.), facilitando una elección informada.
+
+### 7.3. Actualización del Flujo de IA
+
+El "cerebro" de la aplicación fue actualizado para incorporar los nuevos parámetros:
+
+1.  **Actualización de Tipos y Esquemas:** Se modificaron las interfaces en `src/types/index.ts` y los esquemas de validación de Zod en el flujo `generate-educational-activity.ts` para aceptar los nuevos campos.
+
+2.  **Enriquecimiento del Prompt Maestro:** El prompt principal fue actualizado para que la IA utilice estas nuevas variables como **contexto secundario** al generar las actividades. Por ejemplo, ahora se le instruye explícitamente que ajuste el número de pasos según la `duración` o que adapte los materiales según el `contexto` educativo, logrando resultados mucho más precisos y personalizados.
+
+Estas mejoras marcan un paso importante en la evolución de EduSpark AI, pasando de un generador de contenido a una herramienta de co-diseño pedagógico más sofisticada y adaptada a las necesidades reales de los docentes.
+
 ## Conclusión
 
 EduSpark AI ha evolucionado de un simple generador de texto a una plataforma de diseño instruccional multifacética. Cada fase de refinamiento, impulsada por la retroalimentación y la resolución de problemas, ha añadido capas de profundidad, usabilidad y robustez al proyecto, convirtiéndolo en una herramienta significativamente más potente y alineada con las necesidades de los educadores.
