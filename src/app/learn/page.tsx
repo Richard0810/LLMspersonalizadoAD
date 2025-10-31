@@ -7,11 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, BrainCircuit, Puzzle, Youtube, Presentation, ExternalLink, Lightbulb, Users, Bot, Rocket, School, Globe, BookOpenCheck, Brain, GraduationCap, Target, Settings, MessageSquare } from 'lucide-react';
+import { ArrowLeft, BrainCircuit, Puzzle, Youtube, Presentation, ExternalLink, Lightbulb, Users, Bot, Rocket, School, Globe, BookOpenCheck, Brain, GraduationCap, Target, Settings, MessageSquare, Calculator, Code, FlaskConical, BookText, Landmark, Palette, Footprints } from 'lucide-react';
 import InteractiveBackground from '@/components/shared/InteractiveBackground';
-import { Pie, PieChart, ResponsiveContainer } from 'recharts';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import type { ChartConfig } from '@/components/ui/chart';
 import { AppShell } from '@/components/layout/AppShell';
 import type { ReactNode, ElementType } from 'react';
 
@@ -42,10 +39,10 @@ interface InfoCardProps {
 }
 
 const InfoCard = ({ icon, title, description }: InfoCardProps) => (
-    <div className="flex items-start gap-4">
-        <div className="flex-shrink-0 text-primary">{icon}</div>
+    <div className="flex items-start gap-4 p-4 rounded-lg bg-background hover:bg-muted/50 transition-colors">
+        <div className="flex-shrink-0 text-primary mt-1">{icon}</div>
         <div>
-            <h4 className="font-semibold text-foreground">{title}</h4>
+            <h4 className="font-semibold text-foreground text-base">{title}</h4>
             <p className="text-sm text-muted-foreground">{description}</p>
         </div>
     </div>
@@ -81,28 +78,6 @@ const PresentationEmbed = ({ presentationId, title }: PresentationEmbedProps) =>
         className="w-full h-[300px] md:h-[450px] rounded-md shadow-md border"
     ></iframe>
 );
-
-const audienceData = [
-  { name: 'Doc. Tecnología', value: 70, fill: 'hsl(var(--chart-1))' },
-  { name: 'Otros Docentes', value: 20, fill: 'hsl(var(--chart-2))' },
-  { name: 'Estudiantes', value: 10, fill: 'hsl(var(--chart-4))' },
-];
-
-const chartConfig = {
-   'Doc. Tecnología': {
-    label: 'Docentes de Tecnología',
-    color: 'hsl(var(--chart-1))',
-  },
-  'Otros Docentes': {
-    label: 'Otros Docentes',
-    color: 'hsl(var(--chart-2))',
-  },
-  'Estudiantes': {
-    label: 'Estudiantes',
-    color: 'hsl(var(--chart-4))',
-  },
-} satisfies ChartConfig;
-
 
 export default function LearnPage() {
     const router = useRouter();
@@ -166,28 +141,21 @@ export default function LearnPage() {
                                     </div>
                                 </TabsContent>
                                 <TabsContent value="audience" className="mt-6">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-                                        <div>
-                                            <InfoCard
-                                                icon={<GraduationCap className="h-6 w-6 text-accent"/>}
-                                                title="Docentes de Tecnología e Informática"
-                                                description="Principalmente, para educadores que buscan innovar en sus clases de pensamiento computacional, incluso en entornos con baja conectividad."
-                                            />
-                                            <InfoCard
-                                                icon={<Users className="h-6 w-6 mt-4"/>}
-                                                title="Otros Docentes y Estudiantes"
-                                                description="También es útil para cualquier docente interesado en la materia y para estudiantes que deseen explorar estos conceptos."
-                                            />
-                                        </div>
-                                        <ChartContainer config={chartConfig} className="mx-auto aspect-square h-[200px] w-full">
-                                            <ResponsiveContainer width="100%" height="100%">
-                                                <PieChart>
-                                                    <ChartTooltip content={<ChartTooltipContent nameKey="name" hideLabel />} />
-                                                    <Pie data={audienceData} dataKey="value" nameKey="name" innerRadius={40} outerRadius={60} paddingAngle={5} />
-                                                </PieChart>
-                                            </ResponsiveContainer>
-                                        </ChartContainer>
+                                    <p className="text-center mb-6">
+                                      EduSpark AI está diseñada para docentes de distintas áreas del conocimiento que buscan integrar el pensamiento computacional en sus clases mediante actividades desconectadas, accesibles y contextualizadas.
+                                    </p>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                      <InfoCard icon={<Calculator size={20}/>} title="Matemáticas" description="Para fortalecer la lógica, la secuenciación y la resolución estructurada de problemas."/>
+                                      <InfoCard icon={<Code size={20}/>} title="Tecnología e Informática" description="Para diseñar actividades que desarrollen pensamiento algorítmico sin depender de dispositivos."/>
+                                      <InfoCard icon={<FlaskConical size={20}/>} title="Ciencias Naturales" description="Para analizar procesos, reconocer patrones y formular soluciones basadas en la experimentación."/>
+                                      <InfoCard icon={<BookText size={20}/>} title="Lengua Castellana" description="Para aplicar la descomposición en la comprensión lectora y la producción textual."/>
+                                      <InfoCard icon={<Landmark size={20}/>} title="Ciencias Sociales" description="Para abstraer información, identificar relaciones y secuenciar eventos históricos o sociales."/>
+                                      <InfoCard icon={<Palette size={20}/>} title="Educación Artística" description="Para fomentar la creatividad estructurada a través de patrones visuales o sonoros."/>
+                                      <InfoCard icon={<Footprints size={20}/>} title="Educación Física" description="Para diseñar juegos y dinámicas basadas en secuencias, reglas y retos colaborativos."/>
                                     </div>
+                                     <p className="text-center mt-6 text-sm">
+                                      Así, cualquier docente interesado en promover el razonamiento lógico, la creatividad y la resolución de problemas puede utilizar la herramienta en su contexto.
+                                    </p>
                                 </TabsContent>
                                 <TabsContent value="what-it-does" className="mt-6">
                                     <Accordion type="single" collapsible className="w-full" defaultValue="item-1">
@@ -333,5 +301,3 @@ export default function LearnPage() {
       </AppShell>
     );
 }
-
-    
