@@ -86,7 +86,13 @@ export const computationalConcepts = [
 export const complexityLevels: LessonParams['complexityLevel'][] = ["Básico", "Intermedio", "Avanzado"];
 export const groupSizes: LessonParams['groupSize'][] = ["Individual", "Parejas", "Grupal"];
 export const educationalContexts: LessonParams['context'][] = ["Urbano", "Rural", "Mixto"];
-export const activityTypes = ["Juego", "Debate", "Manualidad", "Reflexión", "Experimento"];
+export const activityTypes: { id: string; name: string; description: string }[] = [
+    { id: "Juego", name: "Juego", description: "Actividades centradas en reglas, competencia o colaboración para lograr un objetivo lúdico." },
+    { id: "Debate", name: "Debate", description: "Fomenta la argumentación y el pensamiento crítico sobre un tema, con diferentes roles." },
+    { id: "Manualidad", name: "Manualidad", description: "Implica la creación de un artefacto físico o tangible para representar conceptos." },
+    { id: "Reflexión", name: "Reflexión", description: "Actividades introspectivas para conectar la experiencia con conceptos abstractos." },
+    { id: "Experimento", name: "Experimento", description: "Se basa en la observación y el análisis de resultados a partir de una hipótesis." }
+];
 
 
 export const SvgGenerationInputSchema = z.object({

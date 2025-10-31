@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Textarea } from '@/components/ui/textarea';
 import { BookOpenCheck, Brain, GraduationCap, Target, Lightbulb, Settings2, Clock, Users, School, Puzzle } from 'lucide-react';
 import type { LessonParams } from '@/types';
@@ -137,6 +138,7 @@ const InitialSetupForm: React.FC<InitialSetupFormProps> = ({ onSetupComplete }) 
                            </div>
                         </AccordionTrigger>
                         <AccordionContent className="pt-4">
+                          <TooltipProvider>
                             <div className="space-y-6">
                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                   <div className="space-y-2">
@@ -177,7 +179,16 @@ const InitialSetupForm: React.FC<InitialSetupFormProps> = ({ onSetupComplete }) 
                                    <Select value={activityType} onValueChange={setActivityType} required>
                                       <SelectTrigger id="activityType"><SelectValue placeholder="Selecciona un tipo" /></SelectTrigger>
                                       <SelectContent>
-                                      {activityTypes.map(type => <SelectItem key={type} value={type}>{type}</SelectItem>)}
+                                        {activityTypes.map(type => (
+                                          <Tooltip key={type.id}>
+                                            <TooltipTrigger asChild>
+                                              <SelectItem value={type.id}>{type.name}</SelectItem>
+                                            </TooltipTrigger>
+                                            <TooltipContent side="right" align="start">
+                                              <p className="max-w-xs">{type.description}</p>
+                                            </TooltipContent>
+                                          </Tooltip>
+                                        ))}
                                       </SelectContent>
                                   </Select>
                                </div>
@@ -187,6 +198,7 @@ const InitialSetupForm: React.FC<InitialSetupFormProps> = ({ onSetupComplete }) 
                                     <Textarea id="teacherNotes" value={teacherNotes} onChange={(e) => setTeacherNotes(e.target.value)} placeholder="Ej: Quiero que sea una actividad al aire libre, usar material reciclado, debe ser colaborativa..." />
                                 </div>
                             </div>
+                          </TooltipProvider>
                         </AccordionContent>
                     </AccordionItem>
                 </Accordion>
