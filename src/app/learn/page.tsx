@@ -20,6 +20,8 @@ import {
 import { PieChart, Pie, Cell } from 'recharts';
 
 type LearnSection = 'about' | 'pc' | 'ad' | 'presentation';
+type AboutSubSection = 'objetivo' | 'para-quien' | 'que-hace';
+
 
 interface InfoSectionProps {
   title: string;
@@ -119,6 +121,7 @@ const chartConfig = {
 
 export default function LearnPage() {
     const [activeSection, setActiveSection] = useState<LearnSection>('about');
+    const [activeAboutSubSection, setActiveAboutSubSection] = useState<AboutSubSection>('que-hace');
     const presentationId = "1_Iys9XP0Te5-spn3DO5vhB01vm1OVC5d";
     const presentationUrl = `https://docs.google.com/presentation/d/${presentationId}/edit?usp=drive_link&ouid=105808271510700269082&rtpof=true&sd=true`;
 
@@ -129,6 +132,91 @@ export default function LearnPage() {
       { id: 'presentation', title: 'Presentación', icon: Presentation },
     ];
     
+    const renderAboutSubContent = () => {
+        switch (activeAboutSubSection) {
+            case 'objetivo':
+                return (
+                    <div className="space-y-4 pt-2 animate-fade-in">
+                        <InfoCard
+                             icon={<Rocket size={24} />}
+                             title="Innovación Pedagógica"
+                             description="Asesorar a docentes en el diseño de actividades desconectadas que desarrollen el pensamiento computacional de forma creativa."
+                         />
+                         <InfoCard
+                             icon={<School size={24} />}
+                             title="Iniciativa de Investigación"
+                             description="Este proyecto se desarrolla en el marco de la Licenciatura en Informática de la Universidad de Córdoba, Colombia."
+                         />
+                         <InfoCard
+                             icon={<Globe size={24} />}
+                             title="Acceso Equitativo"
+                             description="Implementar y validar la herramienta en contextos reales para asegurar su efectividad y mejorarla con retroalimentación."
+                         />
+                    </div>
+                );
+            case 'para-quien':
+                return (
+                    <div className="space-y-4 pt-2 animate-fade-in">
+                        <p className="mb-4">EduSpark AI está diseñada para docentes de distintas áreas del conocimiento que buscan integrar el pensamiento computacional en sus clases mediante actividades desconectadas, accesibles y contextualizadas.</p>
+                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                           <InfoCard icon={<Calculator size={20}/>} title="Matemáticas" description="Fortalece la lógica, secuenciación y resolución estructurada de problemas."/>
+                           <InfoCard icon={<Code size={20}/>} title="Tecnología e Informática" description="Diseña actividades de pensamiento algorítmico sin depender de dispositivos."/>
+                           <InfoCard icon={<FlaskConical size={20}/>} title="Ciencias Naturales" description="Analiza procesos, reconoce patrones y formula soluciones basadas en la experimentación."/>
+                           <InfoCard icon={<BookText size={20}/>} title="Lengua Castellana" description="Aplica la descomposición en la comprensión lectora y la producción textual."/>
+                           <InfoCard icon={<Landmark size={20}/>} title="Ciencias Sociales" description="Abstrae información, identifica relaciones y secuencia eventos históricos o sociales."/>
+                           <InfoCard icon={<Palette size={20}/>} title="Educación Artística" description="Fomenta la creatividad estructurada a través de patrones visuales o sonoros."/>
+                           <InfoCard icon={<Footprints size={20}/>} title="Educación Física" description="Diseña juegos y dinámicas basadas en secuencias, reglas y retos colaborativos."/>
+                         </div>
+                    </div>
+                );
+            case 'que-hace':
+                return (
+                     <div className="pt-2 animate-fade-in">
+                        <Accordion type="single" collapsible className="w-full" defaultValue="item-3-1">
+                            <AccordionItem value="item-3-1">
+                                <AccordionTrigger className="font-semibold text-primary/90 hover:text-primary">
+                                    <Settings className="mr-2 h-4 w-4"/>Paso 1: Configuración Inteligente
+                                </AccordionTrigger>
+                                <AccordionContent className="space-y-2">
+                                    <p>Define los <strong className='text-foreground'>parámetros básicos</strong> (tema, concepto, área y grado) y <strong className='text-foreground'>avanzados</strong> (duración, complejidad, tipo de actividad, etc.) para guiar a la IA.</p>
+                                    <p>Este proceso de <strong className='text-accent'>ingeniería de prompts guiada</strong> asegura que las actividades generadas sean relevantes, personalizadas y se ajusten perfectamente a las necesidades de tu clase.</p>
+                                </AccordionContent>
+                            </AccordionItem>
+                            <AccordionItem value="item-3-2">
+                                <AccordionTrigger className="font-semibold text-primary/90 hover:text-primary">
+                                    <MessageSquare className="mr-2 h-4 w-4"/>Paso 2: Generación y Asesoramiento
+                                </AccordionTrigger>
+                                <AccordionContent className="space-y-2">
+                                    <p>Una vez definidos los parámetros, el chat se convierte en tu centro de mando. Puedes:</p>
+                                    <ul className='list-disc pl-5 space-y-1'>
+                                        <li><strong>Generar actividades:</strong> La IA crea tres actividades detalladas, listas para implementar.</li>
+                                        <li><strong>Hacer preguntas de seguimiento:</strong> "¿Puedes darme un ejemplo de 'abstracción' para niños de primaria?"</li>
+                                        <li><strong>Modificar sobre la marcha:</strong> Usa comandos como "cambiar tema" para ajustar los parámetros sin reiniciar.</li>
+                                    </ul>
+                                </AccordionContent>
+                            </AccordionItem>
+                             <AccordionItem value="item-3-3">
+                                <AccordionTrigger className="font-semibold text-primary/90 hover:text-primary">
+                                    <Wand2 className="mr-2 h-4 w-4"/>Paso 3: Creación de Apoyos Visuales
+                                </AccordionTrigger>
+                                <AccordionContent className="space-y-2">
+                                    <p>Para cualquier actividad generada, puedes solicitar la creación de <strong className='text-foreground'>apoyos visuales</strong>. La IA actúa como un "Director de Arte":</p>
+                                     <ul className='list-disc pl-5 space-y-1'>
+                                        <li>Analiza los recursos de la actividad (materiales, tarjetas, tableros).</li>
+                                        <li>Genera <strong className='text-accent'>tarjetas, tablas o componentes</strong> en formato SVG.</li>
+                                        <li>Crea <strong className='text-accent'>ilustraciones y guías visuales</strong> para los elementos que necesitan ser dibujados.</li>
+                                    </ul>
+                                    <p>Estos recursos se pueden descargar y son perfectos para complementar tus clases.</p>
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
+                    </div>
+                );
+            default:
+                return null;
+        }
+    };
+
     const renderContent = () => {
         switch (activeSection) {
             case 'about':
@@ -166,86 +254,33 @@ export default function LearnPage() {
                              <InfoCard icon={<Puzzle className="text-chart-4" />} title="Algoritmos" description="Crear pasos para soluciones." />
                            </div>
                         </div>
-                        <Accordion type="single" collapsible className="w-full" defaultValue="item-3">
-                            <AccordionItem value="item-1">
-                                <AccordionTrigger className="text-lg font-semibold text-primary/90 hover:text-primary"><Target className="h-5 w-5 mr-2"/> Objetivo</AccordionTrigger>
-                                <AccordionContent className="space-y-4 pt-2">
-                                     <InfoCard
-                                         icon={<Rocket size={24} />}
-                                         title="Innovación Pedagógica"
-                                         description="Asesorar a docentes en el diseño de actividades desconectadas que desarrollen el pensamiento computacional de forma creativa."
-                                     />
-                                     <InfoCard
-                                         icon={<School size={24} />}
-                                         title="Iniciativa de Investigación"
-                                         description="Este proyecto se desarrolla en el marco de la Licenciatura en Informática de la Universidad de Córdoba, Colombia."
-                                     />
-                                     <InfoCard
-                                         icon={<Globe size={24} />}
-                                         title="Acceso Equitativo"
-                                         description="Implementar y validar la herramienta en contextos reales para asegurar su efectividad y mejorarla con retroalimentación."
-                                     />
-                                </AccordionContent>
-                            </AccordionItem>
-                             <AccordionItem value="item-2">
-                                <AccordionTrigger className="text-lg font-semibold text-primary/90 hover:text-primary"><Users className="h-5 w-5 mr-2"/> ¿Para Quién?</AccordionTrigger>
-                                <AccordionContent className="space-y-4 pt-2">
-                                    <p className="mb-4">EduSpark AI está diseñada para docentes de distintas áreas del conocimiento que buscan integrar el pensamiento computacional en sus clases mediante actividades desconectadas, accesibles y contextualizadas.</p>
-                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                       <InfoCard icon={<Calculator size={20}/>} title="Matemáticas" description="Fortalece la lógica, secuenciación y resolución estructurada de problemas."/>
-                                       <InfoCard icon={<Code size={20}/>} title="Tecnología e Informática" description="Diseña actividades de pensamiento algorítmico sin depender de dispositivos."/>
-                                       <InfoCard icon={<FlaskConical size={20}/>} title="Ciencias Naturales" description="Analiza procesos, reconoce patrones y formula soluciones basadas en la experimentación."/>
-                                       <InfoCard icon={<BookText size={20}/>} title="Lengua Castellana" description="Aplica la descomposición en la comprensión lectora y la producción textual."/>
-                                       <InfoCard icon={<Landmark size={20}/>} title="Ciencias Sociales" description="Abstrae información, identifica relaciones y secuencia eventos históricos o sociales."/>
-                                       <InfoCard icon={<Palette size={20}/>} title="Educación Artística" description="Fomenta la creatividad estructurada a través de patrones visuales o sonoros."/>
-                                       <InfoCard icon={<Footprints size={20}/>} title="Educación Física" description="Diseña juegos y dinámicas basadas en secuencias, reglas y retos colaborativos."/>
-                                     </div>
-                                </AccordionContent>
-                            </AccordionItem>
-                            <AccordionItem value="item-3">
-                                <AccordionTrigger className="text-lg font-semibold text-primary/90 hover:text-primary"><Bot className="h-5 w-5 mr-2"/> ¿Qué Hace?</AccordionTrigger>
-                                 <AccordionContent className="pt-2">
-                                    <Accordion type="single" collapsible className="w-full" defaultValue="item-3-1">
-                                        <AccordionItem value="item-3-1">
-                                            <AccordionTrigger className="font-semibold text-primary/90 hover:text-primary">
-                                                <Settings className="mr-2 h-4 w-4"/>Paso 1: Configuración Inteligente
-                                            </AccordionTrigger>
-                                            <AccordionContent className="space-y-2">
-                                                <p>Define los <strong className='text-foreground'>parámetros básicos</strong> (tema, concepto, área y grado) y <strong className='text-foreground'>avanzados</strong> (duración, complejidad, tipo de actividad, etc.) para guiar a la IA.</p>
-                                                <p>Este proceso de <strong className='text-accent'>ingeniería de prompts guiada</strong> asegura que las actividades generadas sean relevantes, personalizadas y se ajusten perfectamente a las necesidades de tu clase.</p>
-                                            </AccordionContent>
-                                        </AccordionItem>
-                                        <AccordionItem value="item-3-2">
-                                            <AccordionTrigger className="font-semibold text-primary/90 hover:text-primary">
-                                                <MessageSquare className="mr-2 h-4 w-4"/>Paso 2: Generación y Asesoramiento
-                                            </AccordionTrigger>
-                                            <AccordionContent className="space-y-2">
-                                                <p>Una vez definidos los parámetros, el chat se convierte en tu centro de mando. Puedes:</p>
-                                                <ul className='list-disc pl-5 space-y-1'>
-                                                    <li><strong>Generar actividades:</strong> La IA crea tres actividades detalladas, listas para implementar.</li>
-                                                    <li><strong>Hacer preguntas de seguimiento:</strong> "¿Puedes darme un ejemplo de 'abstracción' para niños de primaria?"</li>
-                                                    <li><strong>Modificar sobre la marcha:</strong> Usa comandos como "cambiar tema" para ajustar los parámetros sin reiniciar.</li>
-                                                </ul>
-                                            </AccordionContent>
-                                        </AccordionItem>
-                                         <AccordionItem value="item-3-3">
-                                            <AccordionTrigger className="font-semibold text-primary/90 hover:text-primary">
-                                                <Wand2 className="mr-2 h-4 w-4"/>Paso 3: Creación de Apoyos Visuales
-                                            </AccordionTrigger>
-                                            <AccordionContent className="space-y-2">
-                                                <p>Para cualquier actividad generada, puedes solicitar la creación de <strong className='text-foreground'>apoyos visuales</strong>. La IA actúa como un "Director de Arte":</p>
-                                                 <ul className='list-disc pl-5 space-y-1'>
-                                                    <li>Analiza los recursos de la actividad (materiales, tarjetas, tableros).</li>
-                                                    <li>Genera <strong className='text-accent'>tarjetas, tablas o componentes</strong> en formato SVG.</li>
-                                                    <li>Crea <strong className='text-accent'>ilustraciones y guías visuales</strong> para los elementos que necesitan ser dibujados.</li>
-                                                </ul>
-                                                <p>Estos recursos se pueden descargar y son perfectos para complementar tus clases.</p>
-                                            </AccordionContent>
-                                        </AccordionItem>
-                                    </Accordion>
-                                </AccordionContent>
-                            </AccordionItem>
-                        </Accordion>
+                        
+                        <ul className="animated-icon-list">
+                          <li className="icon-content">
+                            <a className="icon-link" data-social="objetivo" onClick={() => setActiveAboutSubSection('objetivo')}>
+                              <div className="filled"></div>
+                              <Target />
+                            </a>
+                            <div className="tooltip">Objetivo</div>
+                          </li>
+                          <li className="icon-content">
+                            <a className="icon-link" data-social="para-quien" onClick={() => setActiveAboutSubSection('para-quien')}>
+                              <div className="filled"></div>
+                              <Users />
+                            </a>
+                            <div className="tooltip">¿Para Quién?</div>
+                          </li>
+                          <li className="icon-content">
+                            <a className="icon-link" data-social="que-hace" onClick={() => setActiveAboutSubSection('que-hace')}>
+                              <div className="filled"></div>
+                              <Bot />
+                            </a>
+                            <div className="tooltip">¿Qué Hace?</div>
+                          </li>
+                        </ul>
+                        <div className="mt-4 p-4 border-t">
+                            {renderAboutSubContent()}
+                        </div>
                     </InfoSection>
                 );
             case 'pc':

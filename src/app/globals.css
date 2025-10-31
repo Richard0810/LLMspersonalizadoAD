@@ -110,49 +110,64 @@
 }
 
 /* Loading Cube Styles */
-.cube-container {
-  width: 200px;
-  height: 200px;
-  perspective: 800px;
-  margin: 50px auto;
-}
-
-.cube {
-  position: relative;
+.wrapper {
   width: 100%;
   height: 100%;
-  transform-style: preserve-3d;
-  animation: rotate 12s infinite linear;
-}
-
-.face {
-  position: absolute;
-  width: 200px;
-  height: 200px;
-  color: hsl(var(--primary));
-  font-size: 18px;
-  font-weight: 600;
+  position: relative;
   text-align: center;
-  line-height: 200px;
-  background: hsla(var(--card) / 0.5);
-  border: 2px solid;
-  border-image: linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent))) 1;
-  box-shadow: 0 0 120px hsla(var(--primary) / 0.8);
-  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
-.front { transform: translateZ(100px); }
-.back { transform: rotateY(180deg) translateZ(100px); }
-.right { transform: rotateY(90deg) translateZ(100px); }
-.left { transform: rotateY(-90deg) translateZ(100px); }
-.top { transform: rotateX(90deg) translateZ(100px); }
-.bottom { transform: rotateX(-90deg) translateZ(100px); }
-
-@keyframes rotate {
-  0% { transform: rotateX(0) rotateY(0) rotateZ(0); }
-  100% { transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg); }
+.inner {
+  --w: 100px;
+  --h: 150px;
+  --translateZ: calc((var(--w) + var(--h)) + 0px);
+  --rotateX: -15deg;
+  --perspective: 1000px;
+  position: absolute;
+  width: var(--w);
+  height: var(--h);
+  z-index: 2;
+  transform-style: preserve-3d;
+  transform: perspective(var(--perspective));
+  animation: rotating 20s linear infinite; /* */
+}
+@keyframes rotating {
+  from {
+    transform: perspective(var(--perspective)) rotateX(var(--rotateX))
+      rotateY(0);
+  }
+  to {
+    transform: perspective(var(--perspective)) rotateX(var(--rotateX))
+      rotateY(1turn);
+  }
 }
 
+.card-carousel {
+  position: absolute;
+  border: 2px solid rgba(var(--color-card));
+  border-radius: 12px;
+  overflow: hidden;
+  inset: 0;
+  transform: rotateY(calc((360deg / var(--quantity)) * var(--index)))
+    translateZ(var(--translateZ));
+}
+
+.img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #0000
+    radial-gradient(
+      circle,
+      rgba(var(--color-card), 0.2) 0%,
+      rgba(var(--color-card), 0.6) 80%,
+      rgba(var(--color-card), 0.9) 100%
+    );
+}
 
 /* Brutalist Button animation for Sidebar Footer */
 .eduspark-footer-button {
@@ -304,4 +319,91 @@
   text-indent: 28px;
   width: 100%;
   font-weight: 600;
+}
+
+/* Animated Icons for Learn Page About Section */
+.animated-icon-list {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  margin-bottom: 2rem;
+}
+.animated-icon-list .icon-content {
+  margin: 0 10px;
+  position: relative;
+}
+.animated-icon-list .icon-content .tooltip {
+  position: absolute;
+  top: -45px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: hsl(var(--primary-foreground));
+  padding: 6px 10px;
+  border-radius: 5px;
+  opacity: 0;
+  visibility: hidden;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+.animated-icon-list .icon-content:hover .tooltip {
+  opacity: 1;
+  visibility: visible;
+  top: -50px;
+}
+.animated-icon-list .icon-content .icon-link {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  color: hsl(var(--foreground));
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  transition: all 0.3s ease-in-out;
+  cursor: pointer;
+}
+.animated-icon-list .icon-content .icon-link:hover {
+  box-shadow: 3px 2px 45px 0px rgb(0 0 0 / 12%);
+}
+.animated-icon-list .icon-content .icon-link svg {
+  position: relative;
+  z-index: 1;
+  width: 24px;
+  height: 24px;
+}
+.animated-icon-list .icon-content .icon-link:hover {
+  color: white;
+}
+.animated-icon-list .icon-content .icon-link .filled {
+  position: absolute;
+  top: auto;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 0;
+  background-color: #000;
+  transition: all 0.3s ease-in-out;
+}
+.animated-icon-list .icon-content .icon-link:hover .filled {
+  height: 100%;
+}
+
+.animated-icon-list .icon-content .icon-link[data-social="objetivo"] .filled,
+.animated-icon-list .icon-content .icon-link[data-social="objetivo"] ~ .tooltip {
+  background-color: hsl(var(--primary));
+}
+
+.animated-icon-list .icon-content .icon-link[data-social="para-quien"] .filled,
+.animated-icon-list .icon-content .icon-link[data-social="para-quien"] ~ .tooltip {
+  background-color: hsl(var(--accent));
+}
+.animated-icon-list .icon-content .icon-link[data-social="que-hace"] .filled,
+.animated-icon-list .icon-content .icon-link[data-social="que-hace"] ~ .tooltip {
+    background-color: hsl(var(--chart-3));
 }
