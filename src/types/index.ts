@@ -17,6 +17,13 @@ export interface Activity {
   activityResources: string;
   reflectionQuestion: string;
   evaluationCriteria: string;
+  // --- Nuevos campos opcionales ---
+  duration?: string;
+  teacherNotes?: string;
+  complexityLevel?: 'Básico' | 'Intermedio' | 'Avanzado';
+  groupSize?: 'Individual' | 'Parejas' | 'Grupal';
+  context?: 'Urbano' | 'Rural' | 'Mixto';
+  activityType?: string;
 }
 
 export type MessageSender = 'user' | 'ai' | 'system';
@@ -34,10 +41,18 @@ export interface ChatMessage {
 }
 
 export interface LessonParams {
+  // Parámetros básicos
   topicName: string;
   computationalConcept: string;
   subjectArea: string;
   gradeLevel: string;
+  // Parámetros avanzados
+  duration: string;
+  teacherNotes: string;
+  complexityLevel: 'Básico' | 'Intermedio' | 'Avanzado';
+  groupSize: 'Individual' | 'Parejas' | 'Grupal';
+  context: 'Urbano' | 'Rural' | 'Mixto';
+  activityType: string;
 }
 
 export const subjectAreas = [
@@ -66,6 +81,19 @@ export const computationalConcepts = [
   "Algoritmos",
   "Todos los conceptos"
 ];
+
+// --- Nuevas constantes para los selectores del formulario ---
+export const complexityLevels: LessonParams['complexityLevel'][] = ["Básico", "Intermedio", "Avanzado"];
+export const groupSizes: LessonParams['groupSize'][] = ["Individual", "Parejas", "Grupal"];
+export const educationalContexts: LessonParams['context'][] = ["Urbano", "Rural", "Mixto"];
+export const activityTypes: { id: string; name: string; description: string }[] = [
+    { id: "Juego", name: "Juego", description: "Actividades centradas en reglas, competencia o colaboración para lograr un objetivo lúdico." },
+    { id: "Debate", name: "Debate", description: "Fomenta la argumentación y el pensamiento crítico sobre un tema, con diferentes roles." },
+    { id: "Manualidad", name: "Manualidad", description: "Implica la creación de un artefacto físico o tangible para representar conceptos." },
+    { id: "Reflexión", name: "Reflexión", description: "Actividades introspectivas para conectar la experiencia con conceptos abstractos." },
+    { id: "Experimento", name: "Experimento", description: "Se basa en la observación y el análisis de resultados a partir de una hipótesis." }
+];
+
 
 export const SvgGenerationInputSchema = z.object({
   componentType: z.enum(['carta_pregunta', 'carta_accion', 'tabla_personalizada']),

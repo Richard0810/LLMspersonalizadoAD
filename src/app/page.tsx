@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -14,8 +13,9 @@ export default function HomePage() {
   const [lessonParams, setLessonParams] = useState<LessonParams | null>(null);
   const [isLoadingParams, setIsLoadingParams] = useState(true);
 
-  // This state and handler will be passed down to control chat messages from the header
-  let handleParameterEdit = (field: keyof LessonParams) => {};
+  // Este estado y manejador se pasarán hacia abajo para controlar la edición de parámetros desde la cabecera.
+  const [parameterEditRequestHandler, setParameterEditRequestHandler] = useState<(field: keyof LessonParams) => void>(() => () => {});
+
 
   const loadParams = useCallback(() => {
     const params = getLessonParamsFromLocalStorage();
@@ -33,7 +33,7 @@ export default function HomePage() {
 
   const handleResetSetup = () => {
     clearLessonParamsFromLocalStorage();
-    clearChatHistoryFromLocalStorage(); // Also clear chat history
+    clearChatHistoryFromLocalStorage(); // También limpiar el historial de chat
     setLessonParams(null);
   };
   
@@ -51,7 +51,8 @@ export default function HomePage() {
           page={!lessonParams ? 'setup' : 'chat'}
           lessonParams={lessonParams}
           onResetSetup={handleResetSetup}
-          onParameterEdit={(field) => handleParameterEdit(field)}
+          // La cabecera llamará a esta función cuando el usuario quiera editar un parámetro
+          onParameterEdit={(field) => parameterEditRequestHandler(field)}
         >
         {!lessonParams ? (
             <div className="flex flex-1 justify-center items-center p-4 relative">
@@ -61,8 +62,8 @@ export default function HomePage() {
             <ChatInterface 
               initialParams={lessonParams} 
               onResetSetup={handleResetSetup}
-              // This prop is a bit of a workaround to lift the function up from ChatInterface
-              handleParameterEdit={(func) => { handleParameterEdit = func; }} 
+              // ChatInterface nos dará la función para manejar la edición
+              setParameterEditRequestHandler={setParameterEditRequestHandler}
             />
         )}
        </AppShell>
