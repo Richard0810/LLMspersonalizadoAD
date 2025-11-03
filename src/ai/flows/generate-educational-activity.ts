@@ -54,7 +54,7 @@ export type GenerateEducationalActivitiesOutput = z.infer<typeof GenerateEducati
 export async function generateEducationalActivities(
   input: GenerateEducationalActivitiesInput
 ): Promise<GenerateEducationalActivitiesOutput> {
-  return generateEducationalActivitiesFlow(input);
+  return await generateEducationalActivitiesFlow(input);
 }
 
 const PromptInputSchema = GenerateEducationalActivitiesInputSchema.extend({
