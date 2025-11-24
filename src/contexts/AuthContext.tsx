@@ -74,6 +74,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           message = defaultMessage;
       } else if (error.code === 'auth/invalid-email') {
           message = "El formato del nombre de usuario no es válido."
+      } else if (error.code === 'auth/operation-not-allowed') {
+          message = "El inicio de sesión por contraseña no está habilitado. Por favor, contacta al administrador."
       }
       toast({ title: "Error al Iniciar Sesión", description: message, variant: "destructive" });
       setIsLoading(false);
@@ -98,6 +100,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             message = "La contraseña es demasiado débil. Debe tener al menos 6 caracteres.";
         } else if (error.code === 'auth/invalid-email') {
             message = "El formato del nombre de usuario no es válido."
+        } else if (error.code === 'auth/operation-not-allowed') {
+            message = "El registro por contraseña no está habilitado en este proyecto. Por favor, activa el proveedor 'Email/Password' en tu consola de Firebase."
         }
         toast({ title: "Error de Registro", description: message, variant: "destructive" });
         setIsLoading(false);
