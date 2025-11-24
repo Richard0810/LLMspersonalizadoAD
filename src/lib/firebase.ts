@@ -9,7 +9,7 @@ const firebaseConfig = {
   "projectId": "eduspark-ai-837vs",
   "appId": "1:637462240048:web:bcf0d49b43e8c4c08dc6f5",
   "storageBucket": "eduspark-ai-837vs.firebasestorage.app",
-  "apiKey": "AIzaSyDy895-0XNjfY2_HvvzUJ8dMRs8Ss4WH-Q",
+  "apiKey": "AIzaSyAAU1Al3JlmckfzEGD69mHd3y7WFv6TYaM",
   "authDomain": "eduspark-ai-837vs.firebaseapp.com",
   "measurementId": "",
   "messagingSenderId": "637462240048"
