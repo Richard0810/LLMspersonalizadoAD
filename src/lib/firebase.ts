@@ -6,7 +6,7 @@ import { getAuth } from "firebase/auth";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyDy895-0XNjfY2_HvvzUJ8dMRs8Ss4WH-Q",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: "eduspark-ai-837vs.firebaseapp.com",
   projectId: "eduspark-ai-837vs",
   storageBucket: "eduspark-ai-837vs.firebasestorage.app",
