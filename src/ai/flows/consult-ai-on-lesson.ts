@@ -1,13 +1,7 @@
-
-// src/ai/flows/consult-ai-on-lesson.ts
 'use server';
 
 /**
  * @fileOverview An AI agent for answering questions about a lesson or computational thinking.
- *
- * - consultAIOnLesson - A function that handles the question answering process.
- * - ConsultAIOnLessonInput - The input type for the consultAIOnLesson function.
- * - ConsultAIOnLessonOutput - The return type for the consultAIOnelon function.
  */
 
 import {ai} from '@/ai/genkit';
@@ -28,13 +22,13 @@ const ConsultAIOnLessonOutputSchema = z.object({
 export type ConsultAIOnLessonOutput = z.infer<typeof ConsultAIOnLessonOutputSchema>;
 
 export async function consultAIOnLesson(input: ConsultAIOnLessonInput): Promise<ConsultAIOnLessonOutput> {
-  // @ts-ignore
-  return await consultAIOnLessonFlow(input);
+  const result = await consultAIOnLessonFlow(input);
+  return result;
 }
 
 const prompt = ai.definePrompt({
   name: 'consultAIOnLessonPrompt',
-  model: 'googleai/gemini-2.0-flash',
+  model: 'googleai/gemini-1.5-flash',
   input: {schema: ConsultAIOnLessonInputSchema},
   output: {schema: ConsultAIOnLessonOutputSchema},
   prompt: `You are an expert in computational thinking and creating offline activities for education.
@@ -61,5 +55,3 @@ const consultAIOnLessonFlow = ai.defineFlow(
     return output!;
   }
 );
-
-    

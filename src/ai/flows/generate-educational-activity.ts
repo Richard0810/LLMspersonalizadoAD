@@ -2,10 +2,6 @@
 
 /**
  * @fileOverview A flow to generate three distinct offline educational activities based on user input.
- *
- * - generateEducationalActivities - A function that triggers the activity generation process.
- * - GenerateEducationalActivitiesInput - The input type for the generateEducationalActivities function.
- * - GenerateEducationalActivitiesOutput - The return type for the generateEducationalactivities function.
  */
 
 import {ai} from '@/ai/genkit';
@@ -16,7 +12,6 @@ const GenerateEducationalActivitiesInputSchema = z.object({
   computationalConcept: z.string().describe('The key computational thinking concept.'),
   subjectArea: z.string().describe('The subject area or discipline.'),
   gradeLevel: z.string().describe('The grade level for the activities.'),
-  // --- Nuevos campos ---
   duration: z.string().describe('La duración estimada para la actividad, ej: "45 minutos".').optional(),
   teacherNotes: z.string().describe('Indicaciones adicionales del docente.').optional(),
   complexityLevel: z.enum(["Básico", "Intermedio", "Avanzado"]).describe('El nivel de complejidad deseado.').optional(),
@@ -38,7 +33,6 @@ const EducationalActivitySchema = z.object({
   activityResources: z.string().describe("Una lista de recursos tangibles y específicos que el docente debe crear o dibujar. No deben ser ejemplos, sino el contenido final. Para tablas, se deben definir columnas y filas exactas. Para tarjetas, se debe describir su contenido (acción, descripción, símbolo). Cada recurso debe estar en una nueva línea."),
   reflectionQuestion: z.string().describe("Una explicación detallada y clara que demuestre cómo la actividad evidencia el concepto de pensamiento computacional, conectando las acciones específicas del ejercicio con la teoría. A continuación, debe incluir preguntas para guiar la reflexión del estudiante, con cada pregunta en una nueva línea y precedida por un guion."),
   evaluationCriteria: z.string().describe('Los criterios de evaluación o evidencias de aprendizaje que el docente puede usar para valorar el desempeño de los estudiantes, donde cada criterio está en una nueva línea.'),
-  // --- Nuevos campos opcionales en el schema de salida ---
   duration: z.string().optional(),
   teacherNotes: z.string().optional(),
   complexityLevel: z.enum(["Básico", "Intermedio", "Avanzado"]).optional(),
@@ -63,7 +57,7 @@ const PromptInputSchema = GenerateEducationalActivitiesInputSchema.extend({
 
 const generateEducationalActivitiesPrompt = ai.definePrompt({
   name: 'generateEducationalActivitiesPrompt',
-  model: 'googleai/gemini-2.0-flash',
+  model: 'googleai/gemini-1.5-flash',
   input: {schema: PromptInputSchema},
   output: {schema: GenerateEducationalActivitiesOutputSchema},
   prompt: `Rol: Eres un diseñador instruccional experto, un genio de la gamificación y un asesor pedagógico especializado en pensamiento computacional para el contexto educativo de Colombia. Tu superpoder es la creatividad con materiales de bajo costo y fácil acceso (papel, cartulina, lápices, tijeras, tapas de botella, piedras, etc.). Tu misión es transformar conceptos abstractos en artefactos físicos y juegos de mesa tangibles.
