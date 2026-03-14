@@ -20,7 +20,8 @@ const generateSvgFromGuideFlow = ai.defineFlow(
     const prompt = `You are an expert SVG generator. Generate SVG code for ${input.componentType} with title ${input.title} and color ${input.color}.`;
 
     const { text: svgCode } = await ai.generate({
-      model: 'googleai/gemini-1.5-flash',
+      // Actualizado a Gemini 2.5 Flash
+      model: 'gemini-2.5-flash',
       prompt,
     });
     

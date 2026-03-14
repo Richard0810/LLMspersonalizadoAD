@@ -189,7 +189,8 @@ async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: stri
 
     try {
         const { media } = await ai.generate({
-            model: 'googleai/gemini-1.5-flash',
+            // Actualizado a Gemini 2.5 Flash
+            model: 'gemini-2.5-flash',
             prompt: fullPrompt,
             config: {
                 responseModalities: ['TEXT', 'IMAGE'],
@@ -232,7 +233,8 @@ const generateVisualContentFlow = ai.defineFlow(
     if (category === VisualCategory.INFO_ORGANIZATION) {
         if (!isInfoOrgParams(params)) throw new Error("Invalid parameters");
         const { text: structuredContent } = await ai.generate({ 
-            model: 'googleai/gemini-1.5-flash', 
+            // Actualizado a Gemini 2.5 Flash
+            model: 'gemini-2.5-flash', 
             prompt: `Genera un resumen para '${params.topic}'.` 
         });
         
@@ -252,7 +254,8 @@ const generateVisualContentFlow = ai.defineFlow(
         }
 
         const { output } = await ai.generate({
-            model: 'googleai/gemini-1.5-flash',
+            // Actualizado a Gemini 2.5 Flash
+            model: 'gemini-2.5-flash',
             prompt: finalPrompt,
             output: { schema: outputSchema }
         });

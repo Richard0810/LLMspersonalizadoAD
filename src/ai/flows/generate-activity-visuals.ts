@@ -26,9 +26,9 @@ async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: stri
     const altText = `Guía visual para: ${prompt.substring(0, 100)}`;
 
     try {
-        // @ts-ignore - Genkit 1.x multimodal generate
         const { media } = await ai.generate({
-            model: 'googleai/gemini-1.5-flash',
+            // Actualizado a Gemini 2.5 Flash
+            model: 'gemini-2.5-flash',
             prompt: fullPrompt,
             config: {
                 responseModalities: ['TEXT', 'IMAGE'],
@@ -54,7 +54,8 @@ export async function generateActivityVisuals(input: string): Promise<VisualItem
 
 const analysisPrompt = ai.definePrompt({
     name: 'analyzeActivityForVisuals',
-    model: 'googleai/gemini-1.5-flash',
+    // Actualizado a Gemini 2.5 Flash
+    model: 'gemini-2.5-flash',
     input: { schema: ActivityResourcesInputSchema },
     output: { schema: VisualAnalysisSchema },
     prompt: `You are an expert Creative Director specializing in educational materials.

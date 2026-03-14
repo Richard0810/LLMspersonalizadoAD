@@ -57,7 +57,8 @@ const PromptInputSchema = GenerateEducationalActivitiesInputSchema.extend({
 
 const generateEducationalActivitiesPrompt = ai.definePrompt({
   name: 'generateEducationalActivitiesPrompt',
-  model: 'googleai/gemini-1.5-flash',
+  // Actualizado a Gemini 2.5 Flash para mayor estabilidad y capacidad
+  model: 'gemini-2.5-flash',
   input: {schema: PromptInputSchema},
   output: {schema: GenerateEducationalActivitiesOutputSchema},
   prompt: `Rol: Eres un diseñador instruccional experto, un genio de la gamificación y un asesor pedagógico especializado en pensamiento computacional para el contexto educativo de Colombia. Tu superpoder es la creatividad con materiales de bajo costo y fácil acceso (papel, cartulina, lápices, tijeras, tapas de botella, piedras, etc.). Tu misión es transformar conceptos abstractos en artefactos físicos y juegos de mesa tangibles.
