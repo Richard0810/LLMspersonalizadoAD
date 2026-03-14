@@ -19,7 +19,7 @@ const ActivityResourcesInputSchema = z.object({
 });
 
 /**
- * Generates an image and a corresponding alt text using the AI model.
+ * Generates an image and a corresponding alt text using the specialized Image model.
  */
 async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: string, altText: string } | null> {
     const fullPrompt = `Educational illustration for a teacher's guide, simple, clean, minimalist, professional, flat design, vector style, white background: ${prompt}`;
@@ -27,12 +27,9 @@ async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: stri
 
     try {
         const { media } = await ai.generate({
-            // Actualizado a Gemini 2.5 Flash
-            model: 'gemini-2.5-flash',
+            // ✅ Actualizado al modelo Imagen 3 para generación de imágenes real
+            model: 'googleai/imagen-3.0-generate-002',
             prompt: fullPrompt,
-            config: {
-                responseModalities: ['TEXT', 'IMAGE'],
-            },
         });
 
         if (media && media.url) {
@@ -54,8 +51,8 @@ export async function generateActivityVisuals(input: string): Promise<VisualItem
 
 const analysisPrompt = ai.definePrompt({
     name: 'analyzeActivityForVisuals',
-    // Actualizado a Gemini 2.5 Flash
-    model: 'gemini-2.5-flash',
+    // ✅ Identificador corregido con prefijo 'googleai/'
+    model: 'googleai/gemini-2.5-flash',
     input: { schema: ActivityResourcesInputSchema },
     output: { schema: VisualAnalysisSchema },
     prompt: `You are an expert Creative Director specializing in educational materials.
