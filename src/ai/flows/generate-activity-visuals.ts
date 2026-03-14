@@ -27,6 +27,7 @@ async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: stri
 
     try {
         const { media } = await ai.generate({
+            // El motor de dibujo especializado de Google
             model: 'googleai/imagen-3.0-generate-002',
             prompt: fullPrompt,
         });

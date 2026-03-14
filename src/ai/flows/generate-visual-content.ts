@@ -75,7 +75,7 @@ const ConceptMapDataContentSchema = z.object({
         id: z.string(), 
         label: z.string(), 
         type: z.enum(['principal', 'concepto', 'conector']), 
-        position: z.object({ top: number(), left: z.number() }) 
+        position: z.object({ top: z.number(), left: z.number() }) 
     })),
     connections: z.array(z.object({ from: z.string(), to: z.string() })),
 });
@@ -99,7 +99,7 @@ const FlowchartDataContentSchema = z.object({
         id: z.string(), 
         label: z.string(), 
         type: z.enum(['start-end', 'process', 'decision']), 
-        position: z.object({ top: number(), left: z.number() }) 
+        position: z.object({ top: z.number(), left: z.number() }) 
     })),
     connections: z.array(z.object({ from: z.string(), to: z.string() })),
 });

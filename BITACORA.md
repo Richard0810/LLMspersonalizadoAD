@@ -18,6 +18,7 @@ El módulo funciona en base a una interacción Frontend -> Backend (Genkit)
 
 - **Modelo a Utilizar:** `googleai/gemini-2.5-flash`
 - **Importante:** Siempre debe llevar el prefijo `googleai/`.
+- **Configuración de Salida:** Se debe incluir `format: 'json'` en la definición del prompt para asegurar que Genkit procese correctamente la respuesta y evitar errores de tipo `undefined`.
 
 ### 2. Generación de Imágenes (Ilustraciones y Apoyos Visuales)
 

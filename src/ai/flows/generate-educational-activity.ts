@@ -93,7 +93,7 @@ Genera tres actividades desconectadas distintas y muy detalladas, basadas en la 
 
 **Formato de Salida Requerido y Guía de Calidad (Debes ser MUY RIGUROSO con esta estructura):**
 Asegúrate de que cada actividad generada cumpla estrictamente con lo siguiente:
-- **title:** Un nombre creativo, lúdico y descriptivo para la actividad.
+- **title:** Un nombre creativo, lúdico y descriptive para la actividad.
 - **objective:** Un objetivo de aprendizaje claro, medible y específico, que esté en coherencia con los lineamientos del Ministerio de Educación Nacional (MEN) de Colombia para el grado especificado.
 - **computationalConcept:** Menciona explícitamente el concepto o conceptos de pensamiento computacional que se trabajan.
 - **materials:** Una lista de materiales simples y accesibles (no electrónicos), adaptados al contexto. **Especifica cantidades por grupo y ofrece opciones de sustitución**. Cada material debe estar en una nueva línea.
