@@ -27,7 +27,6 @@ async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: stri
 
     try {
         const { media } = await ai.generate({
-            // ✅ Actualizado al modelo Imagen 3 para generación de imágenes real
             model: 'googleai/imagen-3.0-generate-002',
             prompt: fullPrompt,
         });
@@ -51,10 +50,12 @@ export async function generateActivityVisuals(input: string): Promise<VisualItem
 
 const analysisPrompt = ai.definePrompt({
     name: 'analyzeActivityForVisuals',
-    // ✅ Identificador corregido con prefijo 'googleai/'
     model: 'googleai/gemini-2.5-flash',
     input: { schema: ActivityResourcesInputSchema },
-    output: { schema: VisualAnalysisSchema },
+    output: { 
+      schema: VisualAnalysisSchema,
+      format: 'json'
+    },
     prompt: `You are an expert Creative Director specializing in educational materials.
 Your task is to analyze a list of activity resources and, for EACH item, generate a prompt to create a beautiful and clear visual illustration.
 
@@ -82,7 +83,7 @@ const generateActivityVisualsFlow = ai.defineFlow(
     const { output: analysisResult } = await analysisPrompt(input);
     
     if (!analysisResult) {
-      throw new Error("AI analysis failed to produce a visual plan for the resources.");
+      throw new Error("El modelo no pudo analizar los recursos para generar el apoyo visual. Intenta de nuevo.");
     }
 
     const generationPromises = analysisResult.map(async (item) => {

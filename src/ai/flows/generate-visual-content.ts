@@ -75,7 +75,7 @@ const ConceptMapDataContentSchema = z.object({
         id: z.string(), 
         label: z.string(), 
         type: z.enum(['principal', 'concepto', 'conector']), 
-        position: z.object({ top: z.number(), left: z.number() }) 
+        position: z.object({ top: number(), left: z.number() }) 
     })),
     connections: z.array(z.object({ from: z.string(), to: z.string() })),
 });
@@ -99,7 +99,7 @@ const FlowchartDataContentSchema = z.object({
         id: z.string(), 
         label: z.string(), 
         type: z.enum(['start-end', 'process', 'decision']), 
-        position: z.object({ top: z.number(), left: z.number() }) 
+        position: z.object({ top: number(), left: z.number() }) 
     })),
     connections: z.array(z.object({ from: z.string(), to: z.string() })),
 });
@@ -189,7 +189,6 @@ async function generateImageAndAltText(prompt: string): Promise<{ imageUrl: stri
 
     try {
         const { media } = await ai.generate({
-            // ✅ Identificador corregido para dibujo
             model: 'googleai/imagen-3.0-generate-002',
             prompt: fullPrompt,
         });
@@ -230,12 +229,11 @@ const generateVisualContentFlow = ai.defineFlow(
     if (category === VisualCategory.INFO_ORGANIZATION) {
         if (!isInfoOrgParams(params)) throw new Error("Invalid parameters");
         const { text: structuredContent } = await ai.generate({ 
-            // ✅ Identificador corregido con prefijo
             model: 'googleai/gemini-2.5-flash', 
             prompt: `Genera un resumen para '${params.topic}'.` 
         });
         
-        if (!structuredContent) throw new Error("Could not generate base content.");
+        if (!structuredContent) throw new Error("No se pudo generar el contenido base.");
 
         let finalPrompt = `Genera un JSON para ${format} basado en: ${structuredContent}`;
         let outputSchema: z.ZodSchema<any> = z.any();
@@ -251,13 +249,15 @@ const generateVisualContentFlow = ai.defineFlow(
         }
 
         const { output } = await ai.generate({
-            // ✅ Identificador corregido con prefijo
             model: 'googleai/gemini-2.5-flash',
             prompt: finalPrompt,
-            output: { schema: outputSchema }
+            output: { 
+              schema: outputSchema,
+              format: 'json'
+            }
         });
 
-        if (!output) throw new Error("Failed to generate output");
+        if (!output) throw new Error("El modelo no pudo estructurar los datos correctamente. Intenta de nuevo.");
         return { ...(output as any), type: format === VisualFormat.INFOGRAPHIC ? 'html' : `${format}-data` };
     }
     

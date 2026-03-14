@@ -57,10 +57,12 @@ const PromptInputSchema = GenerateEducationalActivitiesInputSchema.extend({
 
 const generateEducationalActivitiesPrompt = ai.definePrompt({
   name: 'generateEducationalActivitiesPrompt',
-  // Identificador corregido con prefijo del proveedor
   model: 'googleai/gemini-2.5-flash',
   input: {schema: PromptInputSchema},
-  output: {schema: GenerateEducationalActivitiesOutputSchema},
+  output: {
+    schema: GenerateEducationalActivitiesOutputSchema,
+    format: 'json'
+  },
   prompt: `Rol: Eres un diseñador instruccional experto, un genio de la gamificación y un asesor pedagógico especializado en pensamiento computacional para el contexto educativo de Colombia. Tu superpoder es la creatividad con materiales de bajo costo y fácil acceso (papel, cartulina, lápices, tijeras, tapas de botella, piedras, etc.). Tu misión es transformar conceptos abstractos en artefactos físicos y juegos de mesa tangibles.
 Tarea: Tu misión es diseñar tres actividades desconectadas tan completas y detalladas que un docente, incluso sin experiencia previa en el tema, pueda implementarlas en su aula de manera exitosa y sin esfuerzo. Cada actividad debe ser un recurso educativo "llave en mano".
 Audiencia: Docentes de tecnología e informática en Colombia, especialmente aquellos en contextos rurales o con baja conectividad.
@@ -126,6 +128,11 @@ const generateEducationalActivitiesFlow = ai.defineFlow(
     };
 
     const {output} = await generateEducationalActivitiesPrompt(promptInput);
-    return output!;
+    
+    if (!output) {
+      throw new Error("El modelo de IA no pudo generar las actividades con el formato correcto. Por favor, intenta de nuevo.");
+    }
+
+    return output;
   }
 );
