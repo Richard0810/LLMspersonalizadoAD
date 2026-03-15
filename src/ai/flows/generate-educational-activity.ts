@@ -1,11 +1,8 @@
+
 'use server';
 
 /**
  * @fileOverview A flow to generate three distinct offline educational activities based on user input.
- *
- * - generateEducationalActivities - A function that triggers the activity generation process.
- * - GenerateEducationalActivitiesInput - The input type for the generateEducationalActivities function.
- * - GenerateEducationalActivitiesOutput - The return type for the generateEducationalactivities function.
  */
 
 import {ai} from '@/ai/genkit';
@@ -16,7 +13,6 @@ const GenerateEducationalActivitiesInputSchema = z.object({
   computationalConcept: z.string().describe('The key computational thinking concept.'),
   subjectArea: z.string().describe('The subject area or discipline.'),
   gradeLevel: z.string().describe('The grade level for the activities.'),
-  // --- Nuevos campos ---
   duration: z.string().describe('La duración estimada para la actividad, ej: "45 minutos".').optional(),
   teacherNotes: z.string().describe('Indicaciones adicionales del docente.').optional(),
   complexityLevel: z.enum(["Básico", "Intermedio", "Avanzado"]).describe('El nivel de complejidad deseado.').optional(),
@@ -38,7 +34,6 @@ const EducationalActivitySchema = z.object({
   activityResources: z.string().describe("Una lista de recursos tangibles y específicos que el docente debe crear o dibujar. No deben ser ejemplos, sino el contenido final. Para tablas, se deben definir columnas y filas exactas. Para tarjetas, se debe describir su contenido (acción, descripción, símbolo). Cada recurso debe estar en una nueva línea."),
   reflectionQuestion: z.string().describe("Una explicación detallada y clara que demuestre cómo la actividad evidencia el concepto de pensamiento computacional, conectando las acciones específicas del ejercicio con la teoría. A continuación, debe incluir preguntas para guiar la reflexión del estudiante, con cada pregunta en una nueva línea y precedida por un guion."),
   evaluationCriteria: z.string().describe('Los criterios de evaluación o evidencias de aprendizaje que el docente puede usar para valorar el desempeño de los estudiantes, donde cada criterio está en una nueva línea.'),
-  // --- Nuevos campos opcionales en el schema de salida ---
   duration: z.string().optional(),
   teacherNotes: z.string().optional(),
   complexityLevel: z.enum(["Básico", "Intermedio", "Avanzado"]).optional(),
@@ -63,9 +58,12 @@ const PromptInputSchema = GenerateEducationalActivitiesInputSchema.extend({
 
 const generateEducationalActivitiesPrompt = ai.definePrompt({
   name: 'generateEducationalActivitiesPrompt',
-  model: 'googleai/gemini-2.0-flash',
+  model: 'googleai/gemini-2.5-flash',
   input: {schema: PromptInputSchema},
-  output: {schema: GenerateEducationalActivitiesOutputSchema},
+  output: {
+    schema: GenerateEducationalActivitiesOutputSchema,
+    format: 'json'
+  },
   prompt: `Rol: Eres un diseñador instruccional experto, un genio de la gamificación y un asesor pedagógico especializado en pensamiento computacional para el contexto educativo de Colombia. Tu superpoder es la creatividad con materiales de bajo costo y fácil acceso (papel, cartulina, lápices, tijeras, tapas de botella, piedras, etc.). Tu misión es transformar conceptos abstractos en artefactos físicos y juegos de mesa tangibles.
 Tarea: Tu misión es diseñar tres actividades desconectadas tan completas y detalladas que un docente, incluso sin experiencia previa en el tema, pueda implementarlas en su aula de manera exitosa y sin esfuerzo. Cada actividad debe ser un recurso educativo "llave en mano".
 Audiencia: Docentes de tecnología e informática en Colombia, especialmente aquellos en contextos rurales o con baja conectividad.
@@ -96,7 +94,7 @@ Genera tres actividades desconectadas distintas y muy detalladas, basadas en la 
 
 **Formato de Salida Requerido y Guía de Calidad (Debes ser MUY RIGUROSO con esta estructura):**
 Asegúrate de que cada actividad generada cumpla estrictamente con lo siguiente:
-- **title:** Un nombre creativo, lúdico y descriptivo para la actividad.
+- **title:** Un nombre creativo, lúdico y descriptive para la actividad.
 - **objective:** Un objetivo de aprendizaje claro, medible y específico, que esté en coherencia con los lineamientos del Ministerio de Educación Nacional (MEN) de Colombia para el grado especificado.
 - **computationalConcept:** Menciona explícitamente el concepto o conceptos de pensamiento computacional que se trabajan.
 - **materials:** Una lista de materiales simples y accesibles (no electrónicos), adaptados al contexto. **Especifica cantidades por grupo y ofrece opciones de sustitución**. Cada material debe estar en una nueva línea.
@@ -131,6 +129,11 @@ const generateEducationalActivitiesFlow = ai.defineFlow(
     };
 
     const {output} = await generateEducationalActivitiesPrompt(promptInput);
-    return output!;
+    
+    if (!output) {
+      throw new Error("El modelo de IA no pudo generar las actividades con el formato correcto. Por favor, intenta de nuevo.");
+    }
+
+    return output;
   }
 );

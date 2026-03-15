@@ -470,42 +470,37 @@ export default function ActivityDetailPage() {
             </CardHeader>
             <CardContent className="space-y-6">
               {generatedVisuals.map((item, index) => {
-                if (!item.svgCode && !item.imageUrl) {
-                    // Render simple text for headers or non-visual items
-                     return (
-                        <div key={index} className="p-4 bg-muted/30 rounded-lg">
-                           <h4 className="text-lg font-semibold text-foreground">{item.text}</h4>
+                // If there's an image, render it inside a card.
+                if (item.imageUrl) {
+                    return (
+                        <div key={index} className="p-4 bg-muted/30 rounded-lg border border-primary/20">
+                            <p className="text-muted-foreground mb-4 italic border-l-4 border-muted-foreground/30 pl-3">
+                                {item.text}
+                            </p>
+                            <div className="mt-4 flex justify-center">
+                                <Image
+                                    src={item.imageUrl}
+                                    alt={item.imageAlt || 'Guía visual generada'}
+                                    width={500}
+                                    height={300}
+                                    className="rounded-md border shadow-md object-contain"
+                                />
+                            </div>
                         </div>
                     );
                 }
                 
-                return (
-                    <div key={index} className="p-4 bg-muted/30 rounded-lg border border-primary/20">
-                    <p
-                        className="text-muted-foreground whitespace-pre-line mb-4 italic border-l-4 border-muted-foreground/30 pl-3"
-                        dangerouslySetInnerHTML={{ __html: item.text }}
-                    />
-                    
-                    {item.svgCode && (
-                       <div className="mb-4 flex justify-center">
-                         <div className="w-full max-w-[200px]" dangerouslySetInnerHTML={{ __html: item.svgCode }} />
-                       </div>
-                    )}
-
-                    {item.imageUrl && (
-                        <div className="mt-4">
-                            <p className="text-sm font-semibold text-foreground mb-2">Guía Visual Sugerida:</p>
-                            <Image
-                                src={item.imageUrl}
-                                alt={item.imageAlt || 'Guía visual generada'}
-                                width={500}
-                                height={300}
-                                className="rounded-md border shadow-md object-contain"
-                            />
+                // If there's no image, but there is text, render it as a header/title.
+                if (item.text) {
+                    return (
+                        <div key={index} className="p-4 rounded-lg">
+                           <h4 className="text-lg font-semibold text-foreground">{item.text}</h4>
                         </div>
-                    )}
-                    </div>
-                );
+                    );
+                }
+
+                // If the item is empty, render nothing.
+                return null;
               })}
             </CardContent>
           </Card>
